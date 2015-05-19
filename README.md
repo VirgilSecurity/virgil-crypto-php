@@ -46,11 +46,11 @@ Common library description can be found [here](https://github.com/VirgilSecurity
 5. ``` cd virgil_lib ```
 6. Create folder for the build purposes. ``` mkdir build ```
 7. Navigate to the "build" folder. ``` cd build ```
-8. Configure cmake. '''Note''', replace ''"../install"'' path, if you want install library in different location. 
+8. Configure cmake. Note, replace "../install" path, if you want install library in different location. 
  ``` cmake -DPLATFORM_NAME=PHP -DCMAKE_INSTALL_PREFIX=../install .. ```
 10. Build library. ``` make ```
 11. Install library. ``` make install ```
-12. Add to your php.ini ```extension=path/to/your/virgil_php.so```, replace ''"path/to/your/virgil_php.so"'' to your path where virgil_php.so extension is located
+12. Add to your php.ini ```extension=path/to/your/virgil_php.so```, replace ``"path/to/your/virgil_php.so"`` to your path where virgil_php.so extension is located
 
 ## Examples
 
