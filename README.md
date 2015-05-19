@@ -50,6 +50,7 @@ Common library description can be found [here](https://github.com/VirgilSecurity
  ``` cmake -DPLATFORM_NAME=PHP -DCMAKE_INSTALL_PREFIX=../install .. ```
 10. Build library. ``` make ```
 11. Install library. ``` make install ```
+12. Add to your php.ini ```extension=path/to/your/virgil_php.so```, replace ''"path/to/your/virgil_php.so"'' to your path where virgil_php.so extension is located
 
 ## Examples
 
@@ -64,6 +65,12 @@ This section describes common case library usage scenarios, like
 
 1. Examples MUST be run from their directory.
 1. All results are stored in the "data" directory.
+2. 1. To produce file `virgil_public.key` run:
+    - `get_public_key.php` script - if user is registered;
+    - `register_user.php` script - if user is not registered.
+1. To produce `test.txt.sign` run `sign.php` script.
+1. To produce `text.txt.enc` run `encrypt.php` script.
+1. To produce `decrypted_text.txt` run `decrypt.php` script.
 
 ### <a name="example-1"></a> Example 1: Generate keys
 
