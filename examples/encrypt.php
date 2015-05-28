@@ -41,12 +41,13 @@ require_once 'lib/virgil_php.php';
 const VIRGIL_PKI_URL_BASE = 'https://pki.virgilsecurity.com/';
 const USER_ID_TYPE = 'email';
 const USER_ID = 'test.php.virgilsecurity-02@mailinator.com';
+const VIRGIL_APP_TOKEN = '1234567890';
 
 function getUrl($endpoint) {
     return VIRGIL_PKI_URL_BASE . $endpoint;
 }
 
-function httpPost($url, $data = array()) {
+function httpPost($url, $data = array(), $headers = array()) {
     $result = null;
 
     try {
@@ -55,10 +56,7 @@ function httpPost($url, $data = array()) {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type:application/json',
-            'Accept:application/json'
-        ));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
 
@@ -79,7 +77,13 @@ function searchPublicKey($userDataType, $userDataId) {
         $userDataType => $userDataId
     );
 
-    $response = json_decode(httpPost(getUrl('objects/account/actions/search'), $payload));
+    $headers = array(
+        'Content-Type:application/json',
+        'Accept:application/json',
+        'X-VIRGIL-APP-TOKEN:' . VIRGIL_APP_TOKEN
+    );
+
+    $response = json_decode(httpPost(getUrl('objects/account/actions/search'), $payload, $headers));
 
     if(empty($response) || !empty($response->error)) {
         throw new Exception('Unable to register user');

@@ -46,7 +46,7 @@ function getUrl($endpoint) {
     return VIRGIL_PKI_URL_BASE . $endpoint;
 }
 
-function httpPost($url, $data = array()) {
+function httpPost($url, $data = array(), $header = array()) {
     $result = null;
 
     try {
@@ -55,10 +55,7 @@ function httpPost($url, $data = array()) {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type:application/json',
-            'Accept:application/json'
-        ));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 
         $result = curl_exec($ch);
 
@@ -86,7 +83,13 @@ function pkiCreateUser($publicKey, $userIds) {
         }, $userIds, array_keys($userIds))
     );
 
-    $response = json_decode(httpPost(getUrl('objects/public-key'), $payload));
+    $headers = array(
+        'Content-Type:application/json',
+        'Accept:application/json',
+        'X-VIRGIL-APP-TOKEN:' . VIRGIL_APP_TOKEN
+    );
+
+    $response = json_decode(httpPost(getUrl('objects/public-key'), $payload, $headers));
 
     if(empty($response) || !empty($response->error)) {
         throw new Exception('Unable to register user');
