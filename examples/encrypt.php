@@ -83,7 +83,7 @@ function searchPublicKey($userDataType, $userDataId) {
         'X-VIRGIL-APP-TOKEN:' . VIRGIL_APP_TOKEN
     );
 
-    $response = json_decode(httpPost(getUrl('objects/account/actions/search'), $payload, $headers));
+    $response = json_decode(httpPost(getUrl('account/actions/search'), $payload, $headers));
 
     if(empty($response) || !empty($response->error)) {
         throw new Exception('Unable to register user');

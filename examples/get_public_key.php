@@ -41,6 +41,7 @@ require_once 'lib/virgil_php.php';
 const VIRGIL_PKI_URL_BASE = 'https://pki.virgilsecurity.com/v1/';
 const USER_ID_TYPE = 'email';
 const USER_ID = 'test.php.virgilsecurity-02@mailinator.com';
+const VIRGIL_APP_TOKEN = '1234567890';
 
 function getUrl($endpoint) {
     return VIRGIL_PKI_URL_BASE . $endpoint;
@@ -106,7 +107,7 @@ function searchPublicKey($userDataType, $userDataId) {
         'X-VIRGIL-APP-TOKEN:' . VIRGIL_APP_TOKEN
     );
 
-    $response = json_decode(httpPost(getUrl('objects/account/actions/search'), $payload, $headers));
+    $response = json_decode(httpPost(getUrl('account/actions/search'), $payload, $headers));
 
     if(empty($response) || !empty($response->error)) {
         throw new Exception('Unable to register user');
