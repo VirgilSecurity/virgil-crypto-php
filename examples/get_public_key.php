@@ -38,7 +38,7 @@
 
 require_once 'lib/virgil_php.php';
 
-const VIRGIL_PKI_URL_BASE = 'https://pki.virgilsecurity.com/';
+const VIRGIL_PKI_URL_BASE = 'https://pki.virgilsecurity.com/v1/';
 const USER_ID_TYPE = 'email';
 const USER_ID = 'test.php.virgilsecurity-02@mailinator.com';
 
