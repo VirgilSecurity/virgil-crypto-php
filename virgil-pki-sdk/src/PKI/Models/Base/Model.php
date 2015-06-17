@@ -25,4 +25,8 @@ abstract class Model implements \JsonSerializable {
 
         return $result;
     }
+    
+    public function toJson() {
+        return json_encode($this);
+    }
 }
