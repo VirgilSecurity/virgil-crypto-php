@@ -1,6 +1,6 @@
 {
     "require": {
-        "sdk/pki-sdk": "*"
+        "virgil/pki-sdk": "*"
     },
     "minimum-stability": "dev",
     "autoload": {
