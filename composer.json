@@ -5,7 +5,7 @@
             "email": "sergey.b.dev@gmail.com"
         }
     ],
-    "name": "virgil/pki-sdk",
+    "name": "sdk/pki-sdk",
     "require": {
         "guzzlehttp/guzzle": ">=5.3.0"
     },
