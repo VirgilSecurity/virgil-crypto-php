@@ -2,8 +2,6 @@
 
 namespace Virgil\PKI;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 use Virgil\PKI\Clients\AccountsClient;
 use Virgil\PKI\Clients\PublicKeysClient;
 use Virgil\PKI\Clients\UserDataClient;
