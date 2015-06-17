@@ -1,14 +1,15 @@
 {
     "authors": [
         {
-            "name": "Sergey B",
-            "email": "sergey.b.dev@gmail.com"
+            "name": "Virgil Security",
+            "email": "support@virgilsecurity.com"
         }
     ],
     "name": "sdk/pki-sdk",
     "require": {
         "guzzlehttp/guzzle": ">=5.3.0"
     },
+    "version": "0.1.0-dev",
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
