@@ -19,7 +19,7 @@ class VirgilPublicKey extends Model {
                 $this->public_key_id = $object->id->public_key_id;
             }
 
-            $this->public_key = $object->public_key;
+            $this->public_key = base64_decode($object->public_key);
 
             if(isset($object->user_data)) {
                 foreach($object->user_data as $item) {
