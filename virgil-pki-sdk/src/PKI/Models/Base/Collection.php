@@ -17,6 +17,14 @@ abstract class Collection implements \IteratorAggregate, \JsonSerializable {
     public function add($object) {
         $this->_collection[] = $object;
     }
+    
+    public function get($index) {
+        if(isset($this->_collection[$index])) {
+            return $this->_collection[$index];
+        }
+        
+        return null;
+    }
 
     public function remove($index) {
         unset($this->_collection[$index]);
