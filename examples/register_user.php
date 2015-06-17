@@ -43,7 +43,7 @@ require_once './vendor/autoload.php';
 
 const VIRGIL_PKI_URL_BASE = 'https://pki-stg.virgilsecurity.com/v1/';
 const USER_ID_TYPE = 'email';
-const USER_ID = 'test.php.virgilsecurity-032@mailinator.com';
+const USER_ID = 'test.php.virgilsecurity.005@mailinator.com';
 const USER_DATA_CLASS = 'user_id';
 const VIRGIL_APP_TOKEN = '1234567890';
 
@@ -58,7 +58,7 @@ try {
     $userData = new VirgilUserData();
     $userData->class = USER_DATA_CLASS;
     $userData->type  = USER_ID_TYPE;
-    $userData->user_data_id = USER_ID;
+    $userData->value = USER_ID;
 
     $userDataCollection = new VirgilUserDataCollection(array($userData));
 
