@@ -36,85 +36,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once 'lib/virgil_php.php';
+use Virgil\PKI\Models\VirgilUserData;
+use Virgil\PKI\Models\VirgilUserDataCollection;
 
-const VIRGIL_PKI_URL_BASE = 'https://pki.virgilsecurity.com/v1/';
+require_once './vendor/autoload.php';
+
+const VIRGIL_PKI_URL_BASE = 'https://pki-stg.virgilsecurity.com/v1/';
 const USER_ID_TYPE = 'email';
-const USER_ID = 'test.php.virgilsecurity-02@mailinator.com';
+const USER_ID = 'test.php.virgilsecurity-032@mailinator.com';
+const USER_DATA_CLASS = 'user_id';
 const VIRGIL_APP_TOKEN = '1234567890';
 
-function getUrl($endpoint) {
-    return VIRGIL_PKI_URL_BASE . $endpoint;
-}
-
-function httpPost($url, $data = array(), $header = array()) {
-    $result = null;
-
-    try {
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-
-        $result = curl_exec($ch);
-
-        if(curl_errno($ch) > 0) {
-            throw new Exception('HTTP Request error: ' . curl_error($ch));
-        }
-
-        curl_close($ch);
-    } catch (Exception $e) {
-        echo $e->getMessage();
-    }
-
-    return $result;
-}
-
-function pkiCreateUser($publicKey, $userIds) {
-    $payload = array(
-        'public_key' => base64_encode($publicKey),
-        'user_data'  => array_map(function($value, $key) {
-            return array(
-                'class' => 'user_id',
-                'type'  => $key,
-                'value' => $value
-            );
-        }, $userIds, array_keys($userIds))
-    );
-
-    $headers = array(
-        'Content-Type:application/json',
-        'Accept:application/json',
-        'X-VIRGIL-APP-TOKEN:' . VIRGIL_APP_TOKEN
-    );
-
-    $response = json_decode(httpPost(getUrl('public-key'), $payload, $headers));
-
-    if(empty($response) || !empty($response->error)) {
-        throw new Exception('Unable to register user');
-    }
-
-    $virgilCertificate = new VirgilCertificate($publicKey);
-    $virgilCertificate->id()->setAccountId($response->id->account_id);
-    $virgilCertificate->id()->setCertificateId($response->id->public_key_id);
-
-    return $virgilCertificate;
-}
 
 echo 'Read public key file' . PHP_EOL;
 
 $publicKey = file_get_contents('data' . DIRECTORY_SEPARATOR . 'new_public.key');
 
 try {
-    $virgilCertificate = pkiCreateUser($publicKey, array(
-        USER_ID_TYPE => USER_ID
-    ));
+    $pkiClient = new Virgil\PKI\PkiClient(VIRGIL_APP_TOKEN);
+
+    $userData = new VirgilUserData();
+    $userData->class = USER_DATA_CLASS;
+    $userData->type  = USER_ID_TYPE;
+    $userData->user_data_id = USER_ID;
+
+    $userDataCollection = new VirgilUserDataCollection(array($userData));
+
+    $virgilAccount = $pkiClient->getAccountsClient()->register($userDataCollection, $publicKey);
 
     echo 'Store virgil public key to the output file...';
 
-    file_put_contents('data' . DIRECTORY_SEPARATOR . 'virgil_public.key', $virgilCertificate->publicKey());
+    file_put_contents('data' . DIRECTORY_SEPARATOR . 'virgil_public.key', $virgilAccount->public_keys->get(0)->public_key);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

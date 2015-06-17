@@ -36,71 +36,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once 'lib/virgil_php.php';
+require_once './vendor/autoload.php';
 
-const VIRGIL_PKI_URL_BASE = 'https://pki.virgilsecurity.com/v1/';
+const VIRGIL_PKI_URL_BASE = 'https://pki-stg.virgilsecurity.com/v1/';
 const USER_ID_TYPE = 'email';
 const USER_ID = 'test.php.virgilsecurity-02@mailinator.com';
 const VIRGIL_APP_TOKEN = '1234567890';
 
-function getUrl($endpoint) {
-    return VIRGIL_PKI_URL_BASE . $endpoint;
-}
-
-function httpPost($url, $data = array(), $headers = array()) {
-    $result = null;
-
-    try {
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-
-        if(curl_errno($ch) > 0) {
-            throw new Exception('HTTP Request error: ' . curl_error($ch));
-        }
-
-        curl_close($ch);
-    } catch (Exception $e) {
-        echo $e->getMessage();
-    }
-
-    return $result;
-}
-
-function searchPublicKey($userDataType, $userDataId) {
-    $payload = array(
-        $userDataType => $userDataId
-    );
-
-    $headers = array(
-        'Content-Type:application/json',
-        'Accept:application/json',
-        'X-VIRGIL-APP-TOKEN:' . VIRGIL_APP_TOKEN
-    );
-
-    $response = json_decode(httpPost(getUrl('account/actions/search'), $payload, $headers));
-
-    if(empty($response) || !empty($response->error)) {
-        throw new Exception('Unable to register user');
-    }
-
-    $pkiPublicKey = reset($response);
-
-    $virgilCertificate = new VirgilCertificate(base64_decode(reset($pkiPublicKey->public_keys)->public_key));
-    $virgilCertificate->id()->setAccountId($pkiPublicKey->id->account_id);
-    $virgilCertificate->id()->setCertificateId(reset($pkiPublicKey->public_keys)->id->public_key_id);
-
-    return $virgilCertificate;
-}
-
-
-
 try {
+    $pkiClient = new Virgil\PKI\PkiClient(VIRGIL_APP_TOKEN);
+
     echo 'Read source file' . PHP_EOL;
 
     $source = file_get_contents('data' . DIRECTORY_SEPARATOR . 'test.txt');
@@ -114,11 +59,12 @@ try {
 
     echo 'Get recipient ' . USER_ID . ' information from the Virgil PKI service...' . PHP_EOL;
 
-    $virgilCertificate = searchPublicKey(USER_ID_TYPE, USER_ID);
+    $virgilCertificateCollection = $pkiClient->getPublicKeysClient()->searchKey(USER_ID, USER_ID_TYPE);
+    $virgilCertificate = $virgilCertificateCollection->get(0);
 
     echo 'Add recipient' . PHP_EOL;
 
-    $cipher->addKeyRecipient($virgilCertificate->id()->certificateId(), $virgilCertificate->publicKey());
+    $cipher->addKeyRecipient($virgilCertificate->public_key_id, $virgilCertificate->public_key);
 
     echo 'Encrypt and store results' . PHP_EOL;
 

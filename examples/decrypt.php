@@ -36,7 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once 'lib/virgil_php.php';
+require_once './vendor/autoload.php';
 
 try {
     echo 'Read encrypted data' . PHP_EOL;

@@ -36,7 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once 'lib/virgil_php.php';
+require_once './vendor/autoload.php';
 
 echo 'Generate keys with with password: "password"';
 
