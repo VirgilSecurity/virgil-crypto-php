@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "name": "virgil/crypto",
-    "description": "PHP wrapper for Virgil Security encryption library and key management service",
+    "description": "PHP wrapper for Virgil Security encryption library",
     "type": "standalone",
     "keywords": [
         "virgil",
