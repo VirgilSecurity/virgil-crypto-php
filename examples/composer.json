@@ -1,9 +1,0 @@
-{
-    "require": {
-        "virgil/pki-sdk": "*"
-    },
-    "minimum-stability": "dev",
-    "autoload": {
-        "files": ["lib/virgil_php.php"]
-    }
-}
