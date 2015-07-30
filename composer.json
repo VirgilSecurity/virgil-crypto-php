@@ -1,18 +1,38 @@
 {
+    "version": "1.0.0",
+    "name": "virgil/crypto",
+    "description": "Virgil is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and all the necessary infrastructure to enable seamless, end-to-end encryption for any application, platform or device. See below for currently available languages and platforms. Get in touch with us to get preview access to our key infrastructure.",
+    "type": "standalone",
+    "keywords": [
+        "virgil",
+        "encryption",
+        "decryption",
+        "security",
+        "authentication",
+        "verification",
+        "cryptography",
+        "elliptic",
+        "cross",
+        "platform",
+        "cross"
+    ],
+    "homepage": "http://virgilsecurity.com",
+    "license" : "BSD 3-Clause",
     "authors": [
         {
-            "name": "Sergey B",
-            "email": "sergey.b.dev@gmail.com"
+            "name": "Virgil Security, Inc",
+            "email": "support@virgilsecurity.com",
+            "homepage": "http://virgilsecurity.com"
         }
     ],
-    "name": "virgil/pki-sdk",
-    "require": {
-        "guzzlehttp/guzzle": ">=5.3.0"
-    },
     "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3",
+        "ext-virgil_php": "1.0.0"
+    },
     "autoload": {
-        "psr-4": {
-            "Virgil\\": "src/"
+        "psr-0": {
+            "Virgil": "src/"
         }
     }
 }
