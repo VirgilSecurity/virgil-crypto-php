@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3",
-        "ext-virgil_php": "1.0.0"
+        "ext-virgil_php": "1.0.*"
     },
     "autoload": {
         "psr-0": {
