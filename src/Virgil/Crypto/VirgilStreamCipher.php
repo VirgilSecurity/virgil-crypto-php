@@ -6,12 +6,12 @@ class VirgilStreamCipher extends VirgilCipherBase {
     public $_cPtr=null;
 
     function __set($var,$value) {
-        if ($var === 'thisown') return swig_virgil_php_alter_newobject($this->_cPtr,$value);
+        if ($var === 'thisown') return swig_virgil_crypto_php_alter_newobject($this->_cPtr,$value);
         VirgilCipherBase::__set($var,$value);
     }
 
     function __get($var) {
-        if ($var === 'thisown') return swig_virgil_php_get_newobject($this->_cPtr);
+        if ($var === 'thisown') return swig_virgil_crypto_php_get_newobject($this->_cPtr);
         return VirgilCipherBase::__get($var);
     }
 

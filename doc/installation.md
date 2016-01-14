@@ -26,7 +26,7 @@ Common library description can be found [here](https://github.com/VirgilSecurity
  ``` cmake -DPLATFORM_NAME=PHP -DCMAKE_INSTALL_PREFIX=../install .. ```
 10. Build library. ``` make ```
 11. Install library. ``` make install ```
-12. Add to your php.ini ```extension=path/to/your/virgil_php.so```, replace ``"path/to/your/virgil_php.so"`` to your path where virgil_php.so extension is located
+12. Add to your php.ini ```extension=path/to/your/virgil_crypto_php.so```, replace ``"path/to/your/virgil_crypto_php.so"`` to your path where virgil_php.so extension is located
 
 ## Installation
 
@@ -35,7 +35,7 @@ Use [Composer](http://getcomposer.org) to install this library.
 Into your `composer.json` file, just include this library with adding:
 
 ```
-"virgil/crypto": "1.0.0"
+"virgil/crypto": "1.2.0"
 ```
 
-Then, run `composer update sly/notification-pusher` and enjoy.
+Then, run `composer update` and enjoy.

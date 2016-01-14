@@ -2,7 +2,8 @@
 
 namespace Virgil\Crypto;
 
-abstract class VirgilAsn1Compatible {
+
+class VirgilByteArrayUtils {
     public $_cPtr=null;
     protected $_pData=array();
 
@@ -24,11 +25,23 @@ abstract class VirgilAsn1Compatible {
         $this->_cPtr=$h;
     }
 
-    function toAsn1() {
-        return VirgilAsn1Compatible_toAsn1($this->_cPtr);
+    static function jsonToBytes($json) {
+        return VirgilByteArrayUtils_jsonToBytes($json);
     }
 
-    function fromAsn1($asn1) {
-        VirgilAsn1Compatible_fromAsn1($this->_cPtr,$asn1);
+    static function stringToBytes($str) {
+        return VirgilByteArrayUtils_stringToBytes($str);
+    }
+
+    static function bytesToString($array) {
+        return VirgilByteArrayUtils_bytesToString($array);
+    }
+
+    static function hexToBytes($hexStr) {
+        return VirgilByteArrayUtils_hexToBytes($hexStr);
+    }
+
+    static function bytesToHex($array,$formatted=false) {
+        return VirgilByteArrayUtils_bytesToHex($array,$formatted);
     }
 }
