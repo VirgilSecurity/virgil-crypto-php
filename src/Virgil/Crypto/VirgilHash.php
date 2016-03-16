@@ -74,6 +74,10 @@ class VirgilHash extends VirgilAsn1Compatible {
         return VirgilHash_name($this->_cPtr);
     }
 
+    function type() {
+        return VirgilHash_type($this->_cPtr);
+    }
+
     function hash($bytes) {
         return VirgilHash_hash($this->_cPtr,$bytes);
     }

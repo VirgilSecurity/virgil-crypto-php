@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3",
-        "ext-virgil_crypto_php": "1.2.0"
+        "ext-virgil_crypto_php": "1.3.1"
     },
     "autoload": {
         "psr-0": {
