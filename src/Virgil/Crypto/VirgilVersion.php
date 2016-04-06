@@ -41,6 +41,10 @@ class VirgilVersion {
         return VirgilVersion_patchVersion();
     }
 
+    static function fullName() {
+        return VirgilVersion_fullName();
+    }
+
     function __construct($res=null) {
         if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilVersion') {
             $this->_cPtr=$res;
