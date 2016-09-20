@@ -21,14 +21,14 @@ class VirgilSigner {
         return array_key_exists($var, $this->_pData);
     }
 
-    function __construct($hash=null) {
-        if (is_resource($hash) && get_resource_type($hash) === '_p_virgil__crypto__VirgilSigner') {
-            $this->_cPtr=$hash;
+    function __construct($hashAlgorithm=null) {
+        if (is_resource($hashAlgorithm) && get_resource_type($hashAlgorithm) === '_p_virgil__crypto__VirgilSigner') {
+            $this->_cPtr=$hashAlgorithm;
             return;
         }
         switch (func_num_args()) {
             case 0: $this->_cPtr=new_VirgilSigner(); break;
-            default: $this->_cPtr=new_VirgilSigner($hash);
+            default: $this->_cPtr=new_VirgilSigner($hashAlgorithm);
         }
     }
 

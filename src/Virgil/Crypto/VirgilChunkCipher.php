@@ -22,32 +22,22 @@ class VirgilChunkCipher extends VirgilCipherBase {
 
     const kPreferredChunkSize = VirgilChunkCipher_kPreferredChunkSize;
 
-    function startEncryption($preferredChunkSize=null) {
+    function encrypt($source,$sink,$embedContentInfo=true,$preferredChunkSize=null) {
         switch (func_num_args()) {
-            case 0: $r=VirgilChunkCipher_startEncryption($this->_cPtr); break;
-            default: $r=VirgilChunkCipher_startEncryption($this->_cPtr,$preferredChunkSize);
+            case 2: case 3: VirgilChunkCipher_encrypt($this->_cPtr,$source,$sink,$embedContentInfo); break;
+            default: VirgilChunkCipher_encrypt($this->_cPtr,$source,$sink,$embedContentInfo,$preferredChunkSize);
         }
-        return $r;
     }
 
-    function startDecryptionWithKey($recipientId,$privateKey,$privateKeyPassword=null) {
+    function decryptWithKey($source,$sink,$recipientId,$privateKey,$privateKeyPassword=null) {
         switch (func_num_args()) {
-            case 2: $r=VirgilChunkCipher_startDecryptionWithKey($this->_cPtr,$recipientId,$privateKey); break;
-            default: $r=VirgilChunkCipher_startDecryptionWithKey($this->_cPtr,$recipientId,$privateKey,$privateKeyPassword);
+            case 4: VirgilChunkCipher_decryptWithKey($this->_cPtr,$source,$sink,$recipientId,$privateKey); break;
+            default: VirgilChunkCipher_decryptWithKey($this->_cPtr,$source,$sink,$recipientId,$privateKey,$privateKeyPassword);
         }
-        return $r;
     }
 
-    function startDecryptionWithPassword($pwd) {
-        return VirgilChunkCipher_startDecryptionWithPassword($this->_cPtr,$pwd);
-    }
-
-    function process($data) {
-        return VirgilChunkCipher_process($this->_cPtr,$data);
-    }
-
-    function finish() {
-        VirgilChunkCipher_finish($this->_cPtr);
+    function decryptWithPassword($source,$sink,$pwd) {
+        VirgilChunkCipher_decryptWithPassword($this->_cPtr,$source,$sink,$pwd);
     }
 
     function __construct($res=null) {

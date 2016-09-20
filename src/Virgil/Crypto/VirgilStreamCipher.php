@@ -20,7 +20,7 @@ class VirgilStreamCipher extends VirgilCipherBase {
         return VirgilCipherBase::__isset($var);
     }
 
-    function encrypt($source,$sink,$embedContentInfo=false) {
+    function encrypt($source,$sink,$embedContentInfo=true) {
         VirgilStreamCipher_encrypt($this->_cPtr,$source,$sink,$embedContentInfo);
     }
 

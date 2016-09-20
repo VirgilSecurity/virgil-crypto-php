@@ -1,5 +1,5 @@
 {
-    "version": "1.4.0",
+    "version": "2.0.0",
     "name": "virgil/crypto",
     "description": "Virgil is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and all the necessary infrastructure to enable seamless, end-to-end encryption for any application, platform or device. See below for currently available languages and platforms. Get in touch with us to get preview access to our key infrastructure.",
     "type": "standalone",
@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3",
-        "ext-virgil_crypto_php": "1.4.*"
+        "ext-virgil_crypto_php": "2.0.*"
     },
     "autoload": {
         "psr-0": {

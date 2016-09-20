@@ -37,12 +37,20 @@ class VirgilCipherBase {
         VirgilCipherBase_removeKeyRecipient($this->_cPtr,$recipientId);
     }
 
+    function keyRecipientExists($recipientId) {
+        return VirgilCipherBase_keyRecipientExists($this->_cPtr,$recipientId);
+    }
+
     function addPasswordRecipient($pwd) {
         VirgilCipherBase_addPasswordRecipient($this->_cPtr,$pwd);
     }
 
     function removePasswordRecipient($pwd) {
         VirgilCipherBase_removePasswordRecipient($this->_cPtr,$pwd);
+    }
+
+    function passwordRecipientExists($password) {
+        return VirgilCipherBase_passwordRecipientExists($this->_cPtr,$password);
     }
 
     function removeAllRecipients() {
@@ -65,5 +73,13 @@ class VirgilCipherBase {
         $r=VirgilCipherBase_customParams($this->_cPtr);
         if (!is_resource($r)) return $r;
         return new VirgilCustomParams($r);
+    }
+
+    static function computeShared($publicKey,$privateKey,$privateKeyPassword=null) {
+        switch (func_num_args()) {
+            case 2: $r=VirgilCipherBase_computeShared($publicKey,$privateKey); break;
+            default: $r=VirgilCipherBase_computeShared($publicKey,$privateKey,$privateKeyPassword);
+        }
+        return $r;
     }
 }

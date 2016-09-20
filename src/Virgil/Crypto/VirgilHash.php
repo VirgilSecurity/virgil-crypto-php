@@ -20,54 +20,27 @@ class VirgilHash extends VirgilAsn1Compatible {
         return VirgilAsn1Compatible::__isset($var);
     }
 
-    static function md5() {
-        $r=VirgilHash_md5();
-        if (is_resource($r)) {
-            $c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
-            if (class_exists($c)) return new $c($r);
-            return new VirgilHash($r);
-        }
-        return $r;
-    }
+    const Algorithm_MD5 = 0;
 
-    static function sha256() {
-        $r=VirgilHash_sha256();
-        if (is_resource($r)) {
-            $c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
-            if (class_exists($c)) return new $c($r);
-            return new VirgilHash($r);
-        }
-        return $r;
-    }
+    const Algorithm_SHA1 = VirgilHash_Algorithm_SHA1;
 
-    static function sha384() {
-        $r=VirgilHash_sha384();
-        if (is_resource($r)) {
-            $c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
-            if (class_exists($c)) return new $c($r);
-            return new VirgilHash($r);
-        }
-        return $r;
-    }
+    const Algorithm_SHA224 = VirgilHash_Algorithm_SHA224;
 
-    static function sha512() {
-        $r=VirgilHash_sha512();
-        if (is_resource($r)) {
-            $c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
-            if (class_exists($c)) return new $c($r);
-            return new VirgilHash($r);
-        }
-        return $r;
-    }
+    const Algorithm_SHA256 = VirgilHash_Algorithm_SHA256;
 
-    static function withName($name) {
-        $r=VirgilHash_withName($name);
-        if (is_resource($r)) {
-            $c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
-            if (class_exists($c)) return new $c($r);
-            return new VirgilHash($r);
+    const Algorithm_SHA384 = VirgilHash_Algorithm_SHA384;
+
+    const Algorithm_SHA512 = VirgilHash_Algorithm_SHA512;
+
+    function __construct($alg_or_name=null) {
+        if (is_resource($alg_or_name) && get_resource_type($alg_or_name) === '_p_virgil__crypto__foundation__VirgilHash') {
+            $this->_cPtr=$alg_or_name;
+            return;
         }
-        return $r;
+        switch (func_num_args()) {
+            case 0: $this->_cPtr=new_VirgilHash(); break;
+            default: $this->_cPtr=new_VirgilHash($alg_or_name);
+        }
     }
 
     function name() {
@@ -78,24 +51,24 @@ class VirgilHash extends VirgilAsn1Compatible {
         return VirgilHash_type($this->_cPtr);
     }
 
-    function hash($bytes) {
-        return VirgilHash_hash($this->_cPtr,$bytes);
+    function hash($data) {
+        return VirgilHash_hash($this->_cPtr,$data);
     }
 
     function start() {
         VirgilHash_start($this->_cPtr);
     }
 
-    function update($bytes) {
-        VirgilHash_update($this->_cPtr,$bytes);
+    function update($data) {
+        VirgilHash_update($this->_cPtr,$data);
     }
 
     function finish() {
         return VirgilHash_finish($this->_cPtr);
     }
 
-    function hmac($key,$bytes) {
-        return VirgilHash_hmac($this->_cPtr,$key,$bytes);
+    function hmac($key,$data) {
+        return VirgilHash_hmac($this->_cPtr,$key,$data);
     }
 
     function hmacStart($key) {
@@ -106,22 +79,11 @@ class VirgilHash extends VirgilAsn1Compatible {
         VirgilHash_hmacReset($this->_cPtr);
     }
 
-    function hmacUpdate($bytes) {
-        VirgilHash_hmacUpdate($this->_cPtr,$bytes);
+    function hmacUpdate($data) {
+        VirgilHash_hmacUpdate($this->_cPtr,$data);
     }
 
     function hmacFinish() {
         return VirgilHash_hmacFinish($this->_cPtr);
-    }
-
-    function __construct($other=null) {
-        if (is_resource($other) && get_resource_type($other) === '_p_virgil__crypto__foundation__VirgilHash') {
-            $this->_cPtr=$other;
-            return;
-        }
-        switch (func_num_args()) {
-            case 0: $this->_cPtr=new_VirgilHash(); break;
-            default: $this->_cPtr=new_VirgilHash($other);
-        }
     }
 }

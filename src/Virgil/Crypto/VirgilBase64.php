@@ -20,6 +20,9 @@ class VirgilBase64 {
         if ($var === 'thisown') return true;
         return array_key_exists($var, $this->_pData);
     }
+    function __construct($h) {
+        $this->_cPtr=$h;
+    }
 
     static function encode($data) {
         return VirgilBase64_encode($data);
@@ -27,13 +30,5 @@ class VirgilBase64 {
 
     static function decode($base64str) {
         return VirgilBase64_decode($base64str);
-    }
-
-    function __construct($res=null) {
-        if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__foundation__VirgilBase64') {
-            $this->_cPtr=$res;
-            return;
-        }
-        $this->_cPtr=new_VirgilBase64();
     }
 }
