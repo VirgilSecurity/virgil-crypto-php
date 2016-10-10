@@ -59,7 +59,9 @@ class VirgilKeyPair {
 
     const Type_EC_CURVE25519 = VirgilKeyPair_Type_EC_CURVE25519;
 
-    const Type_EC_ED25519 = VirgilKeyPair_Type_EC_ED25519;
+    const Type_FAST_EC_X25519 = VirgilKeyPair_Type_FAST_EC_X25519;
+
+    const Type_FAST_EC_ED25519 = VirgilKeyPair_Type_FAST_EC_ED25519;
 
     static function generate($type,$pwd=null) {
         switch (func_num_args()) {
