@@ -33,7 +33,7 @@ require_once './vendor/autoload.php';
 
 use Virgil\Crypto\VirgilKeyPair;
 
-$key = new VirgilKeyPair();
+$key = VirgilKeyPair::generate(VirgilKeyPair::Type_FAST_EC_ED25519);
 
 file_put_contents('new_public.key', $key->publicKey());
 file_put_contents('new_private.key', $key->privateKey());
@@ -46,10 +46,15 @@ require_once './vendor/autoload.php';
 
 use Virgil\Crypto\VirgilKeyPair;
 
-$key = new VirgilKeyPair('secret password');
+$password = 'secret password';
+$key = VirgilKeyPair::generate(VirgilKeyPair::Type_FAST_EC_ED25519, $password);
 
-file_put_contents('new_public.key', $key->publicKey());
-file_put_contents('new_private.key', $key->privateKey());
+if (VirgilKeyPair::isPrivateKeyEncrypted($key->privateKey()) 
+    && VirgilKeyPair::checkPrivateKeyPassword($key->privateKey(), $password)
+) {
+    file_put_contents('new_public.key', $key->publicKey());
+    file_put_contents('new_private.key', $key->privateKey());
+}
 ```
 ## Encryption
 
@@ -58,6 +63,7 @@ file_put_contents('new_private.key', $key->privateKey());
 The Virgil library allows to encrypt data using several types of recipients such as password recipient and key transport recipient. The following example shows encryption with only one recipient.
 
 ```php
+require_once './vendor/autoload.php';
 
 use Virgil\Crypto\VirgilKeyPair,
     Virgil\Crypto\VirgilCipher;
@@ -65,19 +71,25 @@ use Virgil\Crypto\VirgilKeyPair,
 $data = 'Encrypt me please';
 $publicKeyId = 'AB82FD88-3DAE-420C-BED0-8D47B7DA497F';
 
-$keyPair = new VirgilKeyPair();
+$keyPair = VirgilKeyPair::generate(VirgilKeyPair::Type_FAST_EC_ED25519);
 $cipher  = new VirgilCipher;
 
 $cipher->addKeyRecipient($publicKeyId, $keyPair->publicKey());
 
-
-$encryptedData = $cipher->encrypt(data);
+$encryptedData = $cipher->encrypt($data);
 $decryptedData = $cipher->decryptWithKey($encryptedData, $publicKeyId, $keyPair->privateKey());
+
+try {
+    $decryptedData = $cipher->decryptWithKey($encryptedData, "wrong public key id", $keyPair->privateKey());
+} catch (Exception $e) {
+    //handle
+}
 ```
 
 ### Decrypt with encrypted private key
 
 ```php
+require_once './vendor/autoload.php';
 
 use Virgil\Crypto\VirgilKeyPair,
     Virgil\Crypto\VirgilCipher;
@@ -86,22 +98,24 @@ $data = 'Encrypt me please';
 $publicKeyId = 'AB82FD88-3DAE-420C-BED0-8D47B7DA497F';
 $privateKeyPassword = 'password';
 
-$keyPair = new VirgilKeyPair($privateKeyPassword);
+$keyPair = VirgilKeyPair::generate(VirgilKeyPair::Type_FAST_EC_ED25519, $privateKeyPassword);
 $cipher  = new VirgilCipher;
 
 $cipher->addKeyRecipient($publicKeyId, $keyPair->publicKey());
 
-$encryptedData = $cipher->encrypt(data);
-$decryptedData =  $cipher->decryptWithKey($encryptedData, $publicKeyId, $privateKey, $privateKeyPassword);
+$encryptedData = $cipher->encrypt($data);
+$decryptedData =  $cipher->decryptWithKey($encryptedData, $publicKeyId, $keyPair->privateKey(), $privateKeyPassword);
 ```
 
 ### Encrypt data for multiple number of recipients
 
 ```php
+require_once './vendor/autoload.php';
+
 use Virgil\Crypto\VirgilKeyPair,
     Virgil\Crypto\VirgilCipher;
 
-$keyPair = new VirgilKeyPair();
+$keyPair = VirgilKeyPair::generate(VirgilKeyPair::Type_FAST_EC_ED25519);
 $cipher  = new VirgilCipher;
 
 $data = 'Encrypt me please';
@@ -113,8 +127,8 @@ $cipher->addKeyRecipient($publicKeyId, $keyPair->publicKey());
 
 $encryptedData = $cipher->encrypt($data);
 
-$decryptedData1 = cipher.decryptWithPassword($encryptedData, $password);
-$decryptedData2 = cipher.decryptWithKey($encryptedData, $publicKeyId, $keyPair->privateKey());
+$decryptedData1 = $cipher->decryptWithPassword($encryptedData, $password);
+$decryptedData2 = $cipher->decryptWithKey($encryptedData, $publicKeyId, $keyPair->privateKey());
 ```
 
 ## Sign and verify data
@@ -122,21 +136,25 @@ $decryptedData2 = cipher.decryptWithKey($encryptedData, $publicKeyId, $keyPair->
 In example below used encrypted data for sign/verify, but it can be done for any data chosen by developer.
 
 ```php
-<?php
+require_once "vendor/autoload.php";
 
 use Virgil\Crypto\VirgilSigner,
     Virgil\Crypto\VirgilKeyPair;
 
 $signer = new VirgilSigner();
-$keyPair = new VirgilKeyPair();
+$keyPair = VirgilKeyPair::generate(VirgilKeyPair::Type_FAST_EC_ED25519);
 
 $data = 'Sign me please';
 
 $sign = $signer->sign($data, $keyPair->privateKey());
+//true
 $isVerified = $signer->verify($data, $sign, $keyPair->publicKey());
 
-echo $sign;
-echo $isVerified;
+try {
+    $signer->verify($data, "wrong sign", $keyPair->publicKey());
+} catch (Exception $e) {
+    //handle wrong sign
+}
 ```
 
 ## License
