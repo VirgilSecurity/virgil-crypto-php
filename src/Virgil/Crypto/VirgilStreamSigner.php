@@ -3,28 +3,19 @@
 namespace Virgil\Crypto;
 
 
-class VirgilStreamSigner
+class VirgilStreamSigner extends VirgilSignerBase
 {
     public $_cPtr = null;
-    protected $_pData = [];
 
 
-    function __construct($hashAlgorithm = null)
+    function __construct($res = null)
     {
-        if (is_resource($hashAlgorithm) &&
-            get_resource_type($hashAlgorithm) === '_p_virgil__crypto__VirgilStreamSigner'
-        ) {
-            $this->_cPtr = $hashAlgorithm;
+        if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilStreamSigner') {
+            $this->_cPtr = $res;
 
             return;
         }
-        switch (func_num_args()) {
-            case 0:
-                $this->_cPtr = new_VirgilStreamSigner();
-                break;
-            default:
-                $this->_cPtr = new_VirgilStreamSigner($hashAlgorithm);
-        }
+        $this->_cPtr = new_VirgilStreamSigner();
     }
 
 
@@ -33,7 +24,7 @@ class VirgilStreamSigner
         if ($var === 'thisown') {
             return swig_virgil_crypto_php_alter_newobject($this->_cPtr, $value);
         }
-        $this->_pData[$var] = $value;
+        VirgilSignerBase::__set($var, $value);
     }
 
 
@@ -43,7 +34,7 @@ class VirgilStreamSigner
             return swig_virgil_crypto_php_get_newobject($this->_cPtr);
         }
 
-        return $this->_pData[$var];
+        return VirgilSignerBase::__get($var);
     }
 
 
@@ -53,7 +44,7 @@ class VirgilStreamSigner
             return true;
         }
 
-        return array_key_exists($var, $this->_pData);
+        return VirgilSignerBase::__isset($var);
     }
 
 

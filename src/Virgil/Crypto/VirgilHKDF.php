@@ -3,25 +3,22 @@
 namespace Virgil\Crypto;
 
 
-abstract class VirgilDataSource
+class VirgilHKDF
 {
     public $_cPtr = null;
     protected $_pData = [];
 
 
-    function __construct($res = null)
+    function __construct($hashAlgorithm)
     {
-        if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilDataSource') {
-            $this->_cPtr = $res;
+        if (is_resource($hashAlgorithm) &&
+            get_resource_type($hashAlgorithm) === '_p_virgil__crypto__foundation__VirgilHKDF'
+        ) {
+            $this->_cPtr = $hashAlgorithm;
 
             return;
         }
-        if (get_class($this) === 'VirgilDataSource') {
-            $_this = null;
-        } else {
-            $_this = $this;
-        }
-        $this->_cPtr = new_VirgilDataSource($_this);
+        $this->_cPtr = new_VirgilHKDF($hashAlgorithm);
     }
 
 
@@ -54,14 +51,8 @@ abstract class VirgilDataSource
     }
 
 
-    function hasData()
+    function derive($in, $salt, $info, $outSize)
     {
-        return VirgilDataSource_hasData($this->_cPtr);
-    }
-
-
-    function read()
-    {
-        return VirgilDataSource_read($this->_cPtr);
+        return VirgilHKDF_derive($this->_cPtr, $in, $salt, $info, $outSize);
     }
 }

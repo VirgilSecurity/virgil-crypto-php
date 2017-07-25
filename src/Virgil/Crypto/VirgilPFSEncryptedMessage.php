@@ -3,25 +3,22 @@
 namespace Virgil\Crypto;
 
 
-abstract class VirgilDataSource
+class VirgilPFSEncryptedMessage
 {
     public $_cPtr = null;
     protected $_pData = [];
 
 
-    function __construct($res = null)
+    function __construct($sessionIdentifier, $salt = null, $cipherText = null)
     {
-        if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilDataSource') {
-            $this->_cPtr = $res;
+        if (is_resource($sessionIdentifier) &&
+            get_resource_type($sessionIdentifier) === '_p_virgil__crypto__pfs__VirgilPFSEncryptedMessage'
+        ) {
+            $this->_cPtr = $sessionIdentifier;
 
             return;
         }
-        if (get_class($this) === 'VirgilDataSource') {
-            $_this = null;
-        } else {
-            $_this = $this;
-        }
-        $this->_cPtr = new_VirgilDataSource($_this);
+        $this->_cPtr = new_VirgilPFSEncryptedMessage($sessionIdentifier, $salt, $cipherText);
     }
 
 
@@ -54,14 +51,20 @@ abstract class VirgilDataSource
     }
 
 
-    function hasData()
+    function getSessionIdentifier()
     {
-        return VirgilDataSource_hasData($this->_cPtr);
+        return VirgilPFSEncryptedMessage_getSessionIdentifier($this->_cPtr);
     }
 
 
-    function read()
+    function getSalt()
     {
-        return VirgilDataSource_read($this->_cPtr);
+        return VirgilPFSEncryptedMessage_getSalt($this->_cPtr);
+    }
+
+
+    function getCipherText()
+    {
+        return VirgilPFSEncryptedMessage_getCipherText($this->_cPtr);
     }
 }

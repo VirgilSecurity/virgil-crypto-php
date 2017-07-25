@@ -1,43 +1,45 @@
 {
-    "version": "2.0.4",
-    "name": "virgil/crypto",
-    "description": "Virgil is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and all the necessary infrastructure to enable seamless, end-to-end encryption for any application, platform or device. See below for currently available languages and platforms. Get in touch with us to get preview access to our key infrastructure.",
-    "type": "standalone",
-    "keywords": [
-        "Virgil",
-        "Encryption",
-        "Decryption",
-        "Security",
-        "Authentication",
-        "Verification",
-        "Cryptography",
-        "Elliptic",
-        "Cross",
-        "Platform",
-        "Cross",
-        "Passwordless",
-        "ECIES",
-        "Virgil.Keys",
-        "Virgil.Pass",
-        "End-to-End"
-    ],
-    "homepage": "http://virgilsecurity.com",
-    "license" : "BSD",
-    "authors": [
-        {
-            "name": "Virgil Security, Inc",
-            "email": "support@virgilsecurity.com",
-            "homepage": "http://virgilsecurity.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {
-        "php": ">=5.3",
-        "ext-virgil_crypto_php": "2.1.*"
-    },
-    "autoload": {
-        "psr-0": {
-            "Virgil": "src/"
-        }
+  "version": "2.2.2",
+  "name": "virgil/crypto",
+  "description": "Virgil is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and all the necessary infrastructure to enable seamless, end-to-end encryption for any application, platform or device. See below for currently available languages and platforms. Get in touch with us to get preview access to our key infrastructure.",
+  "type": "standalone",
+  "keywords": [
+    "Virgil",
+    "Encryption",
+    "Decryption",
+    "Security",
+    "Authentication",
+    "Verification",
+    "Cryptography",
+    "Elliptic",
+    "Cross",
+    "Platform",
+    "Cross",
+    "Passwordless",
+    "ECIES",
+    "Virgil.Keys",
+    "Virgil.Pass",
+    "End-to-End",
+    "Perfect Forward Secrecy",
+    "PFS"
+  ],
+  "homepage": "http://virgilsecurity.com",
+  "license": "BSD",
+  "authors": [
+    {
+      "name": "Virgil Security, Inc",
+      "email": "support@virgilsecurity.com",
+      "homepage": "http://virgilsecurity.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.6",
+    "ext-virgil_crypto_php": "2.2.*"
+  },
+  "autoload": {
+    "psr-0": {
+      "Virgil": "src/"
+    }
+  }
 }

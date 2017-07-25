@@ -3,25 +3,26 @@
 namespace Virgil\Crypto;
 
 
-abstract class VirgilDataSource
+class VirgilPFSPublicKey
 {
     public $_cPtr = null;
     protected $_pData = [];
 
 
-    function __construct($res = null)
+    function __construct($key = null)
     {
-        if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilDataSource') {
-            $this->_cPtr = $res;
+        if (is_resource($key) && get_resource_type($key) === '_p_virgil__crypto__pfs__VirgilPFSPublicKey') {
+            $this->_cPtr = $key;
 
             return;
         }
-        if (get_class($this) === 'VirgilDataSource') {
-            $_this = null;
-        } else {
-            $_this = $this;
+        switch (func_num_args()) {
+            case 0:
+                $this->_cPtr = new_VirgilPFSPublicKey();
+                break;
+            default:
+                $this->_cPtr = new_VirgilPFSPublicKey($key);
         }
-        $this->_cPtr = new_VirgilDataSource($_this);
     }
 
 
@@ -54,14 +55,14 @@ abstract class VirgilDataSource
     }
 
 
-    function hasData()
+    function isEmpty()
     {
-        return VirgilDataSource_hasData($this->_cPtr);
+        return VirgilPFSPublicKey_isEmpty($this->_cPtr);
     }
 
 
-    function read()
+    function getKey()
     {
-        return VirgilDataSource_read($this->_cPtr);
+        return VirgilPFSPublicKey_getKey($this->_cPtr);
     }
 }
