@@ -14,12 +14,12 @@ class VirgilHash extends VirgilAsn1Compatible
     public $_cPtr = null;
 
 
-    function __construct($alg_or_name = null)
+    function __construct($alg_or_name_or_rhs = null)
     {
-        if (is_resource($alg_or_name) &&
-            get_resource_type($alg_or_name) === '_p_virgil__crypto__foundation__VirgilHash'
+        if (is_resource($alg_or_name_or_rhs) &&
+            get_resource_type($alg_or_name_or_rhs) === '_p_virgil__crypto__foundation__VirgilHash'
         ) {
-            $this->_cPtr = $alg_or_name;
+            $this->_cPtr = $alg_or_name_or_rhs;
 
             return;
         }
@@ -28,7 +28,7 @@ class VirgilHash extends VirgilAsn1Compatible
                 $this->_cPtr = new_VirgilHash();
                 break;
             default:
-                $this->_cPtr = new_VirgilHash($alg_or_name);
+                $this->_cPtr = new_VirgilHash($alg_or_name_or_rhs);
         }
     }
 
@@ -68,9 +68,21 @@ class VirgilHash extends VirgilAsn1Compatible
     }
 
 
+    function algorithm()
+    {
+        return VirgilHash_algorithm($this->_cPtr);
+    }
+
+
     function type()
     {
         return VirgilHash_type($this->_cPtr);
+    }
+
+
+    function size()
+    {
+        return VirgilHash_size($this->_cPtr);
     }
 
 

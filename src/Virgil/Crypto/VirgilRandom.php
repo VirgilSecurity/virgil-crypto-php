@@ -9,16 +9,16 @@ class VirgilRandom
     protected $_pData = [];
 
 
-    function __construct($personalInfo)
+    function __construct($personalInfo_or_rhs)
     {
-        if (is_resource($personalInfo) &&
-            get_resource_type($personalInfo) === '_p_virgil__crypto__foundation__VirgilRandom'
+        if (is_resource($personalInfo_or_rhs) &&
+            get_resource_type($personalInfo_or_rhs) === '_p_virgil__crypto__foundation__VirgilRandom'
         ) {
-            $this->_cPtr = $personalInfo;
+            $this->_cPtr = $personalInfo_or_rhs;
 
             return;
         }
-        $this->_cPtr = new_VirgilRandom($personalInfo);
+        $this->_cPtr = new_VirgilRandom($personalInfo_or_rhs);
     }
 
 

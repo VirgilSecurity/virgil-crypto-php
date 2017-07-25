@@ -15,8 +15,8 @@
 
 ## Requirements
 
-* PHP 5.3+
-* virgil_crypto_php.so extension version 2.1.*
+* PHP 5.6+
+* virgil_crypto_php.so extension version 2.2.*
 
 ## Installation
 
