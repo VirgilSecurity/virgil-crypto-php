@@ -24,7 +24,7 @@
     "PFS"
   ],
   "homepage": "http://virgilsecurity.com",
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "authors": [
     {
       "name": "Virgil Security, Inc",
