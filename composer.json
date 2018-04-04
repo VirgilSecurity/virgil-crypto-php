@@ -36,9 +36,15 @@
     "php": ">=5.6",
     "ext-virgil_crypto_php": "2.2.*"
   },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/Qzich/virgil-sdk-php"
+    }
+  ],
   "autoload": {
-    "psr-0": {
-      "Virgil": "src/"
+    "psr-4": {
+      "Virgil\\": ""
     }
   }
 }
