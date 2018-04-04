@@ -34,14 +34,18 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.6",
+    "virgil/crypto-api": "dev-master",
     "ext-virgil_crypto_php": "2.2.*"
   },
   "repositories": [
     {
-      "type": "git",
-      "url": "https://github.com/Qzich/virgil-sdk-php"
+      "type": "vcs",
+      "url": "https://github.com/Qzich/virgil-crypto-api"
     }
   ],
+  "provide": {
+    "virgil/crypto-api-implementation": "v5"
+  },
   "autoload": {
     "psr-4": {
       "Virgil\\": ""
