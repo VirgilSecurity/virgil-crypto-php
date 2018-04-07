@@ -48,7 +48,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Virgil\\": ""
+      "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/"
     }
   }
 }
