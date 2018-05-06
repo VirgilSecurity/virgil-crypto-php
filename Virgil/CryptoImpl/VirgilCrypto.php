@@ -38,6 +38,8 @@
 namespace Virgil\CryptoImpl;
 
 
+use Virgil\CryptoImpl\Cryptography\Core\Cipher\CipherInterface;
+use Virgil\CryptoImpl\Cryptography\Core\Cipher\InputOutputInterface;
 use Virgil\CryptoImpl\Cryptography\Core\VirgilCryptoService;
 
 
@@ -97,14 +99,12 @@ class VirgilCrypto
         $keyPair = $this->cryptoService->generateKeyPair($keyPairType);
 
         $publicKeyDerEncoded = $this->cryptoService->publicKeyToDer($keyPair[0]);
-        $publicKeyReceiverID = $this->calculateFingerprint($publicKeyDerEncoded);
-
-        $virgilPublicKey = new VirgilPublicKey($publicKeyReceiverID, $publicKeyDerEncoded);
-
         $privateKeyDerEncoded = $this->cryptoService->privateKeyToDer($keyPair[1]);
-        $privateKeyReceiverID = $this->calculateFingerprint($privateKeyDerEncoded);
 
-        $virgilPrivateKey = new VirgilPrivateKey($privateKeyReceiverID, $privateKeyDerEncoded);
+        $receiverID = $this->calculateFingerprint($publicKeyDerEncoded);
+
+        $virgilPublicKey = new VirgilPublicKey($receiverID, $publicKeyDerEncoded);
+        $virgilPrivateKey = new VirgilPrivateKey($receiverID, $privateKeyDerEncoded);
 
         return new VirgilKeyPair($virgilPublicKey, $virgilPrivateKey);
     }
@@ -194,10 +194,18 @@ class VirgilCrypto
      * @param VirgilPrivateKey $recipientPrivateKey
      *
      * @return string
+     * @throws Cryptography\Core\Exceptions\CipherException
      */
     public function decrypt($encryptedContent, VirgilPrivateKey $recipientPrivateKey)
     {
-        return "";
+        $cipher = $this->cryptoService->createCipher();
+        $cipherInputOutput = $cipher->createInputOutput($encryptedContent);
+
+        return $cipher->decryptWithKey(
+            $cipherInputOutput,
+            $recipientPrivateKey->getReceiverID(),
+            $recipientPrivateKey->getValue()
+        );
     }
 
 
@@ -218,10 +226,21 @@ class VirgilCrypto
      * @param VirgilPublicKey[] $recipientsPublicKeys
      *
      * @return string
+     * @throws Cryptography\Core\Exceptions\CipherException
      */
     public function encrypt($content, array $recipientsPublicKeys)
     {
-        return "";
+        $cipher = $this->cryptoService->createCipher();
+        $cipherInputOutput = $cipher->createInputOutput($content);
+
+        foreach ($recipientsPublicKeys as $recipientPublicKey) {
+            $cipher->addKeyRecipient(
+                $recipientPublicKey->getReceiverID(),
+                $recipientPublicKey->getValue()
+            );
+        }
+
+        return $cipher->encrypt($cipherInputOutput);
     }
 
 

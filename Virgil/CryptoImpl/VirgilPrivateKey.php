@@ -54,18 +54,36 @@ class VirgilPrivateKey implements PrivateKey
     /**
      * @var string
      */
-    private $key;
+    private $value;
 
 
     /**
      * VirgilPublicKey constructor.
      *
      * @param string $receiverID
-     * @param string $key
+     * @param string $value
      */
-    public function __construct($receiverID, $key)
+    public function __construct($receiverID, $value)
     {
         $this->receiverID = $receiverID;
-        $this->key = $key;
+        $this->value = $value;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getReceiverID()
+    {
+        return $this->receiverID;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 }
