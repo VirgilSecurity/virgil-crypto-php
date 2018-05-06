@@ -35,38 +35,72 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Crypto;
 
 
-use Virgil\CryptoApi\PublicKey;
-
-
-/**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
- */
-class VirgilPublicKey implements PublicKey
+class VirgilKDF extends VirgilAsn1Compatible
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    const Algorithm_KDF1 = 0;
+    const Algorithm_KDF2 = VirgilKDF_Algorithm_KDF2;
+    public $_cPtr = null;
 
 
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $key
-     */
-    public function __construct($receiverID, $key)
+    function __construct($alg_or_name = null)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        if (is_resource($alg_or_name) &&
+            get_resource_type($alg_or_name) === '_p_virgil__crypto__foundation__VirgilKDF'
+        ) {
+            $this->_cPtr = $alg_or_name;
+
+            return;
+        }
+        switch (func_num_args()) {
+            case 0:
+                $this->_cPtr = new_VirgilKDF();
+                break;
+            default:
+                $this->_cPtr = new_VirgilKDF($alg_or_name);
+        }
     }
 
+
+    function __set($var, $value)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_alter_newobject($this->_cPtr, $value);
+        }
+        VirgilAsn1Compatible::__set($var, $value);
+    }
+
+
+    function __get($var)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_get_newobject($this->_cPtr);
+        }
+
+        return VirgilAsn1Compatible::__get($var);
+    }
+
+
+    function __isset($var)
+    {
+        if ($var === 'thisown') {
+            return true;
+        }
+
+        return VirgilAsn1Compatible::__isset($var);
+    }
+
+
+    function name()
+    {
+        return VirgilKDF_name($this->_cPtr);
+    }
+
+
+    function derive($in, $outSize)
+    {
+        return VirgilKDF_derive($this->_cPtr, $in, $outSize);
+    }
 }

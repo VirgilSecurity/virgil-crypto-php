@@ -35,38 +35,67 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoApi\PublicKey;
-
+use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilDataSource;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class is representation of data provider stream.
  */
-class VirgilPublicKey implements PublicKey
+class VirgilStreamDataSource extends VirgilDataSource
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var resource $stream */
+    private $stream;
+
+    /** @var int $dataChunk */
+    private $dataChunk;
 
 
     /**
-     * VirgilPublicKey constructor.
+     * Class constructor.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param resource $stream
+     * @param int      $dataChunk specifies length number of bytes read.
      */
-    public function __construct($receiverID, $key)
+    public function __construct($stream, $dataChunk = 1024)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        parent::__construct($this);
+        $this->stream = $stream;
+        rewind($this->stream);
+        $this->dataChunk = $dataChunk;
     }
 
+
+    /**
+     * Checks if there is data chunk.
+     *
+     * @return bool
+     */
+    public function hasData()
+    {
+        return !feof($this->stream);
+    }
+
+
+    /**
+     * Read data chunk from stream.
+     *
+     * @return string
+     */
+    public function read()
+    {
+        return fread($this->stream, $this->dataChunk);
+    }
+
+
+    /**
+     * Set pointer to begin of the stream.
+     *
+     * @return bool
+     */
+    public function reset()
+    {
+        return rewind($this->stream);
+    }
 }

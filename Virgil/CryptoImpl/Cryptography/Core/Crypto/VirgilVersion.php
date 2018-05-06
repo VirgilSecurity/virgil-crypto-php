@@ -35,38 +35,87 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Crypto;
 
 
-use Virgil\CryptoApi\PublicKey;
-
-
-/**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
- */
-class VirgilPublicKey implements PublicKey
+class VirgilVersion
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    public $_cPtr = null;
+    protected $_pData = [];
 
 
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $key
-     */
-    public function __construct($receiverID, $key)
+    function __construct($res = null)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilVersion') {
+            $this->_cPtr = $res;
+
+            return;
+        }
+        $this->_cPtr = new_VirgilVersion();
     }
 
+
+    static function asNumber()
+    {
+        return VirgilVersion_asNumber();
+    }
+
+
+    static function asString()
+    {
+        return VirgilVersion_asString();
+    }
+
+
+    static function majorVersion()
+    {
+        return VirgilVersion_majorVersion();
+    }
+
+
+    static function minorVersion()
+    {
+        return VirgilVersion_minorVersion();
+    }
+
+
+    static function patchVersion()
+    {
+        return VirgilVersion_patchVersion();
+    }
+
+
+    static function fullName()
+    {
+        return VirgilVersion_fullName();
+    }
+
+
+    function __set($var, $value)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_alter_newobject($this->_cPtr, $value);
+        }
+        $this->_pData[$var] = $value;
+    }
+
+
+    function __get($var)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_get_newobject($this->_cPtr);
+        }
+
+        return $this->_pData[$var];
+    }
+
+
+    function __isset($var)
+    {
+        if ($var === 'thisown') {
+            return true;
+        }
+
+        return array_key_exists($var, $this->_pData);
+    }
 }

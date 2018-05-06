@@ -47,4 +47,25 @@ use Virgil\CryptoApi\PrivateKey;
  */
 class VirgilPrivateKey implements PrivateKey
 {
+    /**
+     * @var string
+     */
+    private $receiverID;
+    /**
+     * @var string
+     */
+    private $key;
+
+
+    /**
+     * VirgilPublicKey constructor.
+     *
+     * @param string $receiverID
+     * @param string $key
+     */
+    public function __construct($receiverID, $key)
+    {
+        $this->receiverID = $receiverID;
+        $this->key = $key;
+    }
 }

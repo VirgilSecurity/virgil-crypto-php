@@ -35,38 +35,58 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Crypto;
 
 
-use Virgil\CryptoApi\PublicKey;
-
-
-/**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
- */
-class VirgilPublicKey implements PublicKey
+abstract class VirgilAsn1Compatible
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    public $_cPtr = null;
+    protected $_pData = [];
 
 
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $key
-     */
-    public function __construct($receiverID, $key)
+    function __construct($h)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        $this->_cPtr = $h;
     }
 
+
+    function __set($var, $value)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_alter_newobject($this->_cPtr, $value);
+        }
+        $this->_pData[$var] = $value;
+    }
+
+
+    function __get($var)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_get_newobject($this->_cPtr);
+        }
+
+        return $this->_pData[$var];
+    }
+
+
+    function __isset($var)
+    {
+        if ($var === 'thisown') {
+            return true;
+        }
+
+        return array_key_exists($var, $this->_pData);
+    }
+
+
+    function toAsn1()
+    {
+        return VirgilAsn1Compatible_toAsn1($this->_cPtr);
+    }
+
+
+    function fromAsn1($asn1)
+    {
+        VirgilAsn1Compatible_fromAsn1($this->_cPtr, $asn1);
+    }
 }

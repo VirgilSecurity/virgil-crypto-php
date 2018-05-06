@@ -35,38 +35,71 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoApi\PublicKey;
+use Exception;
 
+use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilChunkCipher;
+
+use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class implements cipher operations with streams (file, network, memory etc.)
  */
-class VirgilPublicKey implements PublicKey
+class VirgilStreamCipher extends AbstractVirgilCipher
 {
     /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
-
-
-    /**
-     * VirgilPublicKey constructor.
+     * Class constructor.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param VirgilChunkCipher $cipher
      */
-    public function __construct($receiverID, $key)
+    public function __construct(VirgilChunkCipher $cipher)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        $this->cipher = $cipher;
     }
 
+
+    /**
+     * @inheritdoc
+     *
+     * @throws CipherException
+     */
+    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true)
+    {
+        try {
+            $this->cipher->encrypt($cipherInputOutput->getInput(), $cipherInputOutput->getOutput(), $embedContentInfo);
+        } catch (Exception $exception) {
+            throw new CipherException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @throws CipherException
+     */
+    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey)
+    {
+        try {
+            $this->cipher->decryptWithKey(
+                $cipherInputOutput->getInput(),
+                $cipherInputOutput->getOutput(),
+                $recipientId,
+                $privateKey
+            );
+        } catch (Exception $exception) {
+            throw new CipherException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function createInputOutput(...$args)
+    {
+        return new StreamInputOutput($args[0], $args[1]);
+    }
 }

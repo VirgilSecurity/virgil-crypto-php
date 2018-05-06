@@ -35,38 +35,78 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoApi\PublicKey;
+use Exception;
 
+use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilCipherBase;
+
+use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Base abstract class for ciphers.
  */
-class VirgilPublicKey implements PublicKey
+abstract class AbstractVirgilCipher implements CipherInterface
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var VirgilCipherBase $cipher */
+    protected $cipher;
 
 
     /**
-     * VirgilPublicKey constructor.
+     * @inheritdoc
+     */
+    abstract public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
+
+
+    /**
+     * @inheritdoc
+     */
+    abstract public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
+
+
+    /**
+     * @inheritdoc
+     */
+    abstract public function createInputOutput(...$args);
+
+
+    /**
+     * @inheritdoc
      *
-     * @param string $receiverID
-     * @param string $key
+     * @throws CipherException
      */
-    public function __construct($receiverID, $key)
+    public function addKeyRecipient($recipientId, $publicKey)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        try {
+            $this->cipher->addKeyRecipient($recipientId, $publicKey);
+
+            return $this;
+        } catch (Exception $e) {
+            throw new CipherException($e->getMessage(), $e->getCode());
+        }
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getCustomParam($key)
+    {
+        $cipherCustomParams = $this->cipher->customParams();
+
+        return $cipherCustomParams->getData($key);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomParam($key, $value)
+    {
+        $cipherCustomParams = $this->cipher->customParams();
+        $cipherCustomParams->setData($key, $value);
+
+        return $this;
+    }
 }

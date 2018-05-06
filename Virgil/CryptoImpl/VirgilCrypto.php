@@ -38,8 +38,7 @@
 namespace Virgil\CryptoImpl;
 
 
-use Virgil\CryptoApi\PrivateKey;
-use Virgil\CryptoApi\PublicKey;
+use Virgil\CryptoImpl\Cryptography\Core\VirgilCryptoService;
 
 
 /**
@@ -49,36 +48,268 @@ use Virgil\CryptoApi\PublicKey;
 class VirgilCrypto
 {
     /**
+     * @var string
+     */
+    protected $keyPairType;
+
+    /**
+     * @var VirgilCryptoService
+     */
+    protected $cryptoService;
+
+    /**
+     * @var bool
+     */
+    private $userSHA256Fingerprints;
+
+
+    /**
+     * Class constructor.
+     *
+     * @param string $keyPairType
+     * @param bool   $userSHA256Fingerprints
+     */
+    public function __construct(
+        $keyPairType = KeyPairTypes::FAST_EC_ED25519,
+        $userSHA256Fingerprints = false
+    ) {
+        $this->keyPairType = $keyPairType;
+        $this->userSHA256Fingerprints = $userSHA256Fingerprints;
+
+        $this->cryptoService = new VirgilCryptoService();
+    }
+
+
+    /**
+     * @param integer $keyPairType
+     *
      * @return VirgilKeyPair
+     * @throws Cryptography\Core\Exceptions\KeyPairGenerationException
+     * @throws Cryptography\Core\Exceptions\PrivateKeyToDerConvertingException
+     * @throws Cryptography\Core\Exceptions\PublicKeyHashComputationException
+     * @throws Cryptography\Core\Exceptions\PublicKeyToDerConvertingException
      */
-    public function generateKeys()
+    public function generateKeys($keyPairType = null)
     {
-        return new VirgilKeyPair();
+        if ($keyPairType == null) {
+            $keyPairType = $this->keyPairType;
+        }
+        $keyPair = $this->cryptoService->generateKeyPair($keyPairType);
+
+        $publicKeyDerEncoded = $this->cryptoService->publicKeyToDer($keyPair[0]);
+        $publicKeyReceiverID = $this->calculateFingerprint($publicKeyDerEncoded);
+
+        $virgilPublicKey = new VirgilPublicKey($publicKeyReceiverID, $publicKeyDerEncoded);
+
+        $privateKeyDerEncoded = $this->cryptoService->privateKeyToDer($keyPair[1]);
+        $privateKeyReceiverID = $this->calculateFingerprint($privateKeyDerEncoded);
+
+        $virgilPrivateKey = new VirgilPrivateKey($privateKeyReceiverID, $privateKeyDerEncoded);
+
+        return new VirgilKeyPair($virgilPublicKey, $virgilPrivateKey);
     }
 
 
     /**
-     * @param string      $dataToEncrypt
-     * @param PrivateKey  $privateKey
-     * @param PublicKey[] $publicKeys
+     * @param string           $encryptedAndSignedContent
+     * @param VirgilPrivateKey $recipientPrivateKey
+     * @param VirgilPublicKey  $signerPublicKey
      *
      * @return string
      */
-    public function signThenEncrypt($dataToEncrypt, PrivateKey $privateKey, $publicKeys)
+    public function decryptThenVerify(
+        $encryptedAndSignedContent,
+        VirgilPrivateKey $recipientPrivateKey,
+        VirgilPublicKey $signerPublicKey
+    ) {
+        return "";
+    }
+
+
+    /**
+     * @param string            $content
+     * @param VirgilPrivateKey  $signerPrivateKey
+     * @param VirgilPublicKey[] $recipientsPublicKeys
+     *
+     * @return string
+     */
+    public function signThenEncrypt($content, VirgilPrivateKey $signerPrivateKey, array $recipientsPublicKeys)
     {
         return "";
     }
 
 
     /**
-     * @param string      $encryptedData
-     * @param PrivateKey  $privateKey
-     * @param PublicKey[] $publicKeys
+     * @param string          $content
+     * @param string          $signature
+     * @param VirgilPublicKey $signerPublicKey
+     *
+     * @return bool
+     */
+    public function verifySignature($content, $signature, VirgilPublicKey $signerPublicKey)
+    {
+        return false;
+    }
+
+
+    /**
+     * @param resource        $source
+     * @param string          $signature
+     * @param VirgilPublicKey $signerPublicKey
+     *
+     * @return bool
+     */
+    public function verifyStreamSignature($source, $signature, VirgilPublicKey $signerPublicKey)
+    {
+        return false;
+    }
+
+
+    /**
+     * @param string           $content
+     * @param VirgilPrivateKey $signerPrivateKey
      *
      * @return string
      */
-    public function decryptThenVerify($encryptedData, PrivateKey $privateKey, $publicKeys)
+    public function generateSignature($content, VirgilPrivateKey $signerPrivateKey)
     {
         return "";
+    }
+
+
+    /**
+     * @param resource         $content
+     * @param VirgilPrivateKey $signerPrivateKey
+     *
+     * @return string
+     */
+    public function generateStreamSignature($content, VirgilPrivateKey $signerPrivateKey)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param string           $encryptedContent
+     * @param VirgilPrivateKey $recipientPrivateKey
+     *
+     * @return string
+     */
+    public function decrypt($encryptedContent, VirgilPrivateKey $recipientPrivateKey)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param resource         $source
+     * @param VirgilPrivateKey $recipientPrivateKey
+     *
+     * @return resource
+     */
+    public function decryptStream($source, VirgilPrivateKey $recipientPrivateKey)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param string            $content
+     * @param VirgilPublicKey[] $recipientsPublicKeys
+     *
+     * @return string
+     */
+    public function encrypt($content, array $recipientsPublicKeys)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param resource          $source
+     * @param VirgilPublicKey[] $recipientsPublicKeys
+     *
+     * @return resource
+     */
+    public function encryptStream($source, array $recipientsPublicKeys)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param string $content
+     * @param string $algorithm
+     *
+     * @return string
+     */
+    public function generateHash($content, $algorithm)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param string $exportedPublicKey
+     *
+     * @return VirgilPublicKey
+     */
+    public function importPublicKey($exportedPublicKey)
+    {
+        return new VirgilPublicKey();
+    }
+
+
+    /**
+     * @param string $exportedPrivateKey
+     * @param string $password
+     *
+     * @return VirgilPrivateKey
+     */
+    public function importPrivateKey($exportedPrivateKey, $password = '')
+    {
+        return new VirgilPrivateKey();
+    }
+
+
+    /**
+     * @param VirgilPublicKey $publicKey
+     *
+     * @return string
+     */
+    public function exportPublicKey(VirgilPublicKey $publicKey)
+    {
+        return "";
+    }
+
+
+    /**
+     * @param VirgilPrivateKey $privateKey
+     * @param string           $password
+     *
+     * @return string
+     */
+    public function exportPrivateKey(VirgilPrivateKey $privateKey, $password = '')
+    {
+        return "";
+    }
+
+
+    /**
+     * @param $content
+     *
+     * @return string
+     * @throws Cryptography\Core\Exceptions\PublicKeyHashComputationException
+     */
+    protected function calculateFingerprint($content)
+    {
+        if ($this->userSHA256Fingerprints) {
+            $hash = $this->cryptoService->computeHash($content, HashAlgorithms::SHA256);
+        } else {
+            $hash = $this->cryptoService->computeHash($content, HashAlgorithms::SHA512);
+            $hash = substr($hash, 0, 8);
+        }
+
+        return bin2hex($hash);
     }
 }

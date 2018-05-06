@@ -35,38 +35,49 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
-
-
-use Virgil\CryptoApi\PublicKey;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class provides input and output streams for cipher operations.
  */
-class VirgilPublicKey implements PublicKey
+class StreamInputOutput implements InputOutputInterface
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var  VirgilStreamDataSource $input */
+    private $input;
+
+    /** @var VirgilStreamDataSink $output */
+    private $output;
 
 
     /**
-     * VirgilPublicKey constructor.
+     * Class constructor.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param resource $input  is stream source.
+     * @param resource $output is stream destination.
      */
-    public function __construct($receiverID, $key)
+    public function __construct($input, $output)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        $this->input = new VirgilStreamDataSource($input);
+        $this->output = new VirgilStreamDataSink($output);
+        $this->input->reset();
     }
 
+
+    /**
+     * @return VirgilStreamDataSource
+     */
+    public function getInput()
+    {
+        return $this->input;
+    }
+
+
+    /**
+     * @return VirgilStreamDataSink
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
 }

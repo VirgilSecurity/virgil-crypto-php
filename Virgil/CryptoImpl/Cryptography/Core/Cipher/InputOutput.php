@@ -35,38 +35,45 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
-
-
-use Virgil\CryptoApi\PublicKey;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class provides content input for cipher operations.
  */
-class VirgilPublicKey implements PublicKey
+class InputOutput implements InputOutputInterface
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var string $input */
+    private $input;
 
 
     /**
-     * VirgilPublicKey constructor.
+     * Class constructor.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param string $input
      */
-    public function __construct($receiverID, $key)
+    public function __construct($input)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        $this->input = $input;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getInput()
+    {
+        return $this->input;
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @throws MethodIsDisabledException
+     */
+    public function getOutput()
+    {
+        throw new MethodIsDisabledException(__METHOD__);
+    }
 }

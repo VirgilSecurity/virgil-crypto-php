@@ -35,38 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
 
 
-use Virgil\CryptoApi\PublicKey;
-
+use Exception;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class specifies exception during compute public key hash.
  */
-class VirgilPublicKey implements PublicKey
+class PublicKeyHashComputationException extends Exception
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
-
-
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $key
-     */
-    public function __construct($receiverID, $key)
-    {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
-    }
-
 }

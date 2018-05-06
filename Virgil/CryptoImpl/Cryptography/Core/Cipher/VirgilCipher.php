@@ -35,38 +35,66 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoApi\PublicKey;
+use Exception;
 
+use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilCipher as InternalVirgilCipher;
+
+use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class implements cipher operations with primitive data (like strings, numbers etc.)
  */
-class VirgilPublicKey implements PublicKey
+class VirgilCipher extends AbstractVirgilCipher
 {
     /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
-
-
-    /**
-     * VirgilPublicKey constructor.
+     * Class constructor.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param InternalVirgilCipher $cipher
      */
-    public function __construct($receiverID, $key)
+    public function __construct(InternalVirgilCipher $cipher)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        $this->cipher = $cipher;
     }
 
+
+    /**
+     * @inheritdoc
+     *
+     * @throws CipherException
+     */
+    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true)
+    {
+        try {
+            return $this->cipher->encrypt($cipherInputOutput->getInput(), $embedContentInfo);
+        } catch (Exception $exception) {
+            throw new CipherException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @throws CipherException
+     */
+    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey)
+    {
+        try {
+            return $this->cipher->decryptWithKey($cipherInputOutput->getInput(), $recipientId, $privateKey);
+        } catch (Exception $exception) {
+            throw new CipherException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function createInputOutput(...$args)
+    {
+        return new InputOutput($args[0]);
+    }
 }

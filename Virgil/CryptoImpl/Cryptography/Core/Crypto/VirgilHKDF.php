@@ -35,38 +35,59 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Crypto;
 
 
-use Virgil\CryptoApi\PublicKey;
-
-
-/**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
- */
-class VirgilPublicKey implements PublicKey
+class VirgilHKDF
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    public $_cPtr = null;
+    protected $_pData = [];
 
 
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $key
-     */
-    public function __construct($receiverID, $key)
+    function __construct($hashAlgorithm)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        if (is_resource($hashAlgorithm) &&
+            get_resource_type($hashAlgorithm) === '_p_virgil__crypto__foundation__VirgilHKDF'
+        ) {
+            $this->_cPtr = $hashAlgorithm;
+
+            return;
+        }
+        $this->_cPtr = new_VirgilHKDF($hashAlgorithm);
     }
 
+
+    function __set($var, $value)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_alter_newobject($this->_cPtr, $value);
+        }
+        $this->_pData[$var] = $value;
+    }
+
+
+    function __get($var)
+    {
+        if ($var === 'thisown') {
+            return swig_virgil_crypto_php_get_newobject($this->_cPtr);
+        }
+
+        return $this->_pData[$var];
+    }
+
+
+    function __isset($var)
+    {
+        if ($var === 'thisown') {
+            return true;
+        }
+
+        return array_key_exists($var, $this->_pData);
+    }
+
+
+    function derive($in, $salt, $info, $outSize)
+    {
+        return VirgilHKDF_derive($this->_cPtr, $in, $salt, $info, $outSize);
+    }
 }

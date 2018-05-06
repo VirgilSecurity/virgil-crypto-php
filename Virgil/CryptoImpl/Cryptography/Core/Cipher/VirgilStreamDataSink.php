@@ -35,38 +35,55 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoApi\PublicKey;
-
+use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilDataSink;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class is representation of data consumer stream.
  */
-class VirgilPublicKey implements PublicKey
+class VirgilStreamDataSink extends VirgilDataSink
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var resource $stream */
+    private $stream;
 
 
     /**
-     * VirgilPublicKey constructor.
+     * Class constructor.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param resource $stream
      */
-    public function __construct($receiverID, $key)
+    public function __construct($stream)
     {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
+        parent::__construct($this);
+        $this->stream = $stream;
     }
 
+
+    /**
+     * Checks if sink stream is good for write.
+     *
+     * @return bool
+     */
+    function isGood()
+    {
+        $meta = stream_get_meta_data($this->stream);
+        $mode = $meta['mode'];
+
+        return false === strpos($mode, 'r') || true === strpos($mode, 'r+');
+    }
+
+
+    /**
+     * Write chunk of encrypted data to sink stream.
+     *
+     * @param string $data
+     *
+     * @return int
+     */
+    function write($data)
+    {
+        return fwrite($this->stream, $data);
+    }
 }

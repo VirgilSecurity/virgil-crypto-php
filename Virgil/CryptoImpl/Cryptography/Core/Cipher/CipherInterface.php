@@ -35,38 +35,82 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoApi\PublicKey;
-
+use Virgil\Sdk\Cryptography\Core\Exceptions\CipherException;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Interface provides cipher operations.
  */
-class VirgilPublicKey implements PublicKey
+interface CipherInterface
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
-
 
     /**
-     * VirgilPublicKey constructor.
+     * Encrypts input content by cipher.
      *
-     * @param string $receiverID
-     * @param string $key
+     * @param InputOutputInterface $cipherInputOutput
+     * @param bool                 $embedContentInfo
+     *
+     * @return mixed
+     *
+     * @throws CipherException
      */
-    public function __construct($receiverID, $key)
-    {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
-    }
+    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
 
+
+    /**
+     * Decrypts encrypted content with private key.
+     *
+     * @param InputOutputInterface $cipherInputOutput
+     * @param string               $recipientId
+     * @param string               $privateKey
+     *
+     * @return mixed
+     *
+     * @throws CipherException
+     */
+    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
+
+
+    /**
+     * Add recipient's public key to the cipher.
+     *
+     * @param string $recipientId
+     * @param string $publicKey
+     *
+     * @return $this
+     */
+    public function addKeyRecipient($recipientId, $publicKey);
+
+
+    /**
+     * Gets data from cipher custom params.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    public function getCustomParam($key);
+
+
+    /**
+     * Sets data to cipher custom params.
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setCustomParam($key, $value);
+
+
+    /**
+     * Creates proper cipher input output object.
+     *
+     * @param array ...$args
+     *
+     * @return InputOutputInterface
+     */
+    public function createInputOutput(...$args);
 }

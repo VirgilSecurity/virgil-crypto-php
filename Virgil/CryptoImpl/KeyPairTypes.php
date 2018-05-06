@@ -38,35 +38,32 @@
 namespace Virgil\CryptoImpl;
 
 
-use Virgil\CryptoApi\PublicKey;
-
+use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilKeyPair as VirgilKeyPairType;
 
 /**
- * Class VirgilPublicKey
- * @package Virgil\CryptoImpl
+ * Class keeps list of key pair types constants.
  */
-class VirgilPublicKey implements PublicKey
+class KeyPairTypes
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $key;
-
-
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $key
-     */
-    public function __construct($receiverID, $key)
-    {
-        $this->receiverID = $receiverID;
-        $this->key = $key;
-    }
-
+    const RSA256 = VirgilKeyPairType::Type_RSA_256;
+    const RSA512 = VirgilKeyPairType::Type_RSA_512;
+    const RSA1024 = VirgilKeyPairType::Type_RSA_1024;
+    const RSA2048 = VirgilKeyPairType::Type_RSA_2048;
+    const RSA3072 = VirgilKeyPairType::Type_RSA_3072;
+    const RSA4096 = VirgilKeyPairType::Type_RSA_4096;
+    const RSA8192 = VirgilKeyPairType::Type_RSA_8192;
+    const EC_SECP192R1 = VirgilKeyPairType::Type_EC_SECP192R1;
+    const EC_SECP224R1 = VirgilKeyPairType::Type_EC_SECP224R1;
+    const EC_SECP256R1 = VirgilKeyPairType::Type_EC_SECP256R1;
+    const EC_SECP384R1 = VirgilKeyPairType::Type_EC_SECP384R1;
+    const EC_SECP521R1 = VirgilKeyPairType::Type_EC_SECP521R1;
+    const EC_BP256R1 = VirgilKeyPairType::Type_EC_BP256R1;
+    const EC_BP384R1 = VirgilKeyPairType::Type_EC_BP384R1;
+    const EC_BP512R1 = VirgilKeyPairType::Type_EC_BP512R1;
+    const EC_SECP192K1 = VirgilKeyPairType::Type_EC_SECP192K1;
+    const EC_SECP224K1 = VirgilKeyPairType::Type_EC_SECP224K1;
+    const EC_SECP256K1 = VirgilKeyPairType::Type_EC_SECP256K1;
+    const EC_CURVE25519 = VirgilKeyPairType::Type_EC_CURVE25519;
+    const FAST_EC_X25519 = VirgilKeyPairType::Type_FAST_EC_X25519;
+    const FAST_EC_ED25519 = VirgilKeyPairType::Type_FAST_EC_ED25519;
 }
