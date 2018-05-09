@@ -63,6 +63,18 @@ use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyToDerConvertingExcep
 class VirgilCryptoService
 {
     /**
+     * @var Crypto\VirgilHash
+     */
+    protected $hashAlgorithm;
+
+
+    public function __construct($hashAlgorithm = VirgilCrypto\VirgilHash::Algorithm_SHA512)
+    {
+        $this->hashAlgorithm = new VirgilCrypto\VirgilHash($hashAlgorithm);
+    }
+
+
+    /**
      * Generate public/private key pair.
      *
      * @param integer $keyPairType
@@ -242,7 +254,7 @@ class VirgilCryptoService
     public function sign($content, $privateKey)
     {
         try {
-            return (new VirgilCrypto\VirgilSigner())->sign($content, $privateKey);
+            return (new VirgilCrypto\VirgilSigner($this->hashAlgorithm))->sign($content, $privateKey);
         } catch (Exception $exception) {
             throw new ContentSigningException($exception->getMessage(), $exception->getCode());
         }
@@ -263,7 +275,7 @@ class VirgilCryptoService
     public function verify($content, $signature, $publicKey)
     {
         try {
-            return (new VirgilCrypto\VirgilSigner())->verify($content, $signature, $publicKey);
+            return (new VirgilCrypto\VirgilSigner($this->hashAlgorithm))->verify($content, $signature, $publicKey);
         } catch (Exception $exception) {
             throw new ContentVerificationException($exception->getMessage(), $exception->getCode());
         }
@@ -308,7 +320,10 @@ class VirgilCryptoService
             $virgilSourceStream = new VirgilStreamDataSource($stream);
             $virgilSourceStream->reset();
 
-            return (new VirgilCrypto\VirgilStreamSigner())->sign($virgilSourceStream, $privateKey);
+            return (new VirgilCrypto\VirgilStreamSigner($this->hashAlgorithm))->sign(
+                $virgilSourceStream,
+                $privateKey
+            );
         } catch (Exception $exception) {
             throw new ContentSigningException($exception->getMessage(), $exception->getCode());
         }
@@ -331,7 +346,11 @@ class VirgilCryptoService
         try {
             $virgilSourceStream = new VirgilStreamDataSource($stream);
 
-            return (new VirgilCrypto\VirgilStreamSigner())->verify($virgilSourceStream, $signature, $publicKey);
+            return (new VirgilCrypto\VirgilStreamSigner($this->hashAlgorithm))->verify(
+                $virgilSourceStream,
+                $signature,
+                $publicKey
+            );
         } catch (Exception $exception) {
             throw new ContentVerificationException($exception->getMessage(), $exception->getCode());
         }
