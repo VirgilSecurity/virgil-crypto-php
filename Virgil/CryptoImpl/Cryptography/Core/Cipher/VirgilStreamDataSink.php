@@ -38,7 +38,7 @@
 namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilDataSink;
+use VirgilDataSink;
 
 /**
  * Class is representation of data consumer stream.

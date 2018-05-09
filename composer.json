@@ -35,7 +35,7 @@
   "require": {
     "php": ">=5.6",
     "virgil/crypto-api": "dev-master",
-    "ext-virgil_crypto_php": "2.2.*"
+    "ext-virgil_crypto_php": "*"
   },
   "repositories": [
     {
@@ -47,6 +47,9 @@
     "virgil/crypto-api-implementation": "v5"
   },
   "autoload": {
+    "files": [
+      "virgil_crypto_php.php"
+    ],
     "psr-4": {
       "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/"
     }

@@ -38,7 +38,7 @@
 namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 
-use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilDataSource;
+use VirgilDataSource;
 
 /**
  * Class is representation of data provider stream.

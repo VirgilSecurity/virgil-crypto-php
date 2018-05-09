@@ -40,8 +40,6 @@ namespace Virgil\CryptoImpl\Cryptography\Core;
 
 use Exception;
 
-use Virgil\CryptoImpl\Cryptography\Core\Crypto as VirgilCrypto;
-
 use Virgil\CryptoImpl\Cryptography\Core\Cipher\VirgilCipher;
 use Virgil\CryptoImpl\Cryptography\Core\Cipher\VirgilStreamCipher;
 use Virgil\CryptoImpl\Cryptography\Core\Cipher\VirgilStreamDataSource;
@@ -57,20 +55,27 @@ use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyExtractionException;
 use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyHashComputationException;
 use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyToDerConvertingException;
 
+use VirgilCipher as CryptoVirgilCipher;
+use VirgilChunkCipher as CryptoVirgilChunkCipher;
+use VirgilSigner as CryptoVirgilSigner;
+use VirgilStreamSigner as CryptoVirgilStreamSigner;
+use VirgilKeyPair as CryptoVirgilKeyPair;
+use VirgilHash as CryptoVirgilHash;
+
 /**
  * Class aims to wrap native crypto library and provides cryptographic operations.
  */
 class VirgilCryptoService
 {
     /**
-     * @var Crypto\VirgilHash
+     * @var CryptoVirgilHash
      */
     protected $hashAlgorithm;
 
 
-    public function __construct($hashAlgorithm = VirgilCrypto\VirgilHash::Algorithm_SHA512)
+    public function __construct($hashAlgorithm = CryptoVirgilHash::Algorithm_SHA512)
     {
-        $this->hashAlgorithm = new VirgilCrypto\VirgilHash($hashAlgorithm);
+        $this->hashAlgorithm = $hashAlgorithm;
     }
 
 
@@ -86,7 +91,7 @@ class VirgilCryptoService
     public function generateKeyPair($keyPairType)
     {
         try {
-            $keyPair = VirgilCrypto\VirgilKeyPair::generate($keyPairType);
+            $keyPair = CryptoVirgilKeyPair::generate($keyPairType);
 
             return [$keyPair->publicKey(), $keyPair->privateKey()];
         } catch (Exception $exception) {
@@ -109,10 +114,10 @@ class VirgilCryptoService
     {
         try {
             if (strlen($privateKyePassword) === 0) {
-                return VirgilCrypto\VirgilKeyPair::privateKeyToDER($privateKey);
+                return CryptoVirgilKeyPair::privateKeyToDER($privateKey);
             }
 
-            return VirgilCrypto\VirgilKeyPair::privateKeyToDER(
+            return CryptoVirgilKeyPair::privateKeyToDER(
                 $this->encryptPrivateKey($privateKey, $privateKyePassword),
                 $privateKyePassword
             );
@@ -134,7 +139,7 @@ class VirgilCryptoService
     public function publicKeyToDer($publicKey)
     {
         try {
-            return VirgilCrypto\VirgilKeyPair::publicKeyToDER($publicKey);
+            return CryptoVirgilKeyPair::publicKeyToDER($publicKey);
         } catch (Exception $exception) {
             throw new PublicKeyToDerConvertingException($exception->getMessage(), $exception->getCode());
         }
@@ -154,7 +159,7 @@ class VirgilCryptoService
     public function isKeyPair($publicKey, $privateKey)
     {
         try {
-            return VirgilCrypto\VirgilKeyPair::isKeyPairMatch($publicKey, $privateKey);
+            return CryptoVirgilKeyPair::isKeyPairMatch($publicKey, $privateKey);
         } catch (Exception $exception) {
             throw new InvalidKeyPairException($exception->getMessage(), $exception->getCode());
         }
@@ -174,7 +179,7 @@ class VirgilCryptoService
     public function computeHash($publicKeyDER, $hashAlgorithm)
     {
         try {
-            return (new VirgilCrypto\VirgilHash($hashAlgorithm))->hash($publicKeyDER);
+            return (new CryptoVirgilHash($hashAlgorithm))->hash($publicKeyDER);
         } catch (Exception $exception) {
             throw new PublicKeyHashComputationException($exception->getMessage(), $exception->getCode());
         }
@@ -194,7 +199,7 @@ class VirgilCryptoService
     public function extractPublicKey($privateKey, $privateKeyPassword)
     {
         try {
-            return VirgilCrypto\VirgilKeyPair::extractPublicKey($privateKey, $privateKeyPassword);
+            return CryptoVirgilKeyPair::extractPublicKey($privateKey, $privateKeyPassword);
         } catch (Exception $exception) {
             throw new PublicKeyExtractionException($exception->getMessage(), $exception->getCode());
         }
@@ -214,7 +219,7 @@ class VirgilCryptoService
     public function encryptPrivateKey($privateKey, $password)
     {
         try {
-            return VirgilCrypto\VirgilKeyPair::encryptPrivateKey($privateKey, $password);
+            return CryptoVirgilKeyPair::encryptPrivateKey($privateKey, $password);
         } catch (Exception $exception) {
             throw new PrivateKeyEncryptionException($exception->getMessage(), $exception->getCode());
         }
@@ -234,7 +239,7 @@ class VirgilCryptoService
     public function decryptPrivateKey($privateKey, $privateKeyPassword)
     {
         try {
-            return VirgilCrypto\VirgilKeyPair::decryptPrivateKey($privateKey, $privateKeyPassword);
+            return CryptoVirgilKeyPair::decryptPrivateKey($privateKey, $privateKeyPassword);
         } catch (Exception $exception) {
             throw new PrivateKeyDecryptionException($exception->getMessage(), $exception->getCode());
         }
@@ -254,7 +259,7 @@ class VirgilCryptoService
     public function sign($content, $privateKey)
     {
         try {
-            return (new VirgilCrypto\VirgilSigner($this->hashAlgorithm))->sign($content, $privateKey);
+            return (new CryptoVirgilSigner($this->hashAlgorithm))->sign($content, $privateKey);
         } catch (Exception $exception) {
             throw new ContentSigningException($exception->getMessage(), $exception->getCode());
         }
@@ -275,7 +280,7 @@ class VirgilCryptoService
     public function verify($content, $signature, $publicKey)
     {
         try {
-            return (new VirgilCrypto\VirgilSigner($this->hashAlgorithm))->verify($content, $signature, $publicKey);
+            return (new CryptoVirgilSigner($this->hashAlgorithm))->verify($content, $signature, $publicKey);
         } catch (Exception $exception) {
             throw new ContentVerificationException($exception->getMessage(), $exception->getCode());
         }
@@ -289,7 +294,7 @@ class VirgilCryptoService
      */
     public function createCipher()
     {
-        return new VirgilCipher(new VirgilCrypto\VirgilCipher());
+        return new VirgilCipher(new CryptoVirgilCipher());
     }
 
 
@@ -300,7 +305,7 @@ class VirgilCryptoService
      */
     public function createStreamCipher()
     {
-        return new VirgilStreamCipher(new VirgilCrypto\VirgilChunkCipher());
+        return new VirgilStreamCipher(new CryptoVirgilChunkCipher());
     }
 
 
@@ -320,7 +325,7 @@ class VirgilCryptoService
             $virgilSourceStream = new VirgilStreamDataSource($stream);
             $virgilSourceStream->reset();
 
-            return (new VirgilCrypto\VirgilStreamSigner($this->hashAlgorithm))->sign(
+            return (new CryptoVirgilStreamSigner($this->hashAlgorithm))->sign(
                 $virgilSourceStream,
                 $privateKey
             );
@@ -346,7 +351,7 @@ class VirgilCryptoService
         try {
             $virgilSourceStream = new VirgilStreamDataSource($stream);
 
-            return (new VirgilCrypto\VirgilStreamSigner($this->hashAlgorithm))->verify(
+            return (new CryptoVirgilStreamSigner($this->hashAlgorithm))->verify(
                 $virgilSourceStream,
                 $signature,
                 $publicKey

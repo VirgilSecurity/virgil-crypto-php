@@ -40,7 +40,7 @@ namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
 
 use Exception;
 
-use Virgil\CryptoImpl\Cryptography\Core\Crypto\VirgilCipherBase;
+use VirgilCipherBase;
 
 use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
 
