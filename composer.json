@@ -37,8 +37,8 @@
     "ext-virgil_crypto_php": "*"
   },
   "autoload": {
-    "psr-0": {
-      "Virgil": "src/"
-    }
+    "files": [
+      "virgil_crypto_php.php"
+    ]
   }
 }
