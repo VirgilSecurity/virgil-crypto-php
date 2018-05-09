@@ -383,10 +383,19 @@ class VirgilCrypto
      * @param string $exportedPublicKey
      *
      * @return VirgilPublicKey
+     * @throws VirgilCryptoException
      */
     public function importPublicKey($exportedPublicKey)
     {
-        return new VirgilPublicKey();
+        try {
+            $publicKeyDerEncoded = $this->cryptoService->publicKeyToDer($exportedPublicKey);
+            $receiverID = $this->calculateFingerprint($publicKeyDerEncoded);
+
+            return new VirgilPublicKey($receiverID, $publicKeyDerEncoded);
+
+        } catch (Exception $exception) {
+            throw new VirgilCryptoException($exception->getMessage());
+        }
     }
 
 
@@ -395,10 +404,20 @@ class VirgilCrypto
      * @param string $password
      *
      * @return VirgilPrivateKey
+     * @throws VirgilCryptoException
      */
     public function importPrivateKey($exportedPrivateKey, $password = '')
     {
-        return new VirgilPrivateKey();
+        try {
+            $privateKeyDerEncoded = $this->cryptoService->decryptPrivateKey($exportedPrivateKey, $password);
+            $receiverID = $this->calculateFingerprint(
+                $this->cryptoService->extractPublicKey($privateKeyDerEncoded, '')
+            );
+
+            return new VirgilPrivateKey($receiverID, $privateKeyDerEncoded);
+        } catch (Exception $exception) {
+            throw new VirgilCryptoException($exception->getMessage());
+        }
     }
 
 
@@ -406,10 +425,15 @@ class VirgilCrypto
      * @param VirgilPublicKey $publicKey
      *
      * @return string
+     * @throws VirgilCryptoException
      */
     public function exportPublicKey(VirgilPublicKey $publicKey)
     {
-        return "";
+        try {
+            return $this->cryptoService->publicKeyToDer($publicKey->getValue());
+        } catch (Exception $exception) {
+            throw new VirgilCryptoException($exception->getMessage());
+        }
     }
 
 
@@ -418,10 +442,15 @@ class VirgilCrypto
      * @param string           $password
      *
      * @return string
+     * @throws VirgilCryptoException
      */
     public function exportPrivateKey(VirgilPrivateKey $privateKey, $password = '')
     {
-        return "";
+        try {
+            return $this->cryptoService->privateKeyToDer($privateKey->getValue(), $password);
+        } catch (Exception $exception) {
+            throw new VirgilCryptoException($exception->getMessage());
+        }
     }
 
 
