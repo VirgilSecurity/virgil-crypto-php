@@ -35,14 +35,11 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
+namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 
 use Exception;
 
-/**
- * Class specifies exception during compute public key hash.
- */
-class PublicKeyHashComputationException extends Exception
+class MethodIsDisabledException extends Exception
 {
 }

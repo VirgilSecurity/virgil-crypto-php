@@ -35,78 +35,82 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
+namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 
-use Exception;
-
-use VirgilCipherBase;
-
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\CipherException;
 
 /**
- * Base abstract class for ciphers.
+ * Interface provides cipher operations.
  */
-abstract class AbstractVirgilCipher implements CipherInterface
+interface CipherInterface
 {
-    /** @var VirgilCipherBase $cipher */
-    protected $cipher;
-
 
     /**
-     * @inheritdoc
-     */
-    abstract public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
-
-
-    /**
-     * @inheritdoc
-     */
-    abstract public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
-
-
-    /**
-     * @inheritdoc
-     */
-    abstract public function createInputOutput(...$args);
-
-
-    /**
-     * @inheritdoc
+     * Encrypts input content by cipher.
+     *
+     * @param InputOutputInterface $cipherInputOutput
+     * @param bool                 $embedContentInfo
+     *
+     * @return mixed
      *
      * @throws CipherException
      */
-    public function addKeyRecipient($recipientId, $publicKey)
-    {
-        try {
-            $this->cipher->addKeyRecipient($recipientId, $publicKey);
-
-            return $this;
-        } catch (Exception $e) {
-            throw new CipherException($e->getMessage(), $e->getCode());
-        }
-    }
+    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
 
 
     /**
-     * @inheritdoc
+     * Decrypts encrypted content with private key.
+     *
+     * @param InputOutputInterface $cipherInputOutput
+     * @param string               $recipientId
+     * @param string               $privateKey
+     *
+     * @return mixed
+     *
+     * @throws CipherException
      */
-    public function getCustomParam($key)
-    {
-        $cipherCustomParams = $this->cipher->customParams();
-
-        return $cipherCustomParams->getData($key);
-    }
+    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
 
 
     /**
-     * @inheritdoc
+     * Add recipient's public key to the cipher.
+     *
+     * @param string $recipientId
+     * @param string $publicKey
+     *
+     * @return $this
      */
-    public function setCustomParam($key, $value)
-    {
-        $cipherCustomParams = $this->cipher->customParams();
-        $cipherCustomParams->setData($key, $value);
+    public function addKeyRecipient($recipientId, $publicKey);
 
-        return $this;
-    }
+
+    /**
+     * Gets data from cipher custom params.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    public function getCustomParam($key);
+
+
+    /**
+     * Sets data to cipher custom params.
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setCustomParam($key, $value);
+
+
+    /**
+     * Creates proper cipher input output object.
+     *
+     * @param array ...$args
+     *
+     * @return InputOutputInterface
+     */
+    public function createInputOutput(...$args);
 }

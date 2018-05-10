@@ -35,25 +35,25 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core;
+namespace Virgil\CryptoImpl\Cryptography;
 
 
 use Exception;
 
-use Virgil\CryptoImpl\Cryptography\Core\Cipher\VirgilCipher;
-use Virgil\CryptoImpl\Cryptography\Core\Cipher\VirgilStreamCipher;
-use Virgil\CryptoImpl\Cryptography\Core\Cipher\VirgilStreamDataSource;
+use Virgil\CryptoImpl\Cryptography\Cipher\VirgilCipher;
+use Virgil\CryptoImpl\Cryptography\Cipher\VirgilStreamCipher;
+use Virgil\CryptoImpl\Cryptography\Cipher\VirgilStreamDataSource;
 
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\ContentSigningException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\ContentVerificationException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\InvalidKeyPairException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\KeyPairGenerationException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PrivateKeyDecryptionException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PrivateKeyEncryptionException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PrivateKeyToDerConvertingException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyExtractionException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyHashComputationException;
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\PublicKeyToDerConvertingException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\ContentSigningException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\ContentVerificationException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\InvalidKeyPairException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\KeyPairGenerationException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\PrivateKeyDecryptionException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\PrivateKeyEncryptionException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\PrivateKeyToDerConvertingException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\PublicKeyExtractionException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\PublicKeyHashComputationException;
+use Virgil\CryptoImpl\Cryptography\Exceptions\PublicKeyToDerConvertingException;
 
 use VirgilCipher as CryptoVirgilCipher;
 use VirgilChunkCipher as CryptoVirgilChunkCipher;

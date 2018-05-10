@@ -35,14 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
+namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
 
 use Exception;
 
 /**
- * Class specifies exception during extract public key.
+ * Class specifies exception during cipher's operation invocation (e.g encrypt, decrypt, add recipient).
  */
-class PublicKeyExtractionException extends Exception
+class CipherException extends Exception
 {
 }

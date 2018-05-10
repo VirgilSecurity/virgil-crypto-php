@@ -35,66 +35,55 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
+namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 
-use Exception;
-
-use VirgilCipher as CryptoVirgilCipher;
-
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
+use VirgilDataSink;
 
 /**
- * Class implements cipher operations with primitive data (like strings, numbers etc.)
+ * Class is representation of data consumer stream.
  */
-class VirgilCipher extends AbstractVirgilCipher
+class VirgilStreamDataSink extends VirgilDataSink
 {
+    /** @var resource $stream */
+    private $stream;
+
+
     /**
      * Class constructor.
      *
-     * @param CryptoVirgilCipher $cipher
+     * @param resource $stream
      */
-    public function __construct(CryptoVirgilCipher $cipher)
+    public function __construct($stream)
     {
-        $this->cipher = $cipher;
+        parent::__construct($this);
+        $this->stream = $stream;
     }
 
 
     /**
-     * @inheritdoc
+     * Checks if sink stream is good for write.
      *
-     * @throws CipherException
+     * @return bool
      */
-    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true)
+    function isGood()
     {
-        try {
-            return $this->cipher->encrypt($cipherInputOutput->getInput(), $embedContentInfo);
-        } catch (Exception $exception) {
-            throw new CipherException($exception->getMessage(), $exception->getCode());
-        }
+        $meta = stream_get_meta_data($this->stream);
+        $mode = $meta['mode'];
+
+        return false === strpos($mode, 'r') || true === strpos($mode, 'r+');
     }
 
 
     /**
-     * @inheritdoc
+     * Write chunk of encrypted data to sink stream.
      *
-     * @throws CipherException
+     * @param string $data
+     *
+     * @return int
      */
-    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey)
+    function write($data)
     {
-        try {
-            return $this->cipher->decryptWithKey($cipherInputOutput->getInput(), $recipientId, $privateKey);
-        } catch (Exception $exception) {
-            throw new CipherException($exception->getMessage(), $exception->getCode());
-        }
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function createInputOutput(...$args)
-    {
-        return new InputOutput($args[0]);
+        return fwrite($this->stream, $data);
     }
 }

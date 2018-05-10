@@ -35,71 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
+namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
 
 use Exception;
 
-use VirgilChunkCipher as CryptoVirgilChunkCipher;
-
-use Virgil\CryptoImpl\Cryptography\Core\Exceptions\CipherException;
-
 /**
- * Class implements cipher operations with streams (file, network, memory etc.)
+ * Class specifies exception during convert public key to material format.
  */
-class VirgilStreamCipher extends AbstractVirgilCipher
+class PublicKeyToDerConvertingException extends Exception
 {
-    /**
-     * Class constructor.
-     *
-     * @param CryptoVirgilChunkCipher $cipher
-     */
-    public function __construct(CryptoVirgilChunkCipher $cipher)
-    {
-        $this->cipher = $cipher;
-    }
-
-
-    /**
-     * @inheritdoc
-     *
-     * @throws CipherException
-     */
-    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true)
-    {
-        try {
-            $this->cipher->encrypt($cipherInputOutput->getInput(), $cipherInputOutput->getOutput(), $embedContentInfo);
-        } catch (Exception $exception) {
-            throw new CipherException($exception->getMessage(), $exception->getCode());
-        }
-    }
-
-
-    /**
-     * @inheritdoc
-     *
-     * @throws CipherException
-     */
-    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey)
-    {
-        try {
-            $this->cipher->decryptWithKey(
-                $cipherInputOutput->getInput(),
-                $cipherInputOutput->getOutput(),
-                $recipientId,
-                $privateKey
-            );
-        } catch (Exception $exception) {
-            throw new CipherException($exception->getMessage(), $exception->getCode());
-        }
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function createInputOutput(...$args)
-    {
-        return new StreamInputOutput($args[0], $args[1]);
-    }
 }

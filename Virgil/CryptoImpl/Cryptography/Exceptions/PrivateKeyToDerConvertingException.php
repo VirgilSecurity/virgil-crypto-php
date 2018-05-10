@@ -35,11 +35,10 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
+namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
 
 use Exception;
-
 
 /**
  * Class specifies exception during convert private key to material format.

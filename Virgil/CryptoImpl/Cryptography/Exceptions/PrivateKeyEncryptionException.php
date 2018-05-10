@@ -35,14 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
+namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
 
 use Exception;
 
 /**
- * Class specifies exception if public and private keys don't belong to same key pair.
+ * Class specifies exception during encrypt private key.
  */
-class InvalidKeyPairException extends Exception
+class PrivateKeyEncryptionException extends Exception
 {
 }

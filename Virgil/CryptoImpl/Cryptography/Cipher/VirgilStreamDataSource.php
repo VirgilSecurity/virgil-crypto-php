@@ -35,82 +35,67 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
+namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 
-use Virgil\Sdk\Cryptography\Core\Exceptions\CipherException;
+use VirgilDataSource;
 
 /**
- * Interface provides cipher operations.
+ * Class is representation of data provider stream.
  */
-interface CipherInterface
+class VirgilStreamDataSource extends VirgilDataSource
 {
+    /** @var resource $stream */
+    private $stream;
+
+    /** @var int $dataChunk */
+    private $dataChunk;
+
 
     /**
-     * Encrypts input content by cipher.
+     * Class constructor.
      *
-     * @param InputOutputInterface $cipherInputOutput
-     * @param bool                 $embedContentInfo
-     *
-     * @return mixed
-     *
-     * @throws CipherException
+     * @param resource $stream
+     * @param int      $dataChunk specifies length number of bytes read.
      */
-    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
+    public function __construct($stream, $dataChunk = 1024)
+    {
+        parent::__construct($this);
+        $this->stream = $stream;
+        rewind($this->stream);
+        $this->dataChunk = $dataChunk;
+    }
 
 
     /**
-     * Decrypts encrypted content with private key.
+     * Checks if there is data chunk.
      *
-     * @param InputOutputInterface $cipherInputOutput
-     * @param string               $recipientId
-     * @param string               $privateKey
-     *
-     * @return mixed
-     *
-     * @throws CipherException
+     * @return bool
      */
-    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
+    public function hasData()
+    {
+        return !feof($this->stream);
+    }
 
 
     /**
-     * Add recipient's public key to the cipher.
-     *
-     * @param string $recipientId
-     * @param string $publicKey
-     *
-     * @return $this
-     */
-    public function addKeyRecipient($recipientId, $publicKey);
-
-
-    /**
-     * Gets data from cipher custom params.
-     *
-     * @param string $key
+     * Read data chunk from stream.
      *
      * @return string
      */
-    public function getCustomParam($key);
+    public function read()
+    {
+        return fread($this->stream, $this->dataChunk);
+    }
 
 
     /**
-     * Sets data to cipher custom params.
+     * Set pointer to begin of the stream.
      *
-     * @param string $key
-     * @param string $value
-     *
-     * @return $this
+     * @return bool
      */
-    public function setCustomParam($key, $value);
-
-
-    /**
-     * Creates proper cipher input output object.
-     *
-     * @param array ...$args
-     *
-     * @return InputOutputInterface
-     */
-    public function createInputOutput(...$args);
+    public function reset()
+    {
+        return rewind($this->stream);
+    }
 }

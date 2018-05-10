@@ -35,14 +35,22 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
+namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
-
-use Exception;
 
 /**
- * Class specifies exception during generate key pair.
+ * Interface represents input and output for cipher operations.
  */
-class KeyPairGenerationException extends Exception
+interface InputOutputInterface
 {
+    /**
+     * @return mixed
+     */
+    public function getInput();
+
+
+    /**
+     * @return mixed
+     */
+    public function getOutput();
 }

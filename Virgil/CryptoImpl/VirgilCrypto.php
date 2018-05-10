@@ -40,7 +40,7 @@ namespace Virgil\CryptoImpl;
 
 use Exception;
 
-use Virgil\CryptoImpl\Cryptography\Core\VirgilCryptoService;
+use Virgil\CryptoImpl\Cryptography\VirgilCryptoService;
 
 
 /**

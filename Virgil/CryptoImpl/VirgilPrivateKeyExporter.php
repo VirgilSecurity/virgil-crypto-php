@@ -35,14 +35,65 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Exceptions;
+namespace Virgil\CryptoImpl;
 
 
-use Exception;
+use Virgil\CryptoApi\PrivateKey;
+use Virgil\CryptoApi\PrivateKeyExporter;
 
 /**
- * Class specifies exception if content verification by signature is failed.
+ * Class VirgilPrivateKeyExporter
+ * @package Virgil\CryptoImpl
  */
-class ContentVerificationException extends Exception
+class VirgilPrivateKeyExporter implements PrivateKeyExporter
 {
+    /**
+     * @var VirgilCrypto
+     */
+    protected $virgilCrypto;
+
+    /**
+     * @var null|string
+     */
+    protected $password;
+
+
+    /**
+     * VirgilPrivateKeyExporter constructor.
+     *
+     * @param null|string $password
+     */
+    public function __construct($password = null)
+    {
+        $this->password = $password;
+        $this->virgilCrypto = new VirgilCrypto();
+    }
+
+
+    /**
+     * @param PrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function exportPrivateKey(PrivateKey $privateKey)
+    {
+        if (!$privateKey instanceof VirgilPrivateKey) {
+            throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
+        }
+
+        return $this->virgilCrypto->exportPrivateKey($privateKey, $this->password);
+    }
+
+
+    /**
+     * @param string $data
+     *
+     * @return PrivateKey
+     * @throws VirgilCryptoException
+     */
+    public function importPrivateKey($data)
+    {
+        return $this->virgilCrypto->importPrivateKey($data, $this->password);
+    }
 }

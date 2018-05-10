@@ -35,45 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Core\Cipher;
+namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
+
+use Exception;
 
 /**
- * Class provides content input for cipher operations.
+ * Class specifies exception during generate key pair.
  */
-class InputOutput implements InputOutputInterface
+class KeyPairGenerationException extends Exception
 {
-    /** @var string $input */
-    private $input;
-
-
-    /**
-     * Class constructor.
-     *
-     * @param string $input
-     */
-    public function __construct($input)
-    {
-        $this->input = $input;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInput()
-    {
-        return $this->input;
-    }
-
-
-    /**
-     * @inheritdoc
-     *
-     * @throws MethodIsDisabledException
-     */
-    public function getOutput()
-    {
-        throw new MethodIsDisabledException(__METHOD__);
-    }
 }
