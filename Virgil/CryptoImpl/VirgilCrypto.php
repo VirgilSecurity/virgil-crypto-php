@@ -114,9 +114,9 @@ class VirgilCrypto
 
 
     /**
-     * @param string           $encryptedAndSignedContent
-     * @param VirgilPrivateKey $recipientPrivateKey
-     * @param VirgilPublicKey  $signerPublicKey
+     * @param string            $encryptedAndSignedContent
+     * @param VirgilPrivateKey  $recipientPrivateKey
+     * @param VirgilPublicKey[] $signerPublicKeys
      *
      * @return string
      *
@@ -126,7 +126,7 @@ class VirgilCrypto
     public function decryptThenVerify(
         $encryptedAndSignedContent,
         VirgilPrivateKey $recipientPrivateKey,
-        VirgilPublicKey $signerPublicKey
+        array $signerPublicKeys
     ) {
         try {
             $cipher = $this->cryptoService->createCipher();
@@ -139,7 +139,15 @@ class VirgilCrypto
             );
 
             $signature = $cipher->getCustomParam(self::CUSTOM_PARAM_KEY_SIGNATURE);
-            if (!$this->verifySignature($decryptedContent, $signature, $signerPublicKey)) {
+
+            $isSignatureValid = false;
+            foreach ($signerPublicKeys as $signerPublicKey) {
+                if ($this->verifySignature($decryptedContent, $signature, $signerPublicKey)) {
+                    $isSignatureValid = true;
+                }
+            }
+
+            if (!$isSignatureValid) {
                 throw new SignatureIsNotValidException('signature is not valid');
             }
 
@@ -455,6 +463,25 @@ class VirgilCrypto
 
 
     /**
+     * @param VirgilPrivateKey $privateKey
+     * @param string           $password
+     *
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoException
+     */
+    public function extractPublicKey(VirgilPrivateKey $privateKey, $password = '')
+    {
+        try {
+            $publicKeyData = $this->cryptoService->extractPublicKey($privateKey->getValue(), $password);
+
+            return $this->importPublicKey($publicKeyData);
+        } catch (Exception $exception) {
+            throw new VirgilCryptoException($exception->getMessage());
+        }
+    }
+
+
+    /**
      * @param $content
      *
      * @return string
@@ -470,7 +497,7 @@ class VirgilCrypto
                 $hash = substr($hash, 0, 8);
             }
 
-            return bin2hex($hash);
+            return $hash;
         } catch (Exception $exception) {
             throw new VirgilCryptoException($exception->getMessage());
         }
