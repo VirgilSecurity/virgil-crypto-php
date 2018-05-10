@@ -40,9 +40,9 @@ namespace Tests\Unit\Virgil\VirgilImpl;
 
 use PHPUnit\Framework\TestCase;
 
-use Virgil\CryptoApi\PublicKey;
 use Virgil\CryptoImpl\KeyPairTypes;
 use Virgil\CryptoImpl\VirgilPublicKey;
+
 use Virgil\Tests\CompatibilityDataProvider;
 
 use Virgil\CryptoImpl\VirgilCrypto;
