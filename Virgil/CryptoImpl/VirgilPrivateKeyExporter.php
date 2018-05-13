@@ -82,7 +82,7 @@ class VirgilPrivateKeyExporter implements PrivateKeyExporter
             throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
         }
 
-        return $this->virgilCrypto->exportPrivateKey($privateKey, $this->password);
+        return base64_encode($this->virgilCrypto->exportPrivateKey($privateKey, $this->password));
     }
 
 
@@ -94,6 +94,6 @@ class VirgilPrivateKeyExporter implements PrivateKeyExporter
      */
     public function importPrivateKey($data)
     {
-        return $this->virgilCrypto->importPrivateKey($data, $this->password);
+        return $this->virgilCrypto->importPrivateKey(base64_decode($data), $this->password);
     }
 }
