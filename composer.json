@@ -31,21 +31,14 @@
       "homepage": "https://virgilsecurity.com/"
     }
   ],
-  "minimum-stability": "dev",
   "require": {
     "php": ">=5.6",
-    "virgil/crypto-api": "dev-master",
+    "virgil/crypto-api": "^5.0",
     "ext-virgil_crypto_php": "*"
   },
   "require-dev": {
     "phpunit/phpunit": ">=5.6"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/Qzich/virgil-crypto-api"
-    }
-  ],
   "provide": {
     "virgil/crypto-api-implementation": "v5"
   },
