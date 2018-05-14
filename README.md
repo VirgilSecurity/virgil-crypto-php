@@ -18,6 +18,10 @@ composer require virgil/crypto
 
 BSD 3-Clause. See LICENSE for details.
 
+## Virgil Crypto V4
+
+https://github.com/VirgilSecurity/virgil-sdk-crypto-php/tree/v4
+
 ## Contacts
 
 Our developer support team is here to help you. Find out more information on our [Help Center](https://help.virgilsecurity.com/).
