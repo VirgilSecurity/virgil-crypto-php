@@ -3,3 +3,5 @@
 vendor/
 samples/
 composer.lock
+/virgil_crypto_php-old.php
+/index.php
