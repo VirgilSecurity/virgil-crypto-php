@@ -37,7 +37,6 @@
 
 namespace Virgil\Tests;
 
-
 /**
  * Class provides data for compatibility tests.
  */
