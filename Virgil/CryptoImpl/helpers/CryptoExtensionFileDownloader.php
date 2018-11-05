@@ -1,0 +1,123 @@
+<?php
+/**
+ * Copyright (C) 2015-2018 Virgil Security Inc.
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     (1) Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *     (2) Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *     (3) Neither the name of the copyright holder nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
+ */
+
+namespace Virgil\CryptoImpl\helpers;
+
+use PharData;
+
+/**
+ * Class CryptoExtensionFileDownloader
+ * @package Virgil\Helpers
+ */
+class CryptoExtensionFileDownloader
+{
+    /**
+     * @var CryptoExtensionLinkGenerator
+     */
+    private $link;
+    /**
+     * @var string
+     */
+    private $folder;
+
+    /**
+     * CryptoExtensionFileDownloader constructor.
+     */
+    public function __construct()
+    {
+        $this->extensionFile = 'virgil_crypto_php.so';
+        $this->folder = base64_encode(time()).'/';
+        $this->link = (new CryptoExtensionLinkGenerator);
+        $this->archiveName = $this->link->getArchiveName();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getDownloadArchive()
+    {
+        if (!copy($this->link->getFullLink(), $this->archiveName)) {
+            throw new \Exception('Can`t download archive');
+        }
+    }
+
+    /**
+     * @param $dir
+     * @return bool
+     */
+    private function delFolder($dir)
+    {
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? $this->delFolder("$dir/$file") : unlink("$dir/$file");
+        }
+
+        return rmdir($dir);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getExtensionFileFromArchive()
+    {
+        $this->getDownloadArchive();
+
+        $phar = new PharData($this->link->getArchiveName());
+        $phar->extractTo($this->folder);
+
+        if (!copy($this->folder.$this->getFolderName().'/lib/'.$this->extensionFile, $this->folder
+            .$this->extensionFile)) {
+            throw new \Exception('Can`t copy file from CDN');
+        }
+
+        if (!unlink($this->archiveName)) {
+            throw new \Exception('Can`t delete archive file');
+        }
+
+        if (!$this->delFolder($this->folder.$this->getFolderName())) {
+            throw new \Exception('Can`t delete folder with extracted files');
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function getFolderName()
+    {
+        return (string) explode(".".$this->link->getExtension(), $this->link->getArchiveName())[0];
+    }
+}
