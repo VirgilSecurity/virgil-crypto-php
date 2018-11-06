@@ -54,7 +54,7 @@
   "autoload-dev": {
     "psr-4": {
       "Virgil\\Tests\\": "tests/src/",
-      "Virgil\\Samples\\": "samples/",
+      "Virgil\\Samples\\": "samples/"
     }
   }
 }
