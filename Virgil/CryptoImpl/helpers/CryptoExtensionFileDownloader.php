@@ -45,6 +45,9 @@ use PharData;
  */
 class CryptoExtensionFileDownloader
 {
+
+    const EXTENSION_FILE_NAME = 'virgil_crypto_php.so';
+
     /**
      * @var CryptoExtensionLinkGenerator
      */
@@ -59,9 +62,8 @@ class CryptoExtensionFileDownloader
      */
     public function __construct()
     {
-        $this->extensionFile = 'virgil_crypto_php.so';
-        $this->folder = base64_encode(time()).'/';
         $this->link = (new CryptoExtensionLinkGenerator);
+        $this->folder = $this->link->getPHPVersion().'/';
         $this->archiveName = $this->link->getArchiveName();
     }
 
@@ -92,15 +94,13 @@ class CryptoExtensionFileDownloader
     /**
      * @throws \Exception
      */
-    public function getExtensionFileFromArchive()
+    private function getExtensionFileFromArchive()
     {
-        $this->getDownloadArchive();
-
         $phar = new PharData($this->link->getArchiveName());
         $phar->extractTo($this->folder);
 
-        if (!copy($this->folder.$this->getFolderName().'/lib/'.$this->extensionFile, $this->folder
-            .$this->extensionFile)) {
+        if (!copy($this->folder.$this->getFolderName().'/lib/'.self::EXTENSION_FILE_NAME, $this->folder
+            .self::EXTENSION_FILE_NAME)) {
             throw new \Exception('Can`t copy file from CDN');
         }
 
@@ -111,6 +111,16 @@ class CryptoExtensionFileDownloader
         if (!$this->delFolder($this->folder.$this->getFolderName())) {
             throw new \Exception('Can`t delete folder with extracted files');
         }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getExtensionFile()
+    {
+        $this->getDownloadArchive();
+
+        return $this->getExtensionFileFromArchive();
     }
 
     /**

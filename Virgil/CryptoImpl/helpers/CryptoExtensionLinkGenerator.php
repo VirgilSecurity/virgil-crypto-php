@@ -63,6 +63,9 @@ class CryptoExtensionLinkGenerator
         }
     }
 
+    /**
+     * @return string
+     */
     public function getArchiveName()
     {
         return 'virgil-crypto-'.$this->getVirgilVersion().'-php-'.$this->getPHPVersion().'-'.$this->getFullOSName().'-x'.$this->getSystemArch().'.'.$this->getExtension();
@@ -101,9 +104,9 @@ class CryptoExtensionLinkGenerator
     /**
      * @return float
      */
-    private function getPHPVersion()
+    public function getPHPVersion()
     {
-        return (float)phpversion();
+        return (float) phpversion();
     }
 
     /**

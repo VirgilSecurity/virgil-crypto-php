@@ -35,12 +35,13 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-require_once('vendor/autoload.php');
+require_once('../vendor/autoload.php');
 
 use Virgil\CryptoImpl\helpers\CryptoExtensionFileDownloader;
 
 try {
-    return (new CryptoExtensionFileDownloader)->getExtensionFileFromArchive();
+    (new CryptoExtensionFileDownloader)->getExtensionFile();
+    echo "Extension file successfully downloaded";
 } catch (Exception $exception) {
     echo $exception;
 }
