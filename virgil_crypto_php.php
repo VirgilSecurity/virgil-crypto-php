@@ -10,22 +10,6 @@
  * interface file instead.
  * ----------------------------------------------------------------------------- */
 
-// Try to load our extension if it's not already loaded.
-if (!extension_loaded('virgil_crypto_php')) {
-  if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
-    if (!dl('php_virgil_crypto_php.dll')) return;
-  } else {
-    // PHP_SHLIB_SUFFIX gives 'dylib' on MacOS X but modules are 'so'.
-    if (PHP_SHLIB_SUFFIX === 'dylib') {
-      if (!dl('virgil_crypto_php.so')) return;
-    } else {
-      if (!dl('virgil_crypto_php.'.PHP_SHLIB_SUFFIX)) return;
-    }
-  }
-}
-
-
-
 abstract class virgil_crypto_php {
 	const VIRGIL_CRYPTO_FEATURE_LOW_LEVEL_WRAP = VIRGIL_CRYPTO_FEATURE_LOW_LEVEL_WRAP;
 
