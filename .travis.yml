@@ -1,0 +1,43 @@
+language: php
+matrix:
+  include:
+  - os: linux
+    compiler: gcc
+    env: PHPUNIT_VERSION=6.2 PHP_VERSION=7.2
+    sudo: required
+    dist: trusty
+before_install:
+  - date -u
+  - uname -a
+  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then lscpu; fi
+install:
+  # Use clean dependencies installation to avoid versions collision.
+  - export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  - echo "Install PHP version ${PHP_VERSION} ..."
+  - travis_retry sudo apt-add-repository -y ppa:ondrej/php
+  - travis_retry sudo apt-get -qq update
+  - travis_retry sudo apt-get install -y -qq php${PHP_VERSION}
+  - travis_retry sudo apt-get install -y -qq php${PHP_VERSION}-cli
+  - travis_retry sudo apt-get install -y -qq php${PHP_VERSION}-dev
+  - travis_retry sudo apt-get install -y -qq php${PHP_VERSION}-mbstring
+  - travis_retry sudo apt-get install -y -qq php${PHP_VERSION}-curl
+  - echo "Install PHPUnit version ${PHPUNIT_VERSION} ..."
+  - travis_retry wget https://phar.phpunit.de/phpunit-${PHPUNIT_VERSION}.phar
+  - chmod +x phpunit-${PHPUNIT_VERSION}.phar
+  - sudo mv phpunit-${PHPUNIT_VERSION}.phar /usr/bin/phpunit
+  - echo "Install composer globally"
+  - curl -sS https://getcomposer.org/installer -o composer-setup.php
+  - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+  - php --version
+  - php -i
+  - phpunit --version
+  - php-config --extension-dir
+  - composer --version
+before_script:
+  - sudo cp $TRAVIS_BUILD_DIR/build/virgil_crypto_php.so /usr/lib/php/20170718
+  - cd /usr/lib/php/20170718
+  - ls -a
+  - sudo sh -c "echo 'extension=virgil_crypto_php.so' >> /etc/php/7.2/cli/php.ini"
+  - cd $TRAVIS_BUILD_DIR
+  - composer install
+script: phpunit --configuration phpunit.xml --coverage-text
