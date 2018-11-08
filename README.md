@@ -1,5 +1,7 @@
 # Virgil Security PHP Crypto Library
 
+[![Build Status](https://api.travis-ci.com/VirgilSecurity/crypto-php.svg?branch=master)](https://travis-ci.com/VirgilSecurity/crypto-php/)
+
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 
 ### [Introduction](#introduction) | [Library purposes](#library-purposes) | [Usage examples](#usage-examples) | [Installation](#installation) | [Docs](#docs) | [License](#license) | [Contacts](#support)
