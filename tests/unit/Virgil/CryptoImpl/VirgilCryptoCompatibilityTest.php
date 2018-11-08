@@ -37,7 +37,6 @@
 
 namespace Tests\Unit\Virgil\VirgilImpl;
 
-
 use PHPUnit\Framework\TestCase;
 
 use Virgil\CryptoImpl\KeyPairTypes;
@@ -50,7 +49,7 @@ use Virgil\CryptoImpl\VirgilCrypto;
 class VirgilCryptoCompatibilityTest extends TestCase
 {
     const COMPATIBILITY_FILE_NAME = 'crypto_compatibility_data.json';
-
+    const VIRGIL_FIXTURE_PATH = __DIR__."/../../../fixtures";
 
     /**
      * @dataProvider getEncryptedContentWithValidRecipientPrivateKeyDataProvider
@@ -222,7 +221,7 @@ class VirgilCryptoCompatibilityTest extends TestCase
     private function createCompatibilityDataProvider()
     {
         return new CompatibilityDataProvider(
-            VIRGIL_FIXTURE_PATH . DIRECTORY_SEPARATOR . self::COMPATIBILITY_FILE_NAME
+            self::VIRGIL_FIXTURE_PATH . DIRECTORY_SEPARATOR . self::COMPATIBILITY_FILE_NAME
         );
     }
 }

@@ -10,22 +10,6 @@
  * interface file instead.
  * ----------------------------------------------------------------------------- */
 
-// Try to load our extension if it's not already loaded.
-if (!extension_loaded('virgil_crypto_php')) {
-  if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
-    if (!dl('php_virgil_crypto_php.dll')) return;
-  } else {
-    // PHP_SHLIB_SUFFIX gives 'dylib' on MacOS X but modules are 'so'.
-    if (PHP_SHLIB_SUFFIX === 'dylib') {
-      if (!dl('virgil_crypto_php.so')) return;
-    } else {
-      if (!dl('virgil_crypto_php.'.PHP_SHLIB_SUFFIX)) return;
-    }
-  }
-}
-
-
-
 abstract class virgil_crypto_php {
 	const VIRGIL_CRYPTO_FEATURE_LOW_LEVEL_WRAP = VIRGIL_CRYPTO_FEATURE_LOW_LEVEL_WRAP;
 
@@ -1010,6 +994,10 @@ class VirgilSymmetricCipher extends VirgilAsn1Compatible {
 		}
 	}
 
+	function isInited() {
+		return VirgilSymmetricCipher_isInited($this->_cPtr);
+	}
+
 	function name() {
 		return VirgilSymmetricCipher_name($this->_cPtr);
 	}
@@ -1744,6 +1732,56 @@ class VirgilChunkCipher extends VirgilCipherBase {
 	}
 }
 
+class VirgilSeqCipher extends VirgilCipherBase {
+	public $_cPtr=null;
+
+	function __set($var,$value) {
+		if ($var === 'thisown') return swig_virgil_crypto_php_alter_newobject($this->_cPtr,$value);
+		VirgilCipherBase::__set($var,$value);
+	}
+
+	function __get($var) {
+		if ($var === 'thisown') return swig_virgil_crypto_php_get_newobject($this->_cPtr);
+		return VirgilCipherBase::__get($var);
+	}
+
+	function __isset($var) {
+		if ($var === 'thisown') return true;
+		return VirgilCipherBase::__isset($var);
+	}
+
+	function startEncryption() {
+		return VirgilSeqCipher_startEncryption($this->_cPtr);
+	}
+
+	function startDecryptionWithKey($recipientId,$privateKey,$privateKeyPassword=null) {
+		switch (func_num_args()) {
+		case 2: VirgilSeqCipher_startDecryptionWithKey($this->_cPtr,$recipientId,$privateKey); break;
+		default: VirgilSeqCipher_startDecryptionWithKey($this->_cPtr,$recipientId,$privateKey,$privateKeyPassword);
+		}
+	}
+
+	function startDecryptionWithPassword($pwd) {
+		VirgilSeqCipher_startDecryptionWithPassword($this->_cPtr,$pwd);
+	}
+
+	function process($data) {
+		return VirgilSeqCipher_process($this->_cPtr,$data);
+	}
+
+	function finish() {
+		return VirgilSeqCipher_finish($this->_cPtr);
+	}
+
+	function __construct($res=null) {
+		if (is_resource($res) && get_resource_type($res) === '_p_virgil__crypto__VirgilSeqCipher') {
+			$this->_cPtr=$res;
+			return;
+		}
+		$this->_cPtr=new_VirgilSeqCipher();
+	}
+}
+
 class VirgilSignerBase {
 	public $_cPtr=null;
 	protected $_pData=array();
@@ -1830,6 +1868,60 @@ class VirgilSigner extends VirgilSignerBase {
 
 	function verify($data,$sign,$publicKey) {
 		return VirgilSigner_verify($this->_cPtr,$data,$sign,$publicKey);
+	}
+}
+
+class VirgilSeqSigner extends VirgilSignerBase {
+	public $_cPtr=null;
+
+	function __set($var,$value) {
+		if ($var === 'thisown') return swig_virgil_crypto_php_alter_newobject($this->_cPtr,$value);
+		VirgilSignerBase::__set($var,$value);
+	}
+
+	function __get($var) {
+		if ($var === 'thisown') return swig_virgil_crypto_php_get_newobject($this->_cPtr);
+		return VirgilSignerBase::__get($var);
+	}
+
+	function __isset($var) {
+		if ($var === 'thisown') return true;
+		return VirgilSignerBase::__isset($var);
+	}
+
+	function __construct($hashAlgorithm=null) {
+		if (is_resource($hashAlgorithm) && get_resource_type($hashAlgorithm) === '_p_virgil__crypto__VirgilSeqSigner') {
+			$this->_cPtr=$hashAlgorithm;
+			return;
+		}
+		switch (func_num_args()) {
+		case 0: $this->_cPtr=new_VirgilSeqSigner(); break;
+		default: $this->_cPtr=new_VirgilSeqSigner($hashAlgorithm);
+		}
+	}
+
+	function startSigning() {
+		VirgilSeqSigner_startSigning($this->_cPtr);
+	}
+
+	function startVerifying($signature) {
+		VirgilSeqSigner_startVerifying($this->_cPtr,$signature);
+	}
+
+	function update($data) {
+		VirgilSeqSigner_update($this->_cPtr,$data);
+	}
+
+	function sign($privateKey,$privateKeyPassword=null) {
+		switch (func_num_args()) {
+		case 1: $r=VirgilSeqSigner_sign($this->_cPtr,$privateKey); break;
+		default: $r=VirgilSeqSigner_sign($this->_cPtr,$privateKey,$privateKeyPassword);
+		}
+		return $r;
+	}
+
+	function verify($publicKey) {
+		return VirgilSeqSigner_verify($this->_cPtr,$publicKey);
 	}
 }
 
