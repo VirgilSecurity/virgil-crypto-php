@@ -85,7 +85,18 @@ Need more examples? Visit our [developer documentation](https://developer.virgil
 * PHP 5.6 and newer
 * virgil_crypto_php extension
 
-You can download virgil_crypto_php extension from our [CDN](https://cdn.virgilsecurity.com/virgil-crypto/php/).
+#### Add virgil_crypto_php extension before install virgil/crypto:
+
+* [Download virgil_crypto_2.6.1 archive from the CDN](https://cdn.virgilsecurity.com/virgil-crypto/php/) according to your server operating system and PHP version
+* Place *virgil_crypto_php.so* file from the archive into the directory with extensions
+* Add string *extension=virgil_crypto_php.so* to the php.ini file
+* Restart your web-service (apache or nginx): *sudo service {apache2 / nginx} restart*
+
+##### Tips:
+
+* PHP version: *phpversion() / php --version*
+* OS Version: *PHP_OS*
+* php.ini and extensions directory: *phpinfo() / php -i / php-config --extension_dir*
 
 ### Installation via composer
 
