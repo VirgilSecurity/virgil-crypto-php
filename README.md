@@ -76,6 +76,80 @@ $crypto = new VirgilCrypto();
 // prepare data to be decrypted
 $decryptedData = $crypto->decrypt($encryptedData, $receiverPrivateKey);
 ```
+#### Encrypt and decrypt files (size: 2Mb+)
+
+Encrypt file:
+
+```php
+use Virgil\CryptoImpl\Cryptography\Cipher\VirgilSeqCipher;
+        
+$seqCipher = new VirgilSeqCipher();
+
+// add recipient`s identity and public key
+$seqCipher->addKeyRecipient($recipientId, $publicKey);
+
+// path to input/output (encrypted) file
+$inputFilePath = "/path/to/input.extension";
+$outputFilePath = "/path/to/output.enc";
+
+// add input/output handlers
+$inputHandler = fopen($inputFilePath, "rb");
+$outputHandler = fopen($outputFilePath, "w");
+
+// add encryption header to file
+fwrite($outputHandler, $seqCipher->startEncryption());
+
+// encrypt each 1024 byts of the file content
+while (!feof($inputHandler)) {
+    $inputData = fread($inputHandler, 1024);
+    $encryptedData = $seqCipher->process($inputData);
+    if(!empty($encryptedData))
+        fwrite($outputHandler, $encryptedData);
+}
+
+// add last encrypted block to the file
+$lastBlock = $seqCipher->finish();
+if(!empty($lastBlock))
+    fwrite($outputHandler, $lastBlock);
+
+// close input/output handlers
+fclose($inputHandler);
+fclose($outputHandler);
+```
+Decrypt file:
+```php
+use Virgil\CryptoImpl\Cryptography\Cipher\VirgilSeqCipher;
+        
+$seqCipher = new VirgilSeqCipher();
+
+// path to input/output (encrypted) file
+$inputFilePath = "/path/to/input.enc";
+$outputFilePath = "/path/to/output.extension";
+
+// add input/output handlers
+$inputHandler = fopen($inputFilePath, "rb");
+$outputHandler = fopen($outputFilePath, "w");
+
+// add decryption header to file and recipient`s identity and private key
+fwrite($outputHandler, $seqCipher->startDecryptionWithKey($recipientId, $privateKey));
+
+// decrypt each 1024 byts of the file content
+while (!feof($inputHandler)) {
+    $inputData = fread($inputHandler, 1024);
+    $encryptedData = $seqCipher->process($inputData);
+    if(!empty($encryptedData))
+        fwrite($outputHandler, $encryptedData);
+}
+
+// add last decrypted block to the file
+$lastBlock = $seqCipher->finish();
+if(!empty($lastBlock))
+    fwrite($outputHandler, $lastBlock);
+
+// close input/output handlers
+fclose($inputHandler);
+fclose($outputHandler);
+```
 Need more examples? Visit our [developer documentation](https://developer.virgilsecurity.com/docs/how-to#cryptography).
 
 ## Installation

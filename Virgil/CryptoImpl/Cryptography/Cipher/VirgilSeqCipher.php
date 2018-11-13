@@ -108,6 +108,15 @@ class VirgilSeqCipher
     }
 
     /**
+     * @param $recipientId
+     * @param $publicKey
+     */
+    public function addKeyRecipient($recipientId, $publicKey)
+    {
+        $this->cipher->addKeyRecipient($recipientId, $publicKey);
+    }
+
+    /**
      * @param $password
      * @throws SeqCipherException
      */
@@ -122,13 +131,25 @@ class VirgilSeqCipher
 
     /**
      * @param $recipientId
-     * @param VirgilPrivateKey $privateKey
+     * @param $privateKey
      * @throws SeqCipherException
      */
-    public function startDecryptionWithKey($recipientId, VirgilPrivateKey $privateKey)
+    public function startDecryptionWithKey($recipientId, $privateKey)
     {
         try {
             return $this->cipher->startDecryptionWithKey($recipientId, $privateKey);
+        } catch (Exception $exception) {
+            throw new SeqCipherException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+    /**
+     * @throws SeqCipherException
+     */
+    public function removeAllRecipients()
+    {
+        try {
+            $this->cipher->removeAllRecipients();
         } catch (Exception $exception) {
             throw new SeqCipherException($exception->getMessage(), $exception->getCode());
         }
