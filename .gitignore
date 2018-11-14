@@ -3,5 +3,7 @@
 vendor/
 samples/
 composer.lock
-/tests/src/decr_test.pdf
-/tests/src/test.enc
+/tests/src/test-password.enc
+/tests/src/decr_test-password.pdf
+/tests/src/decr_test-key.pdf
+/tests/src/test-key.enc
