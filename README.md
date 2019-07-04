@@ -2,6 +2,8 @@
 
 [![Build Status](https://api.travis-ci.com/VirgilSecurity/virgil-crypto-php.svg?branch=master)](https://travis-ci.com/VirgilSecurity/virgil-crypto-php/)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
+[![Total Downloads](https://img.shields.io/packagist/dt/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
 
 ### [Introduction](#introduction) | [Library purposes](#library-purposes) | [Usage examples](#usage-examples) | [Installation](#installation) | [Docs](#docs) | [License](#license) | [Contacts](#support)
 
