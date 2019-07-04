@@ -417,9 +417,11 @@ class VirgilCrypto
     public function importPrivateKey($exportedPrivateKey, $password = '')
     {
         try {
-            $privateKeyDerEncoded = $this->cryptoService->decryptPrivateKey($exportedPrivateKey, $password);
+            $privateKeyDER = \VirgilKeyPair::privateKeyToDER($exportedPrivateKey, $password);
+
+            $privateKeyDerEncoded = $this->cryptoService->decryptPrivateKey($privateKeyDER, $password);
             $receiverID = $this->calculateFingerprint(
-                $this->cryptoService->extractPublicKey($privateKeyDerEncoded, '')
+                $this->cryptoService->extractPublicKey($privateKeyDerEncoded, $password)
             );
 
             return new VirgilPrivateKey($receiverID, $privateKeyDerEncoded);
