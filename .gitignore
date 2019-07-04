@@ -2,8 +2,6 @@
 .idea/
 vendor/
 samples/
-composer.lock
-/tests/src/test-password.enc
-/tests/src/decr_test-password.pdf
-/tests/src/decr_test-key.pdf
-/tests/src/test-key.enc
+tests/src/data/
+!/tests/src/data/test-key.pdf
+!/tests/src/data/test-password.pdf

@@ -61,7 +61,7 @@ $testFile, $inputHandler, $outputHandler, $encFileExtension, $encFile, $decFile,
     {
         $this->virgilSeqCipher = new VirgilSeqCipher();
 
-        $this->pathToFileFolder = __DIR__ . "/../../../../../src/";
+        $this->pathToFileFolder = __DIR__ . "/../../../../../src/data/";
         $this->testFileName = "test-key";
         $this->testFileExtension = "pdf";
         $this->encFileExtension = "enc";
