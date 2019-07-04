@@ -18,7 +18,7 @@ install:
 - curl -sS https://getcomposer.org/installer -o composer-setup.php
 - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 before_script:
-- sudo cp $TRAVIS_BUILD_DIR/_travis/vsce_phe_php.so /usr/lib/php/20170718
-- sudo sh -c "echo 'extension=vsce_phe_php.so' >> /etc/php/7.2/cli/php.ini"
+- sudo cp $TRAVIS_BUILD_DIR/_travis/virgil_crypto_php.so /usr/lib/php/20170718
+- sudo sh -c "echo 'extension=virgil_crypto_php.so' >> /etc/php/7.2/cli/php.ini"
 - composer install
 script: phpunit --configuration phpunit.xml

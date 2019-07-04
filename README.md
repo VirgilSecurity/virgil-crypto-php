@@ -159,24 +159,38 @@ Need more examples? Visit our [developer documentation](https://developer.virgil
 * PHP 5.6 and newer
 * virgil_crypto_php extension
 
-#### Add virgil_crypto_php extension before install virgil/crypto:
+#### Installation via composer
 
-* [Download virgil_crypto_2.6.1 archive from the CDN](https://cdn.virgilsecurity.com/virgil-crypto/php/) according to your server operating system and PHP version
-* Place *virgil_crypto_php.so* file from the archive into the directory with extensions
-* Add string *extension=virgil_crypto_php.so* to the php.ini file
-* Restart your web-service (apache or nginx): *sudo service {apache2 / nginx} restart*
-
-##### Tips:
-
-* PHP version: *phpversion() / php --version*
-* OS Version: *PHP_OS*
-* php.ini and extensions directory: *phpinfo() / php -i / php-config --extension_dir*
-
-### Installation via composer
+Add **virgil_crypto_php** extension before install virgil/crypto! Read more [here](#add-the-crypto-extension-into-your-server).
 
 ```bash
 composer require virgil/crypto
 ```
+
+## Additional information
+
+### Add the crypto extension into your server
+
+- [Download](https://github.com/VirgilSecurity/virgil-crypto-php/releases) *virgil-test.zip*, unzip it and execute on your server [virgil-test.php](/_help/virgil-test.php) file.
+
+- [Download](https://github.com/VirgilSecurity/virgil-crypto-php/releases) and unzip *%YOUR_OS%_extension.zip* archive according to your server operating system and PHP version.
+
+- Make sure you have access to edit the php.ini file (for example, use *root* for the Linux/Darwin or run *cmd* under administrator for the Windows).
+- Copy extension files to the extensions directory.
+    - For Linux/Darwin:
+    ```
+     $ path="%PATH_TO_EXTENSIONS_DIR%" && cp virgil_crypto_php.so $path
+    ```
+    - For Windows:
+    ```
+     $ set path=%PATH_TO_EXTENSIONS_DIR% && copy virgil_crypto_php.dll %path%
+    ```
+- Add the extensions into the php.ini file 
+    ```
+    $ echo -e "extension=virgil_crypto_php” >> %PATH_TO_PHP.INI%
+    ```
+    
+- Restart your server or php-fpm service
 
 ## Docs
 - [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto)
