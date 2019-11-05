@@ -35,7 +35,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography;
+#namespace Virgil\CryptoImpl\Cryptography;
 
 
 use Exception;

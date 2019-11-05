@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -35,45 +35,9 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Cipher;
+namespace Virgil\CryptoImpl\Exceptions;
 
-
-/**
- * Class provides content input for cipher operations.
- */
-class InputOutput implements InputOutputInterface
+class VirgilException extends \Exception
 {
-    /** @var string $input */
-    private $input;
 
-
-    /**
-     * Class constructor.
-     *
-     * @param string $input
-     */
-    public function __construct($input)
-    {
-        $this->input = $input;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInput()
-    {
-        return $this->input;
-    }
-
-
-    /**
-     * @inheritdoc
-     *
-     * @throws MethodIsDisabledException
-     */
-    public function getOutput()
-    {
-        throw new MethodIsDisabledException(__METHOD__);
-    }
 }

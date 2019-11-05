@@ -35,14 +35,78 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+#namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 
 use Exception;
 
+use VirgilCipherBase;
+
+use Virgil\CryptoImpl\Cryptography\Exceptions\CipherException;
+
 /**
- * Class specifies exception during convert private key to material format.
+ * Base abstract class for ciphers.
  */
-class PrivateKeyToDerConvertingException extends Exception
+abstract class AbstractVirgilCipher implements CipherInterface
 {
+    /** @var VirgilCipherBase $cipher */
+    protected $cipher;
+
+
+    /**
+     * @inheritdoc
+     */
+    abstract public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
+
+
+    /**
+     * @inheritdoc
+     */
+    abstract public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
+
+
+    /**
+     * @inheritdoc
+     */
+    abstract public function createInputOutput(...$args);
+
+
+    /**
+     * @inheritdoc
+     *
+     * @throws CipherException
+     */
+    public function addKeyRecipient($recipientId, $publicKey)
+    {
+        try {
+            $this->cipher->addKeyRecipient($recipientId, $publicKey);
+
+            return $this;
+        } catch (Exception $e) {
+            throw new CipherException($e->getMessage(), $e->getCode());
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getCustomParam($key)
+    {
+        $cipherCustomParams = $this->cipher->customParams();
+
+        return $cipherCustomParams->getData($key);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomParam($key, $value)
+    {
+        $cipherCustomParams = $this->cipher->customParams();
+        $cipherCustomParams->setData($key, $value);
+
+        return $this;
+    }
 }

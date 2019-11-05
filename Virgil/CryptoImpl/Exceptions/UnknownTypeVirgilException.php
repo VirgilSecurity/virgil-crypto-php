@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -35,14 +35,9 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+namespace Virgil\CryptoImpl\Exceptions;
 
-
-use Exception;
-
-/**
- * Class specifies exception during extract public key.
- */
-class PublicKeyExtractionException extends Exception
+class UnknownTypeVirgilException extends VirgilException
 {
+
 }

@@ -35,50 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
-use Virgil\CryptoApi\PrivateKey;
+
+use Exception;
 
 /**
- * Class VirgilPrivateKey
- * @package Virgil\CryptoImpl
+ * Class specifies exception during convert private key to material format.
  */
-class VirgilPrivateKey implements PrivateKey
+class PrivateKeyToDerConvertingException extends Exception
 {
-    /**
-     * @var string
-     */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $value
-     */
-    public function __construct(string $receiverID, string $value)
-    {
-        $this->receiverID = $receiverID;
-        $this->value = $value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getReceiverID(): string
-    {
-        return $this->receiverID;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValue(): string
-    {
-        return $this->value;
-    }
 }

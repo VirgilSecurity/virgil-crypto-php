@@ -35,11 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Cipher;
+#namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
 
 use Exception;
 
-class MethodIsDisabledException extends Exception
+/**
+ * Class specifies exception if content verification by signature is failed.
+ */
+class ContentVerificationException extends Exception
 {
 }

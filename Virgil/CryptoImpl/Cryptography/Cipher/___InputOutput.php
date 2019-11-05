@@ -35,14 +35,45 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+#namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
-
-use Exception;
 
 /**
- * Class specifies exception during encrypt private key.
+ * Class provides content input for cipher operations.
  */
-class PrivateKeyEncryptionException extends Exception
+class InputOutput implements InputOutputInterface
 {
+    /** @var string $input */
+    private $input;
+
+
+    /**
+     * Class constructor.
+     *
+     * @param string $input
+     */
+    public function __construct($input)
+    {
+        $this->input = $input;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getInput()
+    {
+        return $this->input;
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @throws MethodIsDisabledException
+     */
+    public function getOutput()
+    {
+        throw new MethodIsDisabledException(__METHOD__);
+    }
 }

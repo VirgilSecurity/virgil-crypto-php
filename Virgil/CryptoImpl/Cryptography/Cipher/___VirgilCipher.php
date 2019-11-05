@@ -38,64 +38,63 @@
 namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 
-use VirgilDataSource;
+#use Exception;
+
+use VirgilCipher as CryptoVirgilCipher;
+
+use Virgil\CryptoImpl\Cryptography\Exceptions\CipherException;
 
 /**
- * Class is representation of data provider stream.
+ * Class implements cipher operations with primitive data (like strings, numbers etc.)
  */
-class VirgilStreamDataSource extends VirgilDataSource
+class VirgilCipher extends AbstractVirgilCipher
 {
-    /** @var resource $stream */
-    private $stream;
-
-    /** @var int $dataChunk */
-    private $dataChunk;
-
-
     /**
      * Class constructor.
      *
-     * @param resource $stream
-     * @param int      $dataChunk specifies length number of bytes read.
+     * @param CryptoVirgilCipher $cipher
      */
-    public function __construct($stream, $dataChunk = 1024)
+    public function __construct(CryptoVirgilCipher $cipher)
     {
-        parent::__construct($this);
-        $this->stream = $stream;
-        rewind($this->stream);
-        $this->dataChunk = $dataChunk;
+        $this->cipher = $cipher;
     }
 
 
     /**
-     * Checks if there is data chunk.
+     * @inheritdoc
      *
-     * @return bool
+     * @throws CipherException
      */
-    public function hasData()
+    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true)
     {
-        return !feof($this->stream);
+        try {
+            return $this->cipher->encrypt($cipherInputOutput->getInput(), $embedContentInfo);
+        } catch (Exception $exception) {
+            throw new CipherException($exception->getMessage(), $exception->getCode());
+        }
     }
 
 
     /**
-     * Read data chunk from stream.
+     * @inheritdoc
      *
-     * @return string
+     * @throws CipherException
      */
-    public function read()
+    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey)
     {
-        return fread($this->stream, $this->dataChunk);
+        try {
+            return $this->cipher->decryptWithKey($cipherInputOutput->getInput(), $recipientId, $privateKey);
+        } catch (Exception $exception) {
+            throw new CipherException($exception->getMessage(), $exception->getCode());
+        }
     }
 
 
     /**
-     * Set pointer to begin of the stream.
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function reset()
+    public function createInputOutput(...$args)
     {
-        return rewind($this->stream);
+        return new InputOutput($args[0]);
     }
 }

@@ -35,14 +35,49 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+#namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
-
-use Exception;
 
 /**
- * Class specifies exception during compute public key hash.
+ * Class provides input and output streams for cipher operations.
  */
-class PublicKeyHashComputationException extends Exception
+class StreamInputOutput implements InputOutputInterface
 {
+    /** @var  VirgilStreamDataSource $input */
+    private $input;
+
+    /** @var VirgilStreamDataSink $output */
+    private $output;
+
+
+    /**
+     * Class constructor.
+     *
+     * @param resource $input  is stream source.
+     * @param resource $output is stream destination.
+     */
+    public function __construct($input, $output)
+    {
+        $this->input = new VirgilStreamDataSource($input);
+        $this->output = new VirgilStreamDataSink($output);
+        $this->input->reset();
+    }
+
+
+    /**
+     * @return VirgilStreamDataSource
+     */
+    public function getInput()
+    {
+        return $this->input;
+    }
+
+
+    /**
+     * @return VirgilStreamDataSink
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
 }

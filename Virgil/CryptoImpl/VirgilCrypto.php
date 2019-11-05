@@ -37,13 +37,16 @@
 
 namespace Virgil\CryptoImpl;
 
-
 use Exception;
-
 use Virgil\CryptoImpl\Cryptography\VirgilCryptoService;
 
 
 /**
+ *
+ * Wrapper for cryptographic operations.
+ * Class provides a cryptographic operations in applications, such as hashing,
+ * signature generation and verification, and encryption and decryption
+ *
  * Class VirgilCrypto
  * @package Virgil\CryptoImpl
  */
@@ -52,37 +55,26 @@ class VirgilCrypto
     const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
     const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
 
-    protected $keyPairType;
-    protected $cryptoService;
+    protected $vKeyPairType;
+    protected $vCryptoService;
     private $userSHA256Fingerprints;
 
+    public function __construct(VirgilKeyPairType $vKeyPairType = null, bool $userSHA256Fingerprints = false) {
 
-    /**
-     * Class constructor.
-     *
-     * @param string $keyPairType
-     * @param bool   $userSHA256Fingerprints
-     */
-    public function __construct($keyPairType = KeyPairTypes::FAST_EC_ED25519, $userSHA256Fingerprints = false) {
-        $this->keyPairType = $keyPairType;
+        $this->vKeyPairType = is_null($vKeyPairType) ? (new VirgilKeyPairType())->getED25519() : $vKeyPairType;
+
         $this->userSHA256Fingerprints = $userSHA256Fingerprints;
 
-        $this->cryptoService = new VirgilCryptoService();
+        $this->vCryptoService = new VirgilCryptoService();
     }
 
-    /**
-     * @param integer $keyPairType
-     *
-     * @return VirgilKeyPair
-     * @throws VirgilCryptoException
-     */
-    public function generateKeys($keyPairType = null)
+    public function generateKeyPair(VirgilKeyPairType $vKeyPairType = null) : VirgilKeyPair
     {
         try {
-            if ($keyPairType == null) {
-                $keyPairType = $this->keyPairType;
-            }
-            $keyPair = $this->cryptoService->generateKeyPair($keyPairType);
+            if(is_null($vKeyPairType))
+                $vKeyPairType = $this->vKeyPairType;
+
+            $keyPair = $this->vCryptoService->generateKeyPair($vKeyPairType);
 
             $publicKeyDerEncoded = $this->cryptoService->publicKeyToDer($keyPair[0]);
             $privateKeyDerEncoded = $this->cryptoService->privateKeyToDer($keyPair[1]);

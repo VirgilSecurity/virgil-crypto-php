@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -37,48 +37,48 @@
 
 namespace Virgil\CryptoImpl;
 
-use Virgil\CryptoApi\PrivateKey;
+use VirgilCrypto\Foundation\AlgId;
 
 /**
- * Class VirgilPrivateKey
+ * Class KeyType
  * @package Virgil\CryptoImpl
  */
-class VirgilPrivateKey implements PrivateKey
+class VirgilKeyType
 {
     /**
-     * @var string
+     * @var AlgId
      */
-    private $receiverID;
-    /**
-     * @var string
-     */
-    private $value;
+    private $algId;
 
     /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $receiverID
-     * @param string $value
+     * @var int|null
      */
-    public function __construct(string $receiverID, string $value)
+    private $rsaBitLen;
+
+    /**
+     * KeyType constructor.
+     * @param AlgId $algId
+     * @param int|null $rsaBitLen
+     */
+    public function __construct(AlgId $algId, int $rsaBitLen = null)
     {
-        $this->receiverID = $receiverID;
-        $this->value = $value;
+        $this->algId = $algId;
+        $this->rsaBitLen = $rsaBitLen;
     }
 
     /**
-     * @return string
+     * @return AlgId
      */
-    public function getReceiverID(): string
+    public function getAlgId(): AlgId
     {
-        return $this->receiverID;
+        return $this->algId;
     }
 
     /**
-     * @return string
+     * @return int|null
      */
-    public function getValue(): string
+    public function getRsaBitLen(): ?int
     {
-        return $this->value;
+        return $this->rsaBitLen;
     }
 }

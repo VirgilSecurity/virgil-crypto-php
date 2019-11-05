@@ -53,7 +53,6 @@ class VirgilKeyPair
      */
     private $privateKey;
 
-
     /**
      * VirgilKeyPair constructor.
      *
@@ -66,7 +65,6 @@ class VirgilKeyPair
         $this->privateKey = $privateKey;
     }
 
-
     /**
      * @return VirgilPublicKey
      */
@@ -75,7 +73,6 @@ class VirgilKeyPair
         return $this->publicKey;
     }
 
-
     /**
      * @return VirgilPrivateKey
      */
@@ -83,5 +80,4 @@ class VirgilKeyPair
     {
         return $this->privateKey;
     }
-
 }

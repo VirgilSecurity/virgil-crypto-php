@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2019 Virgil Security Inc.
+ * Copyright (C) 2015-2018 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -35,50 +35,82 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
-use VirgilCrypto\Foundation\AlgId;
+
+use Virgil\CryptoImpl\Cryptography\Exceptions\CipherException;
 
 /**
- * Class KeyType
- * @package Virgil\CryptoImpl
+ * Interface provides cipher operations.
  */
-class KeyType
+interface CipherInterface
 {
-    /**
-     * @var AlgId
-     */
-    private $algId;
 
     /**
-     * @var int|null
+     * Encrypts input content by cipher.
+     *
+     * @param InputOutputInterface $cipherInputOutput
+     * @param bool                 $embedContentInfo
+     *
+     * @return mixed
+     *
+     * @throws CipherException
      */
-    private $rsaBitLen;
+    public function encrypt(InputOutputInterface $cipherInputOutput, $embedContentInfo = true);
+
 
     /**
-     * KeyType constructor.
-     * @param AlgId $algId
-     * @param int|null $rsaBitLen
+     * Decrypts encrypted content with private key.
+     *
+     * @param InputOutputInterface $cipherInputOutput
+     * @param string               $recipientId
+     * @param string               $privateKey
+     *
+     * @return mixed
+     *
+     * @throws CipherException
      */
-    public function __construct(AlgId $algId, int $rsaBitLen = null)
-    {
-        $this->algId = $algId;
-        $this->rsaBitLen = $rsaBitLen;
-    }
+    public function decryptWithKey(InputOutputInterface $cipherInputOutput, $recipientId, $privateKey);
+
 
     /**
-     * @return AlgId
+     * Add recipient's public key to the cipher.
+     *
+     * @param string $recipientId
+     * @param string $publicKey
+     *
+     * @return $this
      */
-    public function getAlgId(): AlgId
-    {
-        return $this->algId;
-    }
+    public function addKeyRecipient($recipientId, $publicKey);
+
 
     /**
-     * @return int|null
+     * Gets data from cipher custom params.
+     *
+     * @param string $key
+     *
+     * @return string
      */
-    public function getRsaBitLen(): int
-    {
-        return $this->rsaBitLen;
-    }
+    public function getCustomParam($key);
+
+
+    /**
+     * Sets data to cipher custom params.
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setCustomParam($key, $value);
+
+
+    /**
+     * Creates proper cipher input output object.
+     *
+     * @param array ...$args
+     *
+     * @return InputOutputInterface
+     */
+    public function createInputOutput(...$args);
 }

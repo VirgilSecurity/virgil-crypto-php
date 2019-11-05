@@ -35,14 +35,90 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+namespace Virgil\CryptoImpl;
 
-
-use Exception;
+use Virgil\CryptoImpl\Exceptions\UnknownTypeException;
+use VirgilCrypto\Foundation\AlgId;
 
 /**
- * Class specifies exception if content signing by signature is failed.
+ * Class keeps list of key pair types constants.
  */
-class ContentSigningException extends Exception
+class VirgilKeyPairType
 {
+    /**
+     * @var VirgilKeyType
+     */
+    private $CURVE25519;
+
+    /**
+     * @var VirgilKeyType
+     */
+    private $ED25519;
+
+    /**
+     * @var VirgilKeyType
+     */
+    private $SECP256R1;
+
+    /**
+     * @var VirgilKeyType
+     */
+    private $RSA_2048;
+
+    /**
+     * @var VirgilKeyType
+     */
+    private $RSA_4096;
+
+    /**
+     * @var VirgilKeyType
+     */
+    private $RSA_8192;
+
+    /**
+     * KeyPairType constructor.
+     */
+    public function __construct()
+    {
+        $this->CURVE25519 = new VirgilKeyType(AlgId::CURVE25519());
+        $this->ED25519 = new VirgilKeyType(AlgId::ED25519());
+        $this->SECP256R1 = new VirgilKeyType(AlgId::SECP256R1());
+        $this->RSA_2048 = new VirgilKeyType(AlgId::RSA(), 2048);
+        $this->RSA_4096 = new VirgilKeyType(AlgId::RSA(), 4096);
+        $this->RSA_8192 = new VirgilKeyType(AlgId::RSA(), 8192);
+    }
+
+    /**
+     * @param $name
+     * @throws UnknownTypeException
+     */
+    public function __get($name)
+    {
+        throw new UnknownTypeException("KeyPairType not found: $name");
+    }
+
+    /**
+     * @return VirgilKeyType
+     */
+    public function getCURVE25519()
+    {
+        return $this->CURVE25519;
+    }
+
+    /**
+     * @return VirgilKeyType
+     */
+    public function getED25519()
+    {
+        return $this->ED25519;
+    }
+
+    /**
+     * @return VirgilKeyType
+     */
+    public function getSECP256R1()
+    {
+        return $this->SECP256R1;
+    }
+
 }

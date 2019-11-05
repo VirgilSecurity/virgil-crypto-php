@@ -35,12 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+
+
+use Exception;
 
 /**
- * Class keeps list of key pair types constants.
+ * Class specifies exception during cipher's operation invocation (e.g encrypt, decrypt, add recipient).
  */
-class KeyPairTypes
+class CipherException extends Exception
 {
-
 }

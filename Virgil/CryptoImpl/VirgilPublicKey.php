@@ -37,9 +37,7 @@
 
 namespace Virgil\CryptoImpl;
 
-
 use Virgil\CryptoApi\PublicKey;
-
 
 /**
  * Class VirgilPublicKey
@@ -56,33 +54,30 @@ class VirgilPublicKey implements PublicKey
      */
     private $value;
 
-
     /**
      * VirgilPublicKey constructor.
      *
      * @param string $receiverID
      * @param string $value
      */
-    public function __construct($receiverID, $value)
+    public function __construct(string $receiverID, string $value)
     {
         $this->receiverID = $receiverID;
         $this->value = $value;
     }
 
-
     /**
      * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
 
-
     /**
      * @return string
      */
-    public function getReceiverID()
+    public function getReceiverID(): string
     {
         return $this->receiverID;
     }

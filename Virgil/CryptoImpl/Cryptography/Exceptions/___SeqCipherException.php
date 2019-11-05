@@ -35,22 +35,15 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Cipher;
+#namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
+use Exception;
 
 /**
- * Interface represents input and output for cipher operations.
+ * Class SeqCipherException
+ * @package Virgil\CryptoImpl\Cryptography\Exceptions
  */
-interface InputOutputInterface
+class SeqCipherException extends Exception
 {
-    /**
-     * @return mixed
-     */
-    public function getInput();
 
-
-    /**
-     * @return mixed
-     */
-    public function getOutput();
 }

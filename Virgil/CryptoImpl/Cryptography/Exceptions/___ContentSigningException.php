@@ -35,14 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Exceptions;
+#namespace Virgil\CryptoImpl\Cryptography\Exceptions;
 
 
 use Exception;
 
 /**
- * Class specifies exception during convert public key to material format.
+ * Class specifies exception if content signing by signature is failed.
  */
-class PublicKeyToDerConvertingException extends Exception
+class ContentSigningException extends Exception
 {
 }

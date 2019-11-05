@@ -35,7 +35,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Cryptography\Cipher;
+#namespace Virgil\CryptoImpl\Cryptography\Cipher;
 
 use Exception;
 use Virgil\CryptoImpl\Cryptography\Exceptions\SeqCipherException;
