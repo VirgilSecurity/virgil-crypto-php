@@ -35,12 +35,75 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
+
+
+use Virgil\CryptoApi\AccessTokenSigner;
+use Virgil\CryptoApi\PrivateKey;
+use Virgil\CryptoApi\PublicKey;
 
 /**
- * Class keeps list of hash algorithms constants.
+ * Class VirgilAccessTokenSigner
+ * @package Virgil\CryptoImpl
  */
-class HashAlgorithms
+class VirgilAccessTokenSigner implements AccessTokenSigner
 {
-    
+    /**
+     * @var VirgilCrypto
+     */
+    protected $virgilCrypto;
+
+
+    /**
+     * VirgilAccessTokenSigner constructor.
+     */
+    public function __construct()
+    {
+        $this->virgilCrypto = new VirgilCrypto();
+    }
+
+
+    /**
+     * @param string     $data
+     * @param PrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function generateTokenSignature($data, PrivateKey $privateKey)
+    {
+        if (!$privateKey instanceof VirgilPrivateKey) {
+            throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
+        }
+
+        return $this->virgilCrypto->generateSignature($data, $privateKey);
+    }
+
+
+    /**
+     * @param string    $signature
+     *
+     * @param string    $data
+     * @param PublicKey $publicKey
+     *
+     * @return bool
+     * @throws VirgilCryptoException
+     */
+    public function verifyTokenSignature($signature, $data, PublicKey $publicKey)
+    {
+        if (!$publicKey instanceof VirgilPublicKey) {
+            throw new VirgilCryptoException("instance of VirgilPublicKey expected");
+        }
+
+        return $this->virgilCrypto->verifySignature($data, $signature, $publicKey);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAlgorithm()
+    {
+        return "VEDS512";
+    }
 }

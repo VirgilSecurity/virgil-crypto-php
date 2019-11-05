@@ -35,11 +35,13 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
+
 
 use Virgil\CryptoApi\CardCrypto;
 use Virgil\CryptoApi\PrivateKey;
 use Virgil\CryptoApi\PublicKey;
+
 
 /**
  * Class VirgilCardCrypto

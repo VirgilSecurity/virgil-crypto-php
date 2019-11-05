@@ -1,10 +1,10 @@
 <?php
 
-$virgil_crypto_php = 'virgil_crypto_php';
+$virgil_crypto_extension = 'vscf_foundation_php';
 
 $result = [
-    'VIRGIL_CRYPTO_PHP_EXTENSION' => $virgil_crypto_php,
-    'IS_VIRGIL_CRYPTO_PHP_EXTENSION_LOADED' => extension_loaded($virgil_crypto_php),
+    'VIRGIL_CRYPTO_EXTENSION' => $virgil_crypto_extension,
+    'IS_VIRGIL_CRYPTO_EXTENSION_LOADED' => extension_loaded($virgil_crypto_extension),
     'OS' => PHP_OS,
     'PHP' => PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION,
     'PATH_TO_EXTENSIONS_DIR' => PHP_EXTENSION_DIR,

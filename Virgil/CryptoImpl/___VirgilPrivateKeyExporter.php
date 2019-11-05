@@ -35,12 +35,65 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
+
+
+use Virgil\CryptoApi\PrivateKey;
+use Virgil\CryptoApi\PrivateKeyExporter;
 
 /**
- * Class keeps list of hash algorithms constants.
+ * Class VirgilPrivateKeyExporter
+ * @package Virgil\CryptoImpl
  */
-class HashAlgorithms
+class VirgilPrivateKeyExporter implements PrivateKeyExporter
 {
-    
+    /**
+     * @var VirgilCrypto
+     */
+    protected $virgilCrypto;
+
+    /**
+     * @var null|string
+     */
+    protected $password;
+
+
+    /**
+     * VirgilPrivateKeyExporter constructor.
+     *
+     * @param null|string $password
+     */
+    public function __construct($password = null)
+    {
+        $this->password = $password;
+        $this->virgilCrypto = new VirgilCrypto();
+    }
+
+
+    /**
+     * @param PrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function exportPrivateKey(PrivateKey $privateKey)
+    {
+        if (!$privateKey instanceof VirgilPrivateKey) {
+            throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
+        }
+
+        return base64_encode($this->virgilCrypto->exportPrivateKey($privateKey, $this->password));
+    }
+
+
+    /**
+     * @param string $data
+     *
+     * @return PrivateKey
+     * @throws VirgilCryptoException
+     */
+    public function importPrivateKey($data)
+    {
+        return $this->virgilCrypto->importPrivateKey(base64_decode($data), $this->password);
+    }
 }

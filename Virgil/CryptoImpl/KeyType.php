@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -37,10 +37,48 @@
 
 namespace Virgil\CryptoImpl;
 
+use VirgilCrypto\Foundation\AlgId;
+
 /**
- * Class keeps list of hash algorithms constants.
+ * Class KeyType
+ * @package Virgil\CryptoImpl
  */
-class HashAlgorithms
+class KeyType
 {
-    
+    /**
+     * @var AlgId
+     */
+    private $algId;
+
+    /**
+     * @var int|null
+     */
+    private $rsaBitLen;
+
+    /**
+     * KeyType constructor.
+     * @param AlgId $algId
+     * @param int|null $rsaBitLen
+     */
+    public function __construct(AlgId $algId, int $rsaBitLen = null)
+    {
+        $this->algId = $algId;
+        $this->rsaBitLen = $rsaBitLen;
+    }
+
+    /**
+     * @return AlgId
+     */
+    public function getAlgId(): AlgId
+    {
+        return $this->algId;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRsaBitLen(): int
+    {
+        return $this->rsaBitLen;
+    }
 }

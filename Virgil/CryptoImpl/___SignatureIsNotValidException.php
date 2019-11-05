@@ -35,12 +35,13 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
+
 
 /**
- * Class keeps list of hash algorithms constants.
+ * Class SignatureIsNotValidException
+ * @package Virgil\CryptoImpl
  */
-class HashAlgorithms
+class SignatureIsNotValidException extends VirgilCryptoException
 {
-    
 }

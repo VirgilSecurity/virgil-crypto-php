@@ -35,7 +35,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
 
 
 use Exception;
@@ -49,11 +49,21 @@ use Virgil\CryptoImpl\Cryptography\VirgilCryptoService;
  */
 class VirgilCrypto
 {
-    const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
-    const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
+    const CUSTOM_PARAM_KEY_SIGNATURE = 'VIRGIL-DATA-SIGNATURE';
 
+    /**
+     * @var string
+     */
     protected $keyPairType;
+
+    /**
+     * @var VirgilCryptoService
+     */
     protected $cryptoService;
+
+    /**
+     * @var bool
+     */
     private $userSHA256Fingerprints;
 
 
@@ -63,12 +73,16 @@ class VirgilCrypto
      * @param string $keyPairType
      * @param bool   $userSHA256Fingerprints
      */
-    public function __construct($keyPairType = KeyPairTypes::FAST_EC_ED25519, $userSHA256Fingerprints = false) {
+    public function __construct(
+        $keyPairType = KeyPairTypes::FAST_EC_ED25519,
+        $userSHA256Fingerprints = false
+    ) {
         $this->keyPairType = $keyPairType;
         $this->userSHA256Fingerprints = $userSHA256Fingerprints;
 
         $this->cryptoService = new VirgilCryptoService();
     }
+
 
     /**
      * @param integer $keyPairType

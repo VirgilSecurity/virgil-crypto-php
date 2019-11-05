@@ -35,13 +35,55 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
+
+
+use Virgil\CryptoApi\PrivateKey;
 
 
 /**
- * Class SignatureIsNotValidException
+ * Class VirgilPrivateKey
  * @package Virgil\CryptoImpl
  */
-class SignatureIsNotValidException extends VirgilCryptoException
+class VirgilPrivateKey implements PrivateKey
 {
+    /**
+     * @var string
+     */
+    private $receiverID;
+    /**
+     * @var string
+     */
+    private $value;
+
+
+    /**
+     * VirgilPublicKey constructor.
+     *
+     * @param string $receiverID
+     * @param string $value
+     */
+    public function __construct($receiverID, $value)
+    {
+        $this->receiverID = $receiverID;
+        $this->value = $value;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getReceiverID()
+    {
+        return $this->receiverID;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 }

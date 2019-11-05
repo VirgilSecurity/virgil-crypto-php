@@ -32,24 +32,22 @@
     }
   ],
   "require": {
-    "php": ">=5.6",
-    "virgil/crypto-api": "^5.0"
+    "php": "^7.2",
+    "virgil/crypto-api": "^5.0",
+    "myclabs/php-enum": "^1.7"
   },
   "require-dev": {
     "phpunit/phpunit": "^7"
   },
   "autoload": {
-    "files": [
-      "virgil_crypto_php.php"
-    ],
     "psr-4": {
-      "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/"
+      "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/",
+      "VirgilCrypto\\Foundation\\": "_dev/crypto/foundation/src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Virgil\\Tests\\": "tests/src/",
-      "Virgil\\Samples\\": "samples/"
+      "Virgil\\Tests\\": "tests/src/"
     }
   }
 }

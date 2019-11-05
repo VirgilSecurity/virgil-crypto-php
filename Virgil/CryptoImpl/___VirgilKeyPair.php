@@ -35,12 +35,53 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+#namespace Virgil\CryptoImpl;
+
 
 /**
- * Class keeps list of hash algorithms constants.
+ * Class VirgilKeyPair
+ * @package Virgil\CryptoImpl
  */
-class HashAlgorithms
+class VirgilKeyPair
 {
-    
+    /**
+     * @var VirgilPublicKey
+     */
+    private $publicKey;
+    /**
+     * @var VirgilPrivateKey
+     */
+    private $privateKey;
+
+
+    /**
+     * VirgilKeyPair constructor.
+     *
+     * @param VirgilPublicKey  $publicKey
+     * @param VirgilPrivateKey $privateKey
+     */
+    public function __construct(VirgilPublicKey $publicKey, VirgilPrivateKey $privateKey)
+    {
+        $this->publicKey = $publicKey;
+        $this->privateKey = $privateKey;
+    }
+
+
+    /**
+     * @return VirgilPublicKey
+     */
+    public function getPublicKey()
+    {
+        return $this->publicKey;
+    }
+
+
+    /**
+     * @return VirgilPrivateKey
+     */
+    public function getPrivateKey()
+    {
+        return $this->privateKey;
+    }
+
 }
