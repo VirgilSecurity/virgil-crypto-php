@@ -134,6 +134,6 @@ class VirgilCardCrypto implements CardCrypto
      */
     public function generateSHA512($data)
     {
-        return $this->virgilCrypto->generateHash($data, HashAlgorithms::SHA512);
+        return $this->virgilCrypto->generateHash($data, VirgilHashAlgorithms::SHA512);
     }
 }

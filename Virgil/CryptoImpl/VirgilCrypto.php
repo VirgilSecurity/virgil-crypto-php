@@ -40,6 +40,7 @@ namespace Virgil\CryptoImpl;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use VirgilCrypto\Foundation\CtrDrbg;
 use VirgilCrypto\Foundation\KeyProvider;
+use VirgilCrypto\Foundation\PublicKey;
 use VirgilCrypto\Foundation\RsaPublicKey;
 use VirgilCrypto\Foundation\Sha512;
 use VirgilCrypto\Foundation\Signer;
@@ -61,11 +62,34 @@ class VirgilCrypto
     const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
     const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
 
+    /**
+     * @var null|VirgilKeyPairType|VirgilKeyType
+     */
     protected $vKeyPairType;
+
+    /**
+     * @var bool
+     */
     private $useSHA256Fingerprints;
+
+    /**
+     * @var CtrDrbg
+     */
     private $rng;
+
+    /**
+     * @var int
+     */
     private $chunkSize = 1024;
 
+    /**
+     * VirgilCrypto constructor.
+     *
+     * @param VirgilKeyPairType|null $vKeyPairType
+     * @param bool $useSHA256Fingerprints
+     *
+     * @throws Exception
+     */
     public function __construct(VirgilKeyPairType $vKeyPairType = null, bool $useSHA256Fingerprints = false) {
         $this->vKeyPairType = is_null($vKeyPairType) ? (new VirgilKeyPairType())->getED25519() : $vKeyPairType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
@@ -157,18 +181,86 @@ class VirgilCrypto
         }
     }
 
+    /**
+     * Imports the Public key from material representation.
+     *
+     * @param string $keyData
+     *
+     * @return VirgilPublicKey
+     * @throws Exception
+     */
     public function importPublicKey(string $keyData)
     {
-        $keyProvider = new KeyProvider();
-        $keyProvider->useRandom($this->rng);
-        $keyProvider->setupDefaults();
+        try {
+            $keyProvider = new KeyProvider();
+            $keyProvider->useRandom($this->rng);
+            $keyProvider->setupDefaults();
 
-        $publicKey = $keyProvider->importPublicKey($keyData);
+            $publicKey = $keyProvider->importPublicKey($keyData);
 
-        if($publicKey instanceof RsaPublicKey) {
+            $bitLen = null;
+            if($publicKey instanceof RsaPublicKey)
+                $bitLen = $publicKey->bitlen();
 
-        } else {
+            $keyType = new VirgilKeyType($publicKey->algId(), $bitLen);
 
+            $keyId = $this->computePublicKeyIdentifier($publicKey);
+
+            $vPublicKey = new VirgilPublicKey($keyId, $publicKey, $keyType);
+
+            return $vPublicKey;
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
         }
+    }
+
+    /**
+     * Computes public key identifier.
+     * Note: Takes first 8 bytes of SHA512 of public key DER if use_sha256_fingerprints=false
+     * and SHA256 of public key der if use_sha256_fingerprints=true
+     *
+     * @param PublicKey $publicKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    private function computePublicKeyIdentifier(PublicKey $publicKey): string
+    {
+        try {
+            $keyProvider = new KeyProvider();
+            $keyProvider->setupDefaults();
+
+            $publicKeyData = $keyProvider->exportPublicKey($publicKey);
+
+            if ($this->useSHA256Fingerprints) {
+                $res = $this->computeHash($publicKeyData, VirgilHashAlgorithms::SHA256());
+            } else {
+                $res = $this->computeHash($publicKeyData);
+                $res = substr($res, 0, 8);
+            }
+
+            return $res;
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
+    }
+
+    /**
+     * Computes the hash of specified data.
+     *
+     * @param string $data
+     * @param VirgilHashAlgorithms|null $vHashAlgorithm
+     *
+     * @return string
+     */
+    private function computeHash(string $data, VirgilHashAlgorithms $vHashAlgorithm = null): string
+    {
+        $vHashAlgorithm = is_null($vHashAlgorithm) ? VirgilHashAlgorithms::SHA512() : $vHashAlgorithm;
+        $nativeAlgorithm = VirgilHashAlgorithms::convertToNative($vHashAlgorithm);
+        // TODO! Need to be fixed ASAP! Only for POC!
+        $nativeHasher = new $nativeAlgorithm();
+        $hash = $nativeHasher->hash($data);
+
+        return $hash;
     }
 }
