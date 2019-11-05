@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -37,8 +37,14 @@
 
 namespace Virgil\CryptoImpl;
 
-use Exception;
-use Virgil\CryptoImpl\Cryptography\VirgilCryptoService;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use VirgilCrypto\Foundation\CtrDrbg;
+use VirgilCrypto\Foundation\KeyProvider;
+use VirgilCrypto\Foundation\RsaPublicKey;
+use VirgilCrypto\Foundation\Sha512;
+use VirgilCrypto\Foundation\Signer;
+use VirgilCrypto\Foundation\Verifier;
+use \Exception;
 
 
 /**
@@ -56,430 +62,113 @@ class VirgilCrypto
     const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
 
     protected $vKeyPairType;
-    protected $vCryptoService;
-    private $userSHA256Fingerprints;
+    private $useSHA256Fingerprints;
+    private $rng;
+    private $chunkSize = 1024;
 
-    public function __construct(VirgilKeyPairType $vKeyPairType = null, bool $userSHA256Fingerprints = false) {
-
+    public function __construct(VirgilKeyPairType $vKeyPairType = null, bool $useSHA256Fingerprints = false) {
         $this->vKeyPairType = is_null($vKeyPairType) ? (new VirgilKeyPairType())->getED25519() : $vKeyPairType;
+        $this->useSHA256Fingerprints = $useSHA256Fingerprints;
 
-        $this->userSHA256Fingerprints = $userSHA256Fingerprints;
-
-        $this->vCryptoService = new VirgilCryptoService();
+        $rng = new CtrDrbg();
+        $rng->setupDefaults();
+        $this->rng = $rng;
     }
-
-    public function generateKeyPair(VirgilKeyPairType $vKeyPairType = null) : VirgilKeyPair
-    {
-        try {
-            if(is_null($vKeyPairType))
-                $vKeyPairType = $this->vKeyPairType;
-
-            $keyPair = $this->vCryptoService->generateKeyPair($vKeyPairType);
-
-            $publicKeyDerEncoded = $this->cryptoService->publicKeyToDer($keyPair[0]);
-            $privateKeyDerEncoded = $this->cryptoService->privateKeyToDer($keyPair[1]);
-
-            $receiverID = $this->calculateFingerprint($publicKeyDerEncoded);
-
-            $virgilPublicKey = new VirgilPublicKey($receiverID, $publicKeyDerEncoded);
-            $virgilPrivateKey = new VirgilPrivateKey($receiverID, $privateKeyDerEncoded);
-
-            return new VirgilKeyPair($virgilPublicKey, $virgilPrivateKey);
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
 
     /**
-     * @param string            $encryptedAndSignedContent
-     * @param VirgilPrivateKey  $recipientPrivateKey
-     * @param VirgilPublicKey[] $signerPublicKeys
+     * Generates digital signature of data using private key
      *
-     * @return string
-     *
-     * @throws VirgilCryptoException
-     * @throws SignatureIsNotValidException
-     */
-    public function decryptThenVerify(
-        $encryptedAndSignedContent,
-        VirgilPrivateKey $recipientPrivateKey,
-        array $signerPublicKeys
-    ) {
-        try {
-            $cipher = $this->cryptoService->createCipher();
-            $cipherInputOutput = $cipher->createInputOutput($encryptedAndSignedContent);
-
-            $decryptedContent = $cipher->decryptWithKey(
-                $cipherInputOutput,
-                $recipientPrivateKey->getReceiverID(),
-                $recipientPrivateKey->getValue()
-            );
-
-            $signature = $cipher->getCustomParam(self::CUSTOM_PARAM_KEY_SIGNATURE);
-
-            $isSignatureValid = false;
-            foreach ($signerPublicKeys as $signerPublicKey) {
-                if ($this->verifySignature($decryptedContent, $signature, $signerPublicKey)) {
-                    $isSignatureValid = true;
-                }
-            }
-
-            if (!$isSignatureValid) {
-                throw new SignatureIsNotValidException('signature is not valid');
-            }
-
-            return $decryptedContent;
-        } catch (SignatureIsNotValidException $exception) {
-            throw new SignatureIsNotValidException($exception->getMessage());
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param string            $content
-     * @param VirgilPrivateKey  $signerPrivateKey
-     * @param VirgilPublicKey[] $recipientsPublicKeys
+     * @param string $data
+     * @param VirgilPrivateKey $vPrivateKey
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function signThenEncrypt($content, VirgilPrivateKey $signerPrivateKey, array $recipientsPublicKeys)
+    public static function generateSignature(string $data, VirgilPrivateKey $vPrivateKey): string
     {
         try {
-            $cipher = $this->cryptoService->createCipher();
-            $cipherInputOutput = $cipher->createInputOutput($content);
+            $signer = new Signer();
 
-            $signature = $this->generateSignature($content, $signerPrivateKey);
-            $cipher->setCustomParam(self::CUSTOM_PARAM_KEY_SIGNATURE, $signature);
+            $random = new CtrDrbg();
 
-            foreach ($recipientsPublicKeys as $recipientPublicKey) {
-                $cipher->addKeyRecipient(
-                    $recipientPublicKey->getReceiverID(),
-                    $recipientPublicKey->getValue()
-                );
-            }
+            $random->setupDefaults();
+            $hash = new Sha512();
 
-            return $cipher->encrypt($cipherInputOutput);
+            $signer->useHash($hash);
+            $signer->useRandom($random);
+            $signer->reset();
+            $signer->appendData($data);
 
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
+            $signature = $signer->sign($vPrivateKey->getPrivateKey());
+
+            return $signature;
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
         }
     }
 
-
     /**
-     * @param string          $content
-     * @param string          $signature
-     * @param VirgilPublicKey $signerPublicKey
+     * Verifies the specified signature using original data and signer's public key.
+     *
+     * @param string $data
+     * @param string $signature
+     * @param VirgilPublicKey $vPublicKey
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    public function verifySignature($content, $signature, VirgilPublicKey $signerPublicKey)
+    public static function verifySignature(string $data, string $signature, VirgilPublicKey $vPublicKey)
     {
         try {
-            return $this->cryptoService->verify(
-                $content,
-                $signature,
-                $signerPublicKey->getValue()
-            );
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
+            $verifier = new Verifier();
+            $verifier->reset($signature);
+            $verifier->appendData($data);
+
+            $res = $verifier->verify($vPublicKey->getPublicKey());
+
+            return $res;
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
         }
     }
 
-
     /**
-     * @param resource        $source
-     * @param string          $signature
-     * @param VirgilPublicKey $signerPublicKey
+     * Exports the Public key into material representation.
      *
-     * @return bool
-     * @throws VirgilCryptoException
-     */
-    public function verifyStreamSignature($source, $signature, VirgilPublicKey $signerPublicKey)
-    {
-        try {
-            return $this->cryptoService->verifyStream($source, $signature, $signerPublicKey->getValue());
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param string           $content
-     * @param VirgilPrivateKey $signerPrivateKey
+     * @param VirgilPublicKey $vPublicKey
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function generateSignature($content, VirgilPrivateKey $signerPrivateKey)
+    public static function exportPublicKey(VirgilPublicKey $vPublicKey)
     {
         try {
-            return $this->cryptoService->sign($content, $signerPrivateKey->getValue());
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
+            $keyProvider = new KeyProvider();
+            $rand = new CtrDrbg();
+
+            $keyProvider->useRandom($rand);
+            $keyProvider->setupDefaults();
+
+            $res = $keyProvider->exportPublicKey($vPublicKey->getPublicKey());
+
+            return $res;
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
         }
     }
 
-
-    /**
-     * @param resource         $source
-     * @param VirgilPrivateKey $signerPrivateKey
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function generateStreamSignature($source, VirgilPrivateKey $signerPrivateKey)
+    public function importPublicKey(string $keyData)
     {
-        try {
-            return $this->cryptoService->signStream($source, $signerPrivateKey->getValue());
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
+        $keyProvider = new KeyProvider();
+        $keyProvider->useRandom($this->rng);
+        $keyProvider->setupDefaults();
 
+        $publicKey = $keyProvider->importPublicKey($keyData);
 
-    /**
-     * @param string           $encryptedContent
-     * @param VirgilPrivateKey $recipientPrivateKey
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function decrypt($encryptedContent, VirgilPrivateKey $recipientPrivateKey)
-    {
-        try {
-            $cipher = $this->cryptoService->createCipher();
-            $cipherInputOutput = $cipher->createInputOutput($encryptedContent);
+        if($publicKey instanceof RsaPublicKey) {
 
-            return $cipher->decryptWithKey(
-                $cipherInputOutput,
-                $recipientPrivateKey->getReceiverID(),
-                $recipientPrivateKey->getValue()
-            );
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
+        } else {
 
-
-    /**
-     * @param resource         $source
-     * @param resource         $sin
-     * @param VirgilPrivateKey $recipientPrivateKey
-     *
-     * @throws VirgilCryptoException
-     */
-    public function decryptStream($source, $sin, VirgilPrivateKey $recipientPrivateKey)
-    {
-        try {
-            $cipher = $this->cryptoService->createStreamCipher();
-            $cipherInputOutput = $cipher->createInputOutput($source, $sin);
-
-            $cipher->decryptWithKey(
-                $cipherInputOutput,
-                $recipientPrivateKey->getReceiverID(),
-                $recipientPrivateKey->getValue()
-            );
-
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param string            $content
-     * @param VirgilPublicKey[] $recipientsPublicKeys
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function encrypt($content, array $recipientsPublicKeys)
-    {
-        try {
-            $cipher = $this->cryptoService->createCipher();
-            $cipherInputOutput = $cipher->createInputOutput($content);
-
-            foreach ($recipientsPublicKeys as $recipientPublicKey) {
-                $cipher->addKeyRecipient(
-                    $recipientPublicKey->getReceiverID(),
-                    $recipientPublicKey->getValue()
-                );
-            }
-
-            return $cipher->encrypt($cipherInputOutput);
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param resource          $source
-     * @param resource          $sin
-     * @param VirgilPublicKey[] $recipientsPublicKeys
-     *
-     * @throws VirgilCryptoException
-     */
-    public function encryptStream($source, $sin, array $recipientsPublicKeys)
-    {
-        try {
-            $cipher = $this->cryptoService->createStreamCipher();
-            $cipherInputOutput = $cipher->createInputOutput($source, $sin);
-
-            foreach ($recipientsPublicKeys as $recipientPublicKey) {
-                $cipher->addKeyRecipient(
-                    $recipientPublicKey->getReceiverID(),
-                    $recipientPublicKey->getValue()
-                );
-            }
-
-            $cipher->encrypt($cipherInputOutput);
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param string $content
-     * @param string $algorithm
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function generateHash($content, $algorithm)
-    {
-        try {
-            return $this->cryptoService->computeHash($content, $algorithm);
-
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param string $exportedPublicKey
-     *
-     * @return VirgilPublicKey
-     * @throws VirgilCryptoException
-     */
-    public function importPublicKey($exportedPublicKey)
-    {
-        try {
-            $publicKeyDerEncoded = $this->cryptoService->publicKeyToDer($exportedPublicKey);
-            $receiverID = $this->calculateFingerprint($publicKeyDerEncoded);
-
-            return new VirgilPublicKey($receiverID, $publicKeyDerEncoded);
-
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param string $exportedPrivateKey
-     * @param string $password
-     *
-     * @return VirgilPrivateKey
-     * @throws VirgilCryptoException
-     */
-    public function importPrivateKey($exportedPrivateKey, $password = '')
-    {
-        try {
-            $privateKeyDER = \VirgilKeyPair::privateKeyToDER($exportedPrivateKey, $password);
-
-            $privateKeyDerEncoded = $this->cryptoService->decryptPrivateKey($privateKeyDER, $password);
-            $receiverID = $this->calculateFingerprint(
-                $this->cryptoService->extractPublicKey($privateKeyDerEncoded, $password)
-            );
-
-            return new VirgilPrivateKey($receiverID, $privateKeyDerEncoded);
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param VirgilPublicKey $publicKey
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function exportPublicKey(VirgilPublicKey $publicKey)
-    {
-        try {
-            return $this->cryptoService->publicKeyToDer($publicKey->getValue());
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param VirgilPrivateKey $privateKey
-     * @param string           $password
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function exportPrivateKey(VirgilPrivateKey $privateKey, $password = '')
-    {
-        try {
-            return $this->cryptoService->privateKeyToDer($privateKey->getValue(), $password);
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param VirgilPrivateKey $privateKey
-     * @param string           $password
-     *
-     * @return VirgilPublicKey
-     * @throws VirgilCryptoException
-     */
-    public function extractPublicKey(VirgilPrivateKey $privateKey, $password = '')
-    {
-        try {
-            $publicKeyData = $this->cryptoService->extractPublicKey($privateKey->getValue(), $password);
-
-            return $this->importPublicKey($publicKeyData);
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * @param $content
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    protected function calculateFingerprint($content)
-    {
-        try {
-            if ($this->userSHA256Fingerprints) {
-                $hash = $this->cryptoService->computeHash($content, HashAlgorithms::SHA256);
-            } else {
-                $hash = $this->cryptoService->computeHash($content, HashAlgorithms::SHA512);
-                $hash = substr($hash, 0, 8);
-            }
-
-            return $hash;
-        } catch (Exception $exception) {
-            throw new VirgilCryptoException($exception->getMessage());
         }
     }
 }

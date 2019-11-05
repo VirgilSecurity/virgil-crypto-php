@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  *
  * All rights reserved.
  *
@@ -35,67 +35,10 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Exceptions;
 
-use Virgil\CryptoApi\PublicKey as CryptoApiPublicKey;
-use VirgilCrypto\Foundation\PublicKey;
 
-/**
- * Class VirgilPrivateKey
- * @package Virgil\CryptoImpl
- */
-class VirgilPublicKey implements CryptoApiPublicKey
+class GenerateSignatureVirgilException extends VirgilException
 {
-    /**
-     * @var string
-     */
-    private $identifier;
 
-    /**
-     * @var PublicKey
-     */
-    private $publicKey;
-
-    /**
-     * @var string
-     */
-    private $keyType;
-
-    /**
-     * VirgilPublicKey constructor.
-     *
-     * @param string $identifier
-     * @param PublicKey $publicKey
-     * @param string $keyType
-     */
-    public function __construct(string $identifier, PublicKey $publicKey, string $keyType)
-    {
-        $this->identifier = $identifier;
-        $this->publicKey = $publicKey;
-        $this->keyType = $keyType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * @return PublicKey
-     */
-    public function getPublicKey()
-    {
-        return $this->publicKey;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKeyType()
-    {
-        return $this->keyType;
-    }
 }
