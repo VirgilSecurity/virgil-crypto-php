@@ -43,18 +43,23 @@ use \Exception;
  */
 class VirgilCryptoService
 {
+
     /**
      * @param Random|null $random
+     * @param VirgilKeyType|null $vKeyType
      *
      * @return KeyProvider
      * @throws VirgilCryptoException
      */
-    public function getKeyProvider(Random $random = null): KeyProvider
+    public function getKeyProvider(Random $random = null, VirgilKeyType $vKeyType = null): KeyProvider
     {
         try {
             $keyProvider = new KeyProvider();
             if($random)
                 $keyProvider->useRandom($random);
+
+            if($vKeyType)
+                $keyProvider->setRsaParams($vKeyType->getRsaBitLen());
 
             $keyProvider->setupDefaults();
             return $keyProvider;
@@ -64,7 +69,7 @@ class VirgilCryptoService
     }
 
     /**
-     * @param bool $useRandom
+     * @param bool $setupDefaults
      *
      * @return CtrDrbg
      * @throws VirgilCryptoException

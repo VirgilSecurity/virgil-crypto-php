@@ -1,25 +1,19 @@
 <?php
 /**
- * Copyright (C) 2015-2018 Virgil Security Inc.
- *
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  * All rights reserved.
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- *
  *     (1) Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
- *
  *     (2) Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
  *     distribution.
- *
  *     (3) Neither the name of the copyright holder nor the names of its
  *     contributors may be used to endorse or promote products derived from
  *     this software without specific prior written permission.
- *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,71 +25,20 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
 namespace Virgil\CryptoImpl;
 
-use Virgil\CryptoApi\PrivateKey as CryptoApiPrivateKey;
-use VirgilCrypto\Foundation\PrivateKey;
-
 /**
- * Class VirgilPrivateKey
+ * Interface StreamOutput
+ *
  * @package Virgil\CryptoImpl
  */
-class VirgilPrivateKey implements CryptoApiPrivateKey
+interface StreamOutput
 {
     /**
-     * @var string
+     * @return mixed
      */
-    private $identifier;
-
-    /**
-     * @var PrivateKey
-     */
-    private $privateKey;
-
-    /**
-     * @var VirgilKeyType
-     */
-    private $keyType;
-
-    /**
-     * VirgilPrivateKey constructor.
-     *
-     * @param string $identifier
-     * @param PrivateKey $privateKey
-     * @param VirgilKeyType $keyType
-     */
-    public function __construct(string $identifier, PrivateKey $privateKey, VirgilKeyType $keyType)
-    {
-        $this->identifier = $identifier;
-        $this->privateKey = $privateKey;
-        $this->keyType = $keyType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * @return PrivateKey
-     */
-    public function getPrivateKey()
-    {
-        return $this->privateKey;
-    }
-
-    /**
-     * @return VirgilKeyType
-     */
-    public function getKeyType()
-    {
-        return $this->keyType;
-    }
+    public function getOutput();
 }
