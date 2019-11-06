@@ -42,16 +42,10 @@ use MyCLabs\Enum\Enum;
 /**
  * Class keeps list of hash algorithms constants.
  */
-class VirgilHashAlgorithms extends Enum
+class HashAlgorithm extends Enum
 {
-    private const SHA224 = 1;
-    private const SHA256 = 2;
-    private const SHA384 = 3;
-    private const SHA512 = 4;
-
-    // TODO! Need to be fixed ASAP! Only for POC!
-    static function convertToNative(VirgilHashAlgorithms $virgilHashAlgorithm)
-    {
-        return "SHA512";
-    }
+    private const SHA224 = "SHA224";
+    private const SHA256 = "SHA256";
+    private const SHA384 = "SHA384";
+    private const SHA512 = "SHA512";
 }
