@@ -40,6 +40,8 @@ namespace Virgil\CryptoImpl;
 use Virgil\CryptoApi\CardCrypto;
 use Virgil\CryptoApi\PrivateKey;
 use Virgil\CryptoApi\PublicKey;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use \Exception;
 
 /**
  * Class VirgilCardCrypto
@@ -47,93 +49,65 @@ use Virgil\CryptoApi\PublicKey;
  */
 class VirgilCardCrypto implements CardCrypto
 {
-
     /**
      * @var VirgilCrypto
      */
-    protected $virgilCrypto;
-
+    private $vCrypto;
 
     /**
      * VirgilCardCrypto constructor.
+     *
+     * @throws VirgilCryptoException
      */
     public function __construct()
     {
-        $this->virgilCrypto = new VirgilCrypto();
+        try {
+            $this->vCrypto = new VirgilCrypto();
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
     }
 
-
-    /**
-     * @param string     $data
-     * @param PrivateKey $privateKey
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function generateSignature($data, PrivateKey $privateKey)
+    public function generateSignature(string $data, PrivateKey $privateKey)
     {
         if (!$privateKey instanceof VirgilPrivateKey) {
-            throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
+            throw new VirgilCryptoException("Instance of the VirgilPublicKey expected");
         }
 
-        return $this->virgilCrypto->generateSignature($data, $privateKey);
+        return $this->vCrypto->generateSignature($data, $privateKey);
     }
 
-
-    /**
-     * @param string    $signature
-     * @param string    $data
-     * @param PublicKey $publicKey
-     *
-     * @return bool
-     * @throws VirgilCryptoException
-     */
     public function verifySignature($signature, $data, PublicKey $publicKey)
     {
         if (!$publicKey instanceof VirgilPublicKey) {
-            throw new VirgilCryptoException("instance of VirgilPublicKey expected");
+            throw new VirgilCryptoException("Instance of the VirgilPublicKey expected");
         }
 
-        return $this->virgilCrypto->verifySignature($data, $signature, $publicKey);
+        return $this->vCrypto->verifySignature($data, $signature, $publicKey);
     }
 
-
-    /**
-     * @param PublicKey $publicKey
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
     public function exportPublicKey(PublicKey $publicKey)
     {
         if (!$publicKey instanceof VirgilPublicKey) {
-            throw new VirgilCryptoException("instance of VirgilPublicKey expected");
+            throw new VirgilCryptoException("Instance of the VirgilPublicKey expected");
         }
 
-        return $this->virgilCrypto->exportPublicKey($publicKey);
+        return $this->vCrypto->exportPublicKey($publicKey);
     }
-
 
     /**
      * @param string $data
      *
-     * @return PublicKey
-     * @throws VirgilCryptoException
+     * @return PublicKey|VirgilPublicKey
+     * @throws Exception
      */
     public function importPublicKey($data)
     {
-        return $this->virgilCrypto->importPublicKey($data);
+        return $this->vCrypto->importPublicKey($data);
     }
 
-
-    /**
-     * @param string $data
-     *
-     * @return string
-     * @throws VirgilCryptoException
-     */
     public function generateSHA512($data)
     {
-        return $this->virgilCrypto->generateHash($data, VirgilHashAlgorithms::SHA512);
+        return $this->vCrypto->generateHash($data, VirgilHashAlgorithms::SHA512);
     }
 }

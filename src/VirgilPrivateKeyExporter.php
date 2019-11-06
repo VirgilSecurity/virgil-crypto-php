@@ -37,9 +37,10 @@
 
 namespace Virgil\CryptoImpl;
 
-
 use Virgil\CryptoApi\PrivateKey;
 use Virgil\CryptoApi\PrivateKeyExporter;
+use \Exception;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 
 /**
  * Class VirgilPrivateKeyExporter
@@ -50,25 +51,29 @@ class VirgilPrivateKeyExporter implements PrivateKeyExporter
     /**
      * @var VirgilCrypto
      */
-    protected $virgilCrypto;
+    private $vCrypto;
 
     /**
      * @var null|string
      */
-    protected $password;
-
+    private $password;
 
     /**
      * VirgilPrivateKeyExporter constructor.
      *
-     * @param null|string $password
+     * @param string|null $password
+     *
+     * @throws VirgilCryptoException
      */
-    public function __construct($password = null)
+    public function __construct(string $password = null)
     {
-        $this->password = $password;
-        $this->virgilCrypto = new VirgilCrypto();
+        try {
+            $this->password = $password;
+            $this->vCrypto = new VirgilCrypto();
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
     }
-
 
     /**
      * @param PrivateKey $privateKey
@@ -78,22 +83,29 @@ class VirgilPrivateKeyExporter implements PrivateKeyExporter
      */
     public function exportPrivateKey(PrivateKey $privateKey)
     {
-        if (!$privateKey instanceof VirgilPrivateKey) {
-            throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
+        try {
+            if (!$privateKey instanceof VirgilPrivateKey) {
+                throw new VirgilCryptoException("Instance of the VirgilPrivateKey expected");
+            }
+
+            return base64_encode($this->vCrypto->exportPrivateKey($privateKey, $this->password));
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
         }
-
-        return base64_encode($this->virgilCrypto->exportPrivateKey($privateKey, $this->password));
     }
-
 
     /**
      * @param string $data
      *
-     * @return PrivateKey
+     * @return PrivateKey|VirgilKeyPair
      * @throws VirgilCryptoException
      */
     public function importPrivateKey($data)
     {
-        return $this->virgilCrypto->importPrivateKey(base64_decode($data), $this->password);
+        try {
+            return $this->vCrypto->importPrivateKey(base64_decode($data), $this->password);
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
     }
 }

@@ -33,7 +33,6 @@
   ],
   "require": {
     "php": "^7.2",
-    "virgil/crypto-api": "^5.0",
     "myclabs/php-enum": "^1.7"
   },
   "require-dev": {
@@ -41,8 +40,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/",
-      "VirgilCrypto\\Foundation\\": "_dev/crypto/foundation/src/"
+      "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/"
     }
   },
   "autoload-dev": {

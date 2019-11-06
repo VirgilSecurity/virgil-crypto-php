@@ -37,10 +37,11 @@
 
 namespace Virgil\CryptoImpl;
 
-
 use Virgil\CryptoApi\AccessTokenSigner;
 use Virgil\CryptoApi\PrivateKey;
 use Virgil\CryptoApi\PublicKey;
+use \Exception;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 
 /**
  * Class VirgilAccessTokenSigner
@@ -51,59 +52,65 @@ class VirgilAccessTokenSigner implements AccessTokenSigner
     /**
      * @var VirgilCrypto
      */
-    protected $virgilCrypto;
-
+    protected $vCrypto;
 
     /**
      * VirgilAccessTokenSigner constructor.
+     *
+     * @throws VirgilCryptoException
      */
     public function __construct()
     {
-        $this->virgilCrypto = new VirgilCrypto();
+        try {
+            $this->vCrypto = new VirgilCrypto();
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
     }
 
-
     /**
-     * @param string     $data
+     * @param string $data
      * @param PrivateKey $privateKey
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function generateTokenSignature($data, PrivateKey $privateKey)
+    public function generateTokenSignature(string $data, PrivateKey $privateKey): string
     {
-        if (!$privateKey instanceof VirgilPrivateKey) {
-            throw new VirgilCryptoException("instance of VirgilPrivateKey expected");
-        }
+        try {
+            if (!$privateKey instanceof VirgilPrivateKey) {
+                throw new VirgilCryptoException("Instance of the VirgilPrivateKey expected");
+            }
 
-        return $this->virgilCrypto->generateSignature($data, $privateKey);
+            return $this->vCrypto->generateSignature($data, $privateKey);
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
     }
 
-
     /**
-     * @param string    $signature
-     *
-     * @param string    $data
+     * @param string $signature
+     * @param string $data
      * @param PublicKey $publicKey
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    public function verifyTokenSignature($signature, $data, PublicKey $publicKey)
+    public function verifyTokenSignature($signature, $data, PublicKey $publicKey): bool
     {
         if (!$publicKey instanceof VirgilPublicKey) {
-            throw new VirgilCryptoException("instance of VirgilPublicKey expected");
+            throw new VirgilCryptoException("Instance of the VirgilPrivateKey expected");
         }
 
-        return $this->virgilCrypto->verifySignature($data, $signature, $publicKey);
+        return $this->vCrypto->verifySignature($data, $signature, $publicKey);
     }
-
 
     /**
      * @return string
      */
-    public function getAlgorithm()
+    public function getAlgorithm(): string
     {
-        return "VEDS512";
+        // TODO! "VEDS512";
+        return "";
     }
 }
