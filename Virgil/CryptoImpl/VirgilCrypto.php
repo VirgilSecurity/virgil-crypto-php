@@ -38,9 +38,11 @@
 namespace Virgil\CryptoImpl;
 
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use VirgilCrypto\Foundation\Aes256Gcm;
 use VirgilCrypto\Foundation\CtrDrbg;
-use VirgilCrypto\Foundation\KeyProvider;
 use VirgilCrypto\Foundation\PublicKey;
+use VirgilCrypto\Foundation\RecipientCipher;
+use VirgilCrypto\Foundation\RsaPrivateKey;
 use VirgilCrypto\Foundation\RsaPublicKey;
 use VirgilCrypto\Foundation\Sha512;
 use VirgilCrypto\Foundation\Signer;
@@ -73,14 +75,14 @@ class VirgilCrypto
     private $useSHA256Fingerprints;
 
     /**
-     * @var CtrDrbg
-     */
-    private $rng;
-
-    /**
      * @var int
      */
     private $chunkSize = 1024;
+
+    /**
+     * @var VirgilCryptoService
+     */
+    private $vCryptoService;
 
     /**
      * VirgilCrypto constructor.
@@ -94,9 +96,7 @@ class VirgilCrypto
         $this->vKeyPairType = is_null($vKeyPairType) ? (new VirgilKeyPairType())->getED25519() : $vKeyPairType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
 
-        $rng = new CtrDrbg();
-        $rng->setupDefaults();
-        $this->rng = $rng;
+        $this->vCryptoService = new VirgilCryptoService();
     }
 
     /**
@@ -108,15 +108,13 @@ class VirgilCrypto
      * @return string
      * @throws VirgilCryptoException
      */
-    public static function generateSignature(string $data, VirgilPrivateKey $vPrivateKey): string
+    public function generateSignature(string $data, VirgilPrivateKey $vPrivateKey): string
     {
         try {
             $signer = new Signer();
-
-            $random = new CtrDrbg();
-
-            $random->setupDefaults();
             $hash = new Sha512();
+
+            $random = $this->vCryptoService->getCtrDrbg();
 
             $signer->useHash($hash);
             $signer->useRandom($random);
@@ -141,7 +139,7 @@ class VirgilCrypto
      * @return bool
      * @throws VirgilCryptoException
      */
-    public static function verifySignature(string $data, string $signature, VirgilPublicKey $vPublicKey)
+    public function verifySignature(string $data, string $signature, VirgilPublicKey $vPublicKey)
     {
         try {
             $verifier = new Verifier();
@@ -164,17 +162,13 @@ class VirgilCrypto
      * @return string
      * @throws VirgilCryptoException
      */
-    public static function exportPublicKey(VirgilPublicKey $vPublicKey)
+    public function exportPublicKey(VirgilPublicKey $vPublicKey)
     {
         try {
-            $keyProvider = new KeyProvider();
-            $rand = new CtrDrbg();
-
-            $keyProvider->useRandom($rand);
-            $keyProvider->setupDefaults();
+            $random = $this->vCryptoService->getCtrDrbg(false);
+            $keyProvider = $this->vCryptoService->getKeyProvider($random);
 
             $res = $keyProvider->exportPublicKey($vPublicKey->getPublicKey());
-
             return $res;
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage());
@@ -192,10 +186,8 @@ class VirgilCrypto
     public function importPublicKey(string $keyData)
     {
         try {
-            $keyProvider = new KeyProvider();
-            $keyProvider->useRandom($this->rng);
-            $keyProvider->setupDefaults();
-
+            $random = $this->vCryptoService->getCtrDrbg();
+            $keyProvider = $this->vCryptoService->getKeyProvider($random);
             $publicKey = $keyProvider->importPublicKey($keyData);
 
             $bitLen = null;
@@ -227,9 +219,7 @@ class VirgilCrypto
     private function computePublicKeyIdentifier(PublicKey $publicKey): string
     {
         try {
-            $keyProvider = new KeyProvider();
-            $keyProvider->setupDefaults();
-
+            $keyProvider = $this->vCryptoService->getKeyProvider();
             $publicKeyData = $keyProvider->exportPublicKey($publicKey);
 
             if ($this->useSHA256Fingerprints) {
@@ -262,5 +252,136 @@ class VirgilCrypto
         $hash = $nativeHasher->hash($data);
 
         return $hash;
+    }
+
+    /**
+     * Exports private key to DER format
+     *
+     * @param VirgilPrivateKey $vPrivateKey
+     * @param string $password
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    // TODO! password?
+    public function exportPrivateKey(VirgilPrivateKey $vPrivateKey, string $password): string
+    {
+        try {
+            $random = $this->vCryptoService->getCtrDrbg(false);
+            $keyProvider = $this->vCryptoService->getKeyProvider($random);
+
+            $res = $keyProvider->exportPrivateKey($vPrivateKey->getPrivateKey());
+
+            return $res;
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
+    }
+
+    /**
+     * Imports private key from DER or PEM format
+     *
+     * @param string $data
+     * @param string $password
+     *
+     * @return VirgilKeyPair
+     * @throws VirgilCryptoException
+     */
+    // TODO! password?
+    public function importPrivateKey(string $data, string $password): VirgilKeyPair
+    {
+        try {
+            $random = $this->vCryptoService->getCtrDrbg();
+            $keyProvider = $this->vCryptoService->getKeyProvider($random);
+
+            $privateKey = $keyProvider->importPrivateKey($data);
+
+            $bitLen = null;
+            if($privateKey instanceof RsaPrivateKey)
+                $bitLen = $privateKey->bitlen();
+
+            $keyType = new VirgilKeyType($privateKey->algId(), $bitLen);
+
+            $publicKey = $privateKey->extractPublicKey();
+
+            $keyId = $this->computePublicKeyIdentifier($publicKey);
+
+            $vPublicKey = new VirgilPublicKey($keyId, $publicKey, $keyType);
+            $vPrivateKey = new VirgilPrivateKey($keyId, $privateKey, $keyType);
+
+            $vKeyPair = new VirgilKeyPair($vPublicKey, $vPrivateKey);
+
+            return $vKeyPair;
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
+    }
+
+    /**
+     * Encrypts the specified data using recipients Public keys.
+     *
+     * @param string $data
+     * @param array $vPublicKeys
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function encrypt(string $data, array $vPublicKeys): string
+    {
+        try {
+            $random = $this->vCryptoService->getCtrDrbg();
+
+            $aesGcm = new Aes256Gcm();
+            $cipher = new RecipientCipher();
+            $cipher->useEncryptionCipher($aesGcm);
+            $cipher->useRandom($random);
+
+            foreach ($vPublicKeys as $vPublicKey) {
+                if(!$vPublicKey instanceof VirgilPublicKey)
+                    throw new VirgilCryptoException("Invalid type of the VirgilPublicKey");
+
+                $cipher->addKeyRecipient($vPublicKey->getIdentifier(), $vPublicKey->getPublicKey());
+            }
+
+            $cipher->startEncryption();
+            $res = $cipher->packMessageInfo();
+            $res .= $cipher->processEncryption($data);
+            $res .= $cipher->finishEncryption();
+
+            return $res;
+
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
+    }
+
+    /**
+     * Decrypts the specified data using Private key.
+     *
+     * @param string $data
+     * @param VirgilPrivateKey $vPrivateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function decrypt(string $data, VirgilPrivateKey $vPrivateKey): string
+    {
+        try {
+            $messageInfo = "";
+
+            $random = $this->vCryptoService->getCtrDrbg();
+            $cipher = new RecipientCipher();
+            $cipher->useRandom($random);
+            $cipher->startDecryptionWithKey($vPrivateKey->getIdentifier(), $vPrivateKey->getPrivateKey(), $messageInfo);
+
+            $res = $messageInfo;
+            $res .= $cipher->processDecryption($data);
+            $res .= $cipher->finishDecryption();
+
+            return $res;
+
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e->getMessage());
+        }
     }
 }
