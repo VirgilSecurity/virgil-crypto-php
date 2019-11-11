@@ -39,6 +39,8 @@ namespace Virgil\CryptoImpl;
 
 use MyCLabs\Enum\Enum;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use Virgil\CryptoImpl\VirgilCrypto\VirgilCrypto;
+use VirgilCrypto\Foundation\AlgId;
 
 /**
  * Class keeps list of key pair types constants.
@@ -52,45 +54,114 @@ class KeyPairType extends Enum
     private const RSA4096 = "RSA4096";
     private const RSA8192 = "RSA8192";
 
+    private $algId;
+
     /**
      * @param KeyPairType $keyPairType
      *
      * @return int
      */
-    public function getRsaBitLen(KeyPairType $keyPairType): int
+    public function getRsaBitLen(KeyPairType $keyPairType): ?int
     {
-        switch ($keyPairType)
-        {
+        switch ($keyPairType) {
             case $keyPairType::RSA2048():
-                return 2048;
+                $res = 2048;
                 break;
             case $keyPairType::RSA4096():
-                return 4096;
+                $res = 4096;
                 break;
             case $keyPairType::RSA8192():
-                return 8192;
+                $res = 8192;
                 break;
             default:
-                return null;
+                $res =  null;
+        }
+
+        return $res;
+    }
+
+    /**
+     * @param int $bitLen
+     *
+     * @return KeyPairType
+     * @throws VirgilCryptoException
+     */
+    public function getRsaKeyType(int $bitLen): KeyPairType
+    {
+        switch ($bitLen) {
+            case 2048:
+                $res = KeyPairType::RSA2048();
+                break;
+            case 4096:
+                $res = KeyPairType::RSA4096();
+                break;
+            case 8192:
+                $res =  KeyPairType::RSA8192();
+                break;
+            default:
+                throw new VirgilCryptoException(VirgilCryptoError::UNSUPPORTED_RSA_LENGTH());
+        }
+
+        return $res;
+    }
+
+    /**
+     * @param AlgId $algId
+     *
+     * @return void
+     * @throws VirgilCryptoException
+     */
+    public function setAlgId(AlgId $algId)
+    {
+        switch ($algId) {
+            case $algId::ED25519():
+                $this->algId = KeyPairType::ED25519();
+                break;
+            case $algId::CURVE25519():
+                $this->algId = KeyPairType::CURVE25519();
+                break;
+            case $algId::SECP256R1():
+                $this->algId = KeyPairType::SECP256R1();
+                break;
+            case $algId::RSA():
+                throw new VirgilCryptoException(VirgilCryptoError::RSA_SHOULD_BE_CONSTRUCTED_DIRECTLY());
+            default:
+                throw new VirgilCryptoException(VirgilCryptoError::UNKNOWN_ALG_ID());
         }
     }
 
-    public function getRsaKeyType(int $bitLen): KeyPairType
+    /**
+     * @param KeyPairType $algId
+     *
+     * @return null|AlgId
+     * @throws VirgilCryptoException
+     */
+    public function getAlgId(KeyPairType $algId): ?AlgId
     {
-        switch ($bitLen)
-        {
-            case 2048:
-                return KeyPairType::RSA2048();
+        switch ($algId) {
+            case $algId::ED25519():
+                $res = AlgId::ED25519();
                 break;
-            case 4096:
-                return KeyPairType::RSA4096();
+            case $algId::CURVE25519():
+                $res = AlgId::CURVE25519();
                 break;
-            case 8192:
-                return KeyPairType::RSA8192();
+            case $algId::SECP256R1():
+                $res = AlgId::SECP256R1();
+                break;
+            case $algId::RSA2048():
+                $res = AlgId::RSA();
+                break;
+            case $algId::RSA4096():
+                $res = AlgId::RSA();
+                break;
+            case $algId::RSA8192():
+                $res = AlgId::RSA();
                 break;
             default:
-                throw new VirgilCryptoException();
+                throw new VirgilCryptoException(VirgilCryptoError::UNKNOWN_ALG_ID());
         }
+
+        return $res;
     }
 
 }

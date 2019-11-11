@@ -61,7 +61,7 @@ class VirgilCryptoError extends Enum
      *
      * @return null|string
      */
-    public function getErrorDescription(VirgilCryptoError $virgilCryptoError): ?string
+    public static function getErrorDescription(VirgilCryptoError $virgilCryptoError): ?string
     {
         switch ($virgilCryptoError)
         {

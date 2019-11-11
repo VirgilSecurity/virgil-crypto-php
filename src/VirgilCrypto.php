@@ -41,8 +41,10 @@ use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\HashAlgorithm;
 use Virgil\CryptoImpl\KeyPairType;
 use Virgil\CryptoImpl\StreamInput;
+use Virgil\CryptoImpl\VirgilKeyPair;
 use Virgil\CryptoImpl\VirgilPrivateKey;
 use Virgil\CryptoImpl\VirgilPublicKey;
+use VirgilCrypto\Foundation\AlgId;
 use VirgilCrypto\Foundation\CtrDrbg;
 use \Exception;
 use VirgilCrypto\Foundation\KeyProvider;
@@ -320,13 +322,189 @@ class VirgilCrypto
         }
     }
 
-    public function importPrivateKey(string $data)
+    /**
+     * @param string $data
+     *
+     * @return VirgilKeyPair
+     * @throws VirgilCryptoException
+     */
+    public function importPrivateKey(string $data): VirgilKeyPair
     {
-        $privateKey = $this->importInternalPrivateKey($data);
+        try {
+            $privateKey = $this->importInternalPrivateKey($data);
 
-        $keyType = new KeyPairType();
+            if ($privateKey->algId() == AlgId::RSA()) {
+                $keyType = KeyPairType::getRsaKeyType($privateKey->bitLen());
+            } else {
+                $algId = $privateKey->algId();
+                $keyType = KeyPairType::$algId();
+            }
+
+            $publicKey = $privateKey->extractPublicKey();
+
+            $keyId = $this->computePublicKeyIdentifier($publicKey);
+
+            $virgilPrivateKey = new VirgilPrivateKey($keyId, $privateKey, $keyType);
+            $virgilPublicKey = new VirgilPublicKey($keyId, $publicKey, $keyType);
+
+            return new VirgilKeyPair($virgilPrivateKey, $virgilPublicKey);
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @param PrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    private function exportInternalPrivateKey(PrivateKey $privateKey): string
+    {
+        try {
+            $keyProvider = new KeyProvider();
+
+            $keyProvider->useRandom($this->rnd);
+            $keyProvider->setupDefaults();
+
+            return $keyProvider->exportPrivateKey($privateKey);
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * Extracts public key from private key
+     *
+     * @param VirgilPrivateKey $virgilPrivateKey
+     *
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoException
+     */
+    public function extractPublicKey(VirgilPrivateKey $virgilPrivateKey)
+    {
+        try {
+            $publicKey = $virgilPrivateKey->getPrivateKey()->extractPublicKey();
+
+            return new VirgilPublicKey($virgilPrivateKey->getIdentifier(), $publicKey, $virgilPrivateKey->getKeyType());
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * Imports public key from DER or PEM format
+     *
+     * @param string $data
+     *
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoException
+     */
+    public function importPublicKey(string $data): VirgilPublicKey
+    {
+        try {
+            $keyProvider = new KeyProvider();
+
+            $keyProvider->useRandom($this->rnd);
+            $keyProvider->setupDefaults();
+
+            $publicKey = $keyProvider->importPublicKey($data);
+
+            if ($publicKey->algId() == AlgId::RSA()) {
+                $keyType = KeyPairType::getRsaKeyType($publicKey->bitLen());
+            } else {
+                $algId = $publicKey->algId();
+                $keyType = KeyPairType::$algId();
+            }
+
+            $keyId = $this->computePublicKeyIdentifier($publicKey);
+
+            return new VirgilPublicKey($keyId, $publicKey, $keyType);
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * Exports public key
+     *
+     * @param VirgilPublicKey $publicKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function exportPublicKey(VirgilPublicKey $publicKey)
+    {
+        try {
+            return $this->exportInternalPublicKey($publicKey->getPublicKey());
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * Export private key
+     *
+     * @param VirgilPrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function exportPrivateKey(VirgilPrivateKey $privateKey)
+    {
+        try {
+            return $this->exportInternalPrivateKey($privateKey->getPrivateKey());
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
     }
 
     /// <--- Key Management
 
+    /**
+     * @param PublicKey $publicKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    private function computePublicKeyIdentifier(PublicKey $publicKey): string
+    {
+        try {
+            $publicKeyData = $this->exportInternalPublicKey($publicKey);
+
+            $res = $this->computeHash($publicKeyData, HashAlgorithm::SHA256());
+
+            if (!$this->useSHA256Fingerprints) {
+                $res = substr($res, 0, 8);
+            }
+
+            return $res;
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @param PublicKey $publicKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    private function exportInternalPublicKey(PublicKey $publicKey): string
+    {
+        try {
+            $keyProvider = new KeyProvider();
+
+            $keyProvider->useRandom($this->rnd);
+            $keyProvider->setupDefaults();
+
+            return $keyProvider->exportPublicKey($publicKey);
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
 }
