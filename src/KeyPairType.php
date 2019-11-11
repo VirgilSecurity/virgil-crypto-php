@@ -37,88 +37,60 @@
 
 namespace Virgil\CryptoImpl;
 
-use Virgil\CryptoImpl\Exceptions\UnknownTypeException;
-use VirgilCrypto\Foundation\AlgId;
+use MyCLabs\Enum\Enum;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 
 /**
  * Class keeps list of key pair types constants.
  */
-class VirgilKeyPairType
+class KeyPairType extends Enum
 {
-    /**
-     * @var VirgilKeyType
-     */
-    private $CURVE25519;
+    private const ED25519 = "ED25519";
+    private const CURVE25519 = "CURVE25519";
+    private const SECP256R1 = "SECP256R1";
+    private const RSA2048 = "RSA2048";
+    private const RSA4096 = "RSA4096";
+    private const RSA8192 = "RSA8192";
 
     /**
-     * @var VirgilKeyType
+     * @param KeyPairType $keyPairType
+     *
+     * @return int
      */
-    private $ED25519;
-
-    /**
-     * @var VirgilKeyType
-     */
-    private $SECP256R1;
-
-    /**
-     * @var VirgilKeyType
-     */
-    private $RSA_2048;
-
-    /**
-     * @var VirgilKeyType
-     */
-    private $RSA_4096;
-
-    /**
-     * @var VirgilKeyType
-     */
-    private $RSA_8192;
-
-    /**
-     * KeyPairType constructor.
-     */
-    public function __construct()
+    public function getRsaBitLen(KeyPairType $keyPairType): int
     {
-        $this->CURVE25519 = new VirgilKeyType(AlgId::CURVE25519());
-        $this->ED25519 = new VirgilKeyType(AlgId::ED25519());
-        $this->SECP256R1 = new VirgilKeyType(AlgId::SECP256R1());
-        $this->RSA_2048 = new VirgilKeyType(AlgId::RSA(), 2048);
-        $this->RSA_4096 = new VirgilKeyType(AlgId::RSA(), 4096);
-        $this->RSA_8192 = new VirgilKeyType(AlgId::RSA(), 8192);
+        switch ($keyPairType)
+        {
+            case $keyPairType::RSA2048():
+                return 2048;
+                break;
+            case $keyPairType::RSA4096():
+                return 4096;
+                break;
+            case $keyPairType::RSA8192():
+                return 8192;
+                break;
+            default:
+                return null;
+        }
     }
 
-    /**
-     * @param $name
-     * @throws UnknownTypeException
-     */
-    public function __get($name)
+    public function getRsaKeyType(int $bitLen): KeyPairType
     {
-        throw new UnknownTypeException("KeyPairType not found: $name");
-    }
-
-    /**
-     * @return VirgilKeyType
-     */
-    public function getCURVE25519()
-    {
-        return $this->CURVE25519;
-    }
-
-    /**
-     * @return VirgilKeyType
-     */
-    public function getED25519()
-    {
-        return $this->ED25519;
-    }
-
-    /**
-     * @return VirgilKeyType
-     */
-    public function getSECP256R1()
-    {
-        return $this->SECP256R1;
+        switch ($bitLen)
+        {
+            case 2048:
+                return KeyPairType::RSA2048();
+                break;
+            case 4096:
+                return KeyPairType::RSA4096();
+                break;
+            case 8192:
+                return KeyPairType::RSA8192();
+                break;
+            default:
+                throw new VirgilCryptoException();
+        }
     }
 
 }

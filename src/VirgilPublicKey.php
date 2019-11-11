@@ -57,7 +57,7 @@ class VirgilPublicKey implements CryptoApiPublicKey
     private $publicKey;
 
     /**
-     * @var VirgilKeyType
+     * @var KeyPairType
      */
     private $keyType;
 
@@ -66,9 +66,9 @@ class VirgilPublicKey implements CryptoApiPublicKey
      *
      * @param string $identifier
      * @param PublicKey $publicKey
-     * @param VirgilKeyType $keyType
+     * @param KeyPairType $keyType
      */
-    public function __construct(string $identifier, PublicKey $publicKey, VirgilKeyType $keyType)
+    public function __construct(string $identifier, PublicKey $publicKey, KeyPairType $keyType)
     {
         $this->identifier = $identifier;
         $this->publicKey = $publicKey;
@@ -78,7 +78,7 @@ class VirgilPublicKey implements CryptoApiPublicKey
     /**
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -86,15 +86,15 @@ class VirgilPublicKey implements CryptoApiPublicKey
     /**
      * @return PublicKey
      */
-    public function getPublicKey()
+    public function getPublicKey(): PublicKey
     {
         return $this->publicKey;
     }
 
     /**
-     * @return VirgilKeyType
+     * @return KeyPairType
      */
-    public function getKeyType()
+    public function getKeyType(): KeyPairType
     {
         return $this->keyType;
     }

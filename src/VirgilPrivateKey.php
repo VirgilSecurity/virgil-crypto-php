@@ -37,14 +37,13 @@
 
 namespace Virgil\CryptoImpl;
 
-use Virgil\CryptoApi\PrivateKey as CryptoApiPrivateKey;
 use VirgilCrypto\Foundation\PrivateKey;
 
 /**
  * Class VirgilPrivateKey
  * @package Virgil\CryptoImpl
  */
-class VirgilPrivateKey implements CryptoApiPrivateKey
+class VirgilPrivateKey
 {
     /**
      * @var string
@@ -57,7 +56,7 @@ class VirgilPrivateKey implements CryptoApiPrivateKey
     private $privateKey;
 
     /**
-     * @var VirgilKeyType
+     * @var KeyPairType
      */
     private $keyType;
 
@@ -66,9 +65,9 @@ class VirgilPrivateKey implements CryptoApiPrivateKey
      *
      * @param string $identifier
      * @param PrivateKey $privateKey
-     * @param VirgilKeyType $keyType
+     * @param KeyPairType $keyType
      */
-    public function __construct(string $identifier, PrivateKey $privateKey, VirgilKeyType $keyType)
+    public function __construct(string $identifier, PrivateKey $privateKey, KeyPairType $keyType)
     {
         $this->identifier = $identifier;
         $this->privateKey = $privateKey;
@@ -78,7 +77,7 @@ class VirgilPrivateKey implements CryptoApiPrivateKey
     /**
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -86,15 +85,15 @@ class VirgilPrivateKey implements CryptoApiPrivateKey
     /**
      * @return PrivateKey
      */
-    public function getPrivateKey()
+    public function getPrivateKey(): PrivateKey
     {
         return $this->privateKey;
     }
 
     /**
-     * @return VirgilKeyType
+     * @return KeyPairType
      */
-    public function getKeyType()
+    public function getKeyType(): KeyPairType
     {
         return $this->keyType;
     }

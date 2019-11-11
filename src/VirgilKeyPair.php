@@ -37,7 +37,6 @@
 
 namespace Virgil\CryptoImpl;
 
-
 /**
  * Class VirgilKeyPair
  * @package Virgil\CryptoImpl
@@ -45,39 +44,48 @@ namespace Virgil\CryptoImpl;
 class VirgilKeyPair
 {
     /**
-     * @var VirgilPublicKey
-     */
-    private $publicKey;
-    /**
      * @var VirgilPrivateKey
      */
     private $privateKey;
 
     /**
-     * VirgilKeyPair constructor.
-     *
-     * @param VirgilPublicKey  $publicKey
-     * @param VirgilPrivateKey $privateKey
+     * @var VirgilPublicKey
      */
-    public function __construct(VirgilPublicKey $publicKey, VirgilPrivateKey $privateKey)
-    {
-        $this->publicKey = $publicKey;
-        $this->privateKey = $privateKey;
-    }
+    private $publicKey;
 
     /**
-     * @return VirgilPublicKey
+     * VirgilKeyPair constructor.
+     *
+     * @param VirgilPrivateKey $privateKey*
+     * @param VirgilPublicKey  $publicKey
      */
-    public function getPublicKey()
+    public function __construct(VirgilPrivateKey $privateKey, VirgilPublicKey $publicKey)
     {
-        return $this->publicKey;
+        $this->privateKey = $privateKey;
+        $this->publicKey = $publicKey;
     }
 
     /**
      * @return VirgilPrivateKey
      */
-    public function getPrivateKey()
+    public function getPrivateKey(): VirgilPrivateKey
     {
         return $this->privateKey;
+    }
+
+    /**
+     * @return VirgilPublicKey
+     */
+    public function getPublicKey(): VirgilPublicKey
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->publicKey->getIdentifier();
     }
 }
