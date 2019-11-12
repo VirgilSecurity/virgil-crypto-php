@@ -28,17 +28,10 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Services;
 
-/**
- * Interface StreamInput
- *
- * @package Virgil\CryptoImpl
- */
-interface StreamInput
+
+interface InputOutput
 {
-    /**
-     * @return mixed
-     */
     public function getInput();
 }

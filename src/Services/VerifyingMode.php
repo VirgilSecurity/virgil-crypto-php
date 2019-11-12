@@ -28,17 +28,18 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Services;
+
+use MyCLabs\Enum\Enum;
 
 /**
- * Interface StreamOutput
+ * Class VerifyingMode
  *
- * @package Virgil\CryptoImpl
+ * @package Virgil\CryptoImpl\Services
  */
-interface StreamOutput
+class VerifyingMode extends Enum
 {
-    /**
-     * @return mixed
-     */
-    public function getOutput();
+    private const DECRYPT_AND_VERIFY = "DECRYPT_AND_VERIFY";
+    private const DECRYPT_THEN_VERIFY = "DECRYPT_THEN_VERIFY";
+    private const ANY = "ANY";
 }

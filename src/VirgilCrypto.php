@@ -1,25 +1,19 @@
 <?php
 /**
  * Copyright (C) 2015-2019 Virgil Security Inc.
- *
  * All rights reserved.
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- *
  *     (1) Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
- *
  *     (2) Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
  *     distribution.
- *
  *     (3) Neither the name of the copyright holder nor the names of its
  *     contributors may be used to endorse or promote products derived from
  *     this software without specific prior written permission.
- *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,7 +25,6 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
@@ -40,7 +33,11 @@ namespace Virgil\CryptoImpl\VirgilCrypto;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\HashAlgorithm;
 use Virgil\CryptoImpl\KeyPairType;
-use Virgil\CryptoImpl\StreamInput;
+use Virgil\CryptoImpl\InputStream;
+use Virgil\CryptoImpl\Services\DataInputOutput;
+use Virgil\CryptoImpl\Services\InputOutput;
+use Virgil\CryptoImpl\Services\SigningOptions;
+use Virgil\CryptoImpl\Services\StreamInputOutput;
 use Virgil\CryptoImpl\VirgilCryptoError;
 use Virgil\CryptoImpl\VirgilKeyPair;
 use Virgil\CryptoImpl\VirgilPrivateKey;
@@ -53,6 +50,7 @@ use VirgilCrypto\Foundation\KeyProvider;
 use VirgilCrypto\Foundation\PrivateKey;
 use VirgilCrypto\Foundation\PublicKey;
 use VirgilCrypto\Foundation\Random;
+use VirgilCrypto\Foundation\RecipientCipher;
 use VirgilCrypto\Foundation\Sha224;
 use VirgilCrypto\Foundation\Sha256;
 use VirgilCrypto\Foundation\Sha384;
@@ -70,6 +68,9 @@ use VirgilCrypto\Foundation\Verifier;
  */
 class VirgilCrypto
 {
+    private const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
+    private const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
+
     /**
      * @var KeyPairType
      */
@@ -98,7 +99,8 @@ class VirgilCrypto
      *
      * @throws VirgilCryptoException
      */
-    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false) {
+    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false)
+    {
         $this->defaultKeyType = is_null($defaultKeyType) ? KeyPairType::ED25519() : $defaultKeyType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
 
@@ -111,6 +113,79 @@ class VirgilCrypto
 
         $this->rng = $rng;
     }
+
+    /// Impl --->
+
+    /**
+     * @param RecipientCipher $cipher
+     * @param InputOutput $inputOutput
+     * @param SigningOptions|null $signingOptions
+     *
+     * @throws VirgilCryptoException
+     */
+    private function startEncryption(RecipientCipher $cipher, InputOutput $inputOutput, SigningOptions $signingOptions = null)
+    {
+        try {
+
+            if ($signingOptions) {
+                $signingMode = $signingOptions->getSigningMode();
+
+                switch ($signingMode) {
+                    case $signingMode::SIGN_AND_ENCRYPT():
+
+                        switch ($inputOutput) {
+
+                            case $inputOutput instanceof DataInputOutput:
+
+                                $signature = $this->generateSignature($inputOutput->getInput(), $signingOptions->getVirgilPrivateKey());
+                                $cipher->customParams()->addData(VirgilCrypto::CUSTOM_PARAM_KEY_SIGNATURE, $signature);
+                                $cipher->customParams()->addData(VirgilCrypto::CUSTOM_PARAM_KEY_SIGNER_ID, $signingOptions->getVirgilPrivateKey()->getIdentifier());
+                                break;
+
+                            case $inputOutput instanceof StreamInputOutput:
+                                throw new VirgilCryptoException("signAndEncrypt is not supported for streams");
+                        }
+                        break;
+
+                    case $signingMode::SIGN_THEN_ENCRYPT():
+
+                        $cipher->useSignerHash(new Sha512());
+                        $cipher->addSigner($signingOptions->getVirgilPrivateKey()->getIdentifier(), $signingOptions->getVirgilPrivateKey()->getPrivateKey());
+
+                        $size = null;
+
+                        switch ($inputOutput) {
+
+                            case $inputOutput instanceof DataInputOutput:
+
+                                $size = strlen($inputOutput->getInput());
+                                break;
+
+                            case $inputOutput instanceof StreamInputOutput:
+
+                                if (!$inputOutput->getStreamSize())
+                                    throw new VirgilCryptoException("signThenEncrypt for streams with unknown size is not supported");
+
+                                $size = $inputOutput->getStreamSize();
+                                break;
+                        }
+
+                        $cipher->startSignedEncryption($size);
+                        break;
+                }
+
+            } else {
+
+                $cipher->startEncryption();
+
+            }
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /// <--- Impl
 
     /// Key Generation --->
 
@@ -173,15 +248,15 @@ class VirgilCrypto
         try {
             $keyProvider = new KeyProvider();
 
-            if(!$type)
+            if (!$type)
                 $type = $this->defaultKeyType;
 
             $bitLen = $type->getRsaBitLen($type);
 
-            if($bitLen)
+            if ($bitLen)
                 $keyProvider->setRsaParams($bitLen);
 
-            if(!$rng)
+            if (!$rng)
                 $rng = $this->rng;
 
             $keyProvider->useRandom($rng);
@@ -208,14 +283,10 @@ class VirgilCrypto
     /// Signatures --->
 
     /**
-     *
      * Generates digital signature of data using private key
-     *
      * - Note: Returned value contains only digital signature, not data itself.
-     *
      * - Note: Data inside this function is guaranteed to be hashed with SHA512 at least one time.
      *   It's secure to pass raw data here.
-     *
      * - Note: Verification algorithm depends on PrivateKey type. Default: EdDSA for ed25519 key
      *
      * @param string $data
@@ -242,7 +313,6 @@ class VirgilCrypto
 
     /**
      * Verifies digital signature of data
-     *
      * - Note: Verification algorithm depends on PublicKey type. Default: EdDSA for ed25519 key
      *
      * @param string $signature
@@ -267,19 +337,17 @@ class VirgilCrypto
 
     /**
      * Generates digital signature of data stream using private key
-     *
      * - Note: Returned value contains only digital signature, not data itself.
-     *
      * - Note: Data inside this function is guaranteed to be hashed with SHA512 at least one time.
      *         It's secure to pass raw data here.
      *
-     * @param StreamInput $streamInput
+     * @param InputStream $streamInput
      * @param VirgilPrivateKey $virgilPrivateKey
      *
      * @return void
      * @throws VirgilCryptoException
      */
-    public function generateStreamSignature(StreamInput $streamInput, VirgilPrivateKey $virgilPrivateKey)
+    public function generateStreamSignature(InputStream $streamInput, VirgilPrivateKey $virgilPrivateKey)
     {
         try {
             $signer = new Signer();
@@ -302,18 +370,16 @@ class VirgilCrypto
 
     /**
      * Verifies digital signature of data stream
-     *
      * - Note: Verification algorithm depends on PublicKey type. Default: EdDSA
      *
      * @param string $signature
-     * @param StreamInput $streamInput
+     * @param InputStream $streamInput
      * @param VirgilPublicKey $virgilPublicKey
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    public static function verifyStreamSignature(string $signature, StreamInput $streamInput, VirgilPublicKey
-    $virgilPublicKey): bool
+    public static function verifyStreamSignature(string $signature, InputStream $streamInput, VirgilPublicKey $virgilPublicKey): bool
     {
         try {
             $verifier = new Verifier();
