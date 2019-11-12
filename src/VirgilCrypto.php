@@ -40,6 +40,8 @@ use Virgil\CryptoImpl\Services\SigningMode;
 use Virgil\CryptoImpl\Services\SigningOptions;
 use Virgil\CryptoImpl\Services\StreamInputOutput;
 use Virgil\CryptoImpl\Services\StreamUtils;
+use Virgil\CryptoImpl\Services\VerifyingMode;
+use Virgil\CryptoImpl\Services\VerifyingOptions;
 use Virgil\CryptoImpl\VirgilCryptoError;
 use Virgil\CryptoImpl\VirgilKeyPair;
 use Virgil\CryptoImpl\VirgilPrivateKey;
@@ -439,7 +441,77 @@ class VirgilCrypto
         }
     }
 
+    /**
+     * @param RecipientCipher $cipher
+     * @param InputOutput $inputOutput
+     * @param string|null $result
+     * @param VerifyingOptions|null $verifyingOptions
+     *
+     * @throws VirgilCryptoException
+     */
+    private function finishDecryption(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null, VerifyingOptions $verifyingOptions = null)
+    {
+        try {
 
+            if ($verifyingOptions) {
+
+                $mode = $verifyingOptions->getVerifyingMode();
+
+                if ($mode == VerifyingMode::ANY()) {
+                    $mode = $cipher->isDataSigned() ? VerifyingMode::DECRYPT_THEN_VERIFY() : VerifyingMode::DECRYPT_AND_VERIFY();
+                }
+
+                switch ($mode) {
+                    case VerifyingMode::DECRYPT_THEN_VERIFY():
+
+                        $this->verifyPlainSignature($cipher,  $inputOutput, $result, $verifyingOptions->getVirgilPublicKeys());
+                        break;
+
+                    case VerifyingMode::DECRYPT_AND_VERIFY():
+
+                        $this->verifyPlainSignature($cipher, $inputOutput, $result, $verifyingOptions->getVirgilPublicKeys());
+                        break;
+                }
+
+            } else {
+                return;
+            }
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @param InputOutput $inputOutput
+     * @param VerifyingOptions|null $verifyingOptions
+     * @param VirgilPrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    private function decrypt(InputOutput $inputOutput, VerifyingOptions $verifyingOptions = null, VirgilPrivateKey
+    $privateKey): string
+    {
+        try {
+
+            $messageInfo = "";
+
+            $cipher = new RecipientCipher();
+
+            $cipher->useRandom($this->rng);
+            $cipher->startDecryptionWithKey($privateKey->getIdentifier(), $privateKey->getPrivateKey(), $messageInfo);
+
+            $result = $this->processDecryption($cipher, $inputOutput);
+
+            $this->finishDecryption($cipher, $inputOutput, $result, $verifyingOptions);
+
+            return $result;
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
 
     /// <--- Impl
 
@@ -555,7 +627,7 @@ class VirgilCrypto
     {
         try {
             $signer = new Signer();
-            $signer->useRandom($this->rnd);
+            $signer->useRandom($this->rng);
             $signer->useHash(new Sha512());
 
             $signer->reset();
