@@ -28,17 +28,21 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
+namespace Virgil\CryptoImpl\Core;
 
-use MyCLabs\Enum\Enum;
+use Virgil\CryptoImpl\InputOutput;
 
 /**
- * Class SingingMode
+ * Interface Data
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\CryptoImpl\Core
  */
-class SigningMode extends Enum
+interface DataInterface extends InputOutput
 {
-    private const SIGN_AND_ENCRYPT = "SIGN_AND_ENCRYPT";
-    private const SIGN_THEN_ENCRYPT = "SIGN_THEN_ENCRYPT";
+    /**
+     * Data constructor.
+     *
+     * @param string $input
+     */
+    public function __construct(string $input);
 }

@@ -28,68 +28,33 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
+namespace Virgil\CryptoImpl\Core;
 
-use Virgil\CryptoImpl\InputStream;
-use Virgil\CryptoImpl\OutputStream;
+use Virgil\CryptoImpl\InputOutput;
 
 /**
- * Class StreamInputOutput
+ * Interface Stream
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\CryptoImpl\Core
  */
-class StreamInputOutput implements InputOutput
+interface StreamInterface extends InputOutput
 {
     /**
-     * @var InputStream
-     */
-    private $input;
-
-    /**
-     * @var int|null
-     */
-    private $streamSize;
-
-    /**
-     * @var OutputStream
-     */
-    private $output;
-
-    /**
-     * StreamInputOutput constructor.
+     * StreamInterface constructor.
      *
-     * @param InputStream $input
+     * @param string $streamInput
+     * @param string $streamOutput
      * @param int|null $streamSize
-     * @param OutputStream $output
      */
-    public function __construct(InputStream $input, int $streamSize = null, OutputStream $output)
-    {
-        $this->input = $input;
-        $this->streamSize = $streamSize;
-        $this->output = $output;
-    }
-
-    /**s
-     * @return InputStream
-     */
-    public function getInput(): InputStream
-    {
-        return $this->input;
-    }
+    public function __construct(string $streamInput, string $streamOutput, int $streamSize = null);
 
     /**
      * @return int|null
      */
-    public function getStreamSize(): ?int
-    {
-        return $this->streamSize;
-    }
+    public function getStreamSize(): ?int;
 
     /**
-     * @return OutputStream
+     * @return string
      */
-    public function getOutput(): OutputStream
-    {
-        return $this->output;
-    }
+    public function getOutput(): string;
 }
