@@ -28,53 +28,19 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Tests;
 
-use Virgil\CryptoImpl\VirgilPrivateKey;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Class SigningOptions
+ * Class CryptoTests
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Tests
  */
-class SigningOptions
+class CryptoTests extends TestCase
 {
-    /**
-     * @var VirgilPrivateKey
-     */
-    private $virgilPrivateKey;
-
-    /**
-     * @var SigningMode
-     */
-    private $signingMode;
-
-    /**
-     * SigningOptions constructor.
-     *
-     * @param VirgilPrivateKey $virgilPrivateKey
-     * @param SigningMode $signingMode
-     */
-    public function __construct(VirgilPrivateKey $virgilPrivateKey, SigningMode $signingMode)
+    public function testTemp()
     {
-        $this->virgilPrivateKey = $virgilPrivateKey;
-        $this->signingMode = $signingMode;
+        $this->assertTrue(true);
     }
-
-    /**
-     * @return VirgilPrivateKey
-     */
-    public function getVirgilPrivateKey()
-    {
-        return $this->virgilPrivateKey;
-    }
-
-    /**
-     * @return SigningMode
-     */
-    public function getSigningMode()
-    {
-        return $this->signingMode;
-    }
-
 }

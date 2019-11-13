@@ -28,18 +28,19 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\VirgilCrypto;
+namespace Virgil\CryptoImpl;
 
+use Virgil\CryptoImpl\Core\HashAlgorithms;
 use Virgil\CryptoImpl\Core\StreamInterface;
+use Virgil\CryptoImpl\Core\VirgilKeyPair;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\InputOutput;
-use Virgil\CryptoImpl\KeyPairType;
-use Virgil\CryptoImpl\Services\SigningOptions;
-use Virgil\CryptoImpl\Services\VerifyingOptions;
+use Virgil\CryptoImpl\Core\KeyPairType;
+use Virgil\CryptoImpl\Core\SigningOptions;
+use Virgil\CryptoImpl\Core\VerifyingOptions;
 use Virgil\CryptoImpl\Services\VirgilCryptoService;
-use Virgil\CryptoImpl\VirgilKeyPair;
-use Virgil\CryptoImpl\VirgilPrivateKey;
-use Virgil\CryptoImpl\VirgilPublicKey;
+use Virgil\CryptoImpl\Core\irgilKeyPair;
+use Virgil\CryptoImpl\Core\VirgilPrivateKey;
+use Virgil\CryptoImpl\Core\VirgilPublicKey;
 use VirgilCrypto\Foundation\Random;
 use Virgil\CryptoImpl\Core\DataInterface;
 
@@ -86,7 +87,7 @@ class VirgilCrypto
      */
     private function getCryptoService(): VirgilCryptoService
     {
-        return new VirgilCryptoService();
+        return new VirgilCryptoService($this->defaultKeyType, $this->useSHA256Fingerprints);
     }
 
     /**
@@ -213,5 +214,27 @@ class VirgilCrypto
      */
     public function decryptStream(StreamInterface $stream, VirgilPrivateKey $privateKey, VerifyingOptions $verifyingOptions = null): string {
         return $this->getCryptoService()->decrypt($stream, $privateKey, $verifyingOptions);
+    }
+
+    /**
+     * @param string $data
+     * @param HashAlgorithms $algorithm
+     *
+     * @return null|string
+     */
+    public function computeHash(string $data, HashAlgorithms $algorithm): ?string
+    {
+        return $this->getCryptoService()->computeHash($data, $algorithm);
+    }
+
+    /**
+     * @param VirgilPublicKey $publicKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function exportPublicKey(VirgilPublicKey $publicKey)
+    {
+        return $this->getCryptoService()->exportPublicKey($publicKey);
     }
 }

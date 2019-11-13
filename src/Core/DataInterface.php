@@ -30,8 +30,6 @@
 
 namespace Virgil\CryptoImpl\Core;
 
-use Virgil\CryptoImpl\InputOutput;
-
 /**
  * Interface Data
  *

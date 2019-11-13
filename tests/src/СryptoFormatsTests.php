@@ -28,53 +28,54 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Tests;
 
-use Virgil\CryptoImpl\VirgilPrivateKey;
+use PHPUnit\Framework\TestCase;
+use Virgil\CryptoImpl\Core\HashAlgorithms;
+use Virgil\CryptoImpl\VirgilCrypto;
 
 /**
- * Class SigningOptions
+ * Class СryptoFormatsTests
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Tests
  */
-class SigningOptions
+class CryptoFormatsTest extends TestCase
 {
     /**
-     * @var VirgilPrivateKey
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
      */
-    private $virgilPrivateKey;
-
-    /**
-     * @var SigningMode
-     */
-    private $signingMode;
-
-    /**
-     * SigningOptions constructor.
-     *
-     * @param VirgilPrivateKey $virgilPrivateKey
-     * @param SigningMode $signingMode
-     */
-    public function __construct(VirgilPrivateKey $virgilPrivateKey, SigningMode $signingMode)
+    public function test001SignatureHash()
     {
-        $this->virgilPrivateKey = $virgilPrivateKey;
-        $this->signingMode = $signingMode;
+        $crypto = new VirgilCrypto();
+        $keyPair = $crypto->generateKeyPair();
+        $signature = $crypto->generateSignature("test", $keyPair->getPrivateKey());
+
+        self::assertEquals(substr($signature, 0, 17), base64_decode("MFEwDQYJYIZIAWUDBAIDBQA="));
     }
 
     /**
-     * @return VirgilPrivateKey
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
      */
-    public function getVirgilPrivateKey()
+    public function test004KeyIdentifierIsCorrect()
     {
-        return $this->virgilPrivateKey;
-    }
+        $crypto1 = new VirgilCrypto();
+        $keyPair1 = $crypto1->generateKeyPair();
 
-    /**
-     * @return SigningMode
-     */
-    public function getSigningMode()
-    {
-        return $this->signingMode;
-    }
+        self::assertEquals($keyPair1->getPrivateKey()->getIdentifier(), $keyPair1->getPublicKey()->getIdentifier());
 
+        $a1 = substr($crypto1->computeHash($crypto1->exportPublicKey($keyPair1->getPublicKey()),
+            HashAlgorithms::SHA512()),0, 8);
+        $a2 = $keyPair1->getPrivateKey()->getIdentifier();
+
+        // TODO!
+        // $this->assertEquals($a1, $a2);
+
+        $crypto2 = new VirgilCrypto(null, true);
+        $keyPair2 = $crypto2->generateKeyPair();
+
+        $b1 = $crypto1->computeHash($crypto1->exportPublicKey($keyPair2->getPublicKey()), HashAlgorithms::SHA256());
+        $b2 = $keyPair2->getPrivateKey()->getIdentifier();
+
+        self::assertEquals($b1, $b2);
+    }
 }

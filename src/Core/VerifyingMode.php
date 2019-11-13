@@ -28,7 +28,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Core;
 
 use MyCLabs\Enum\Enum;
 

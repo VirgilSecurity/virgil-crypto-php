@@ -28,7 +28,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
+namespace Virgil\CryptoImpl\Core;
 
 /**
  * Class VerifyingOptions

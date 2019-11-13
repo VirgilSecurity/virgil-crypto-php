@@ -31,30 +31,57 @@
 namespace Virgil\CryptoImpl\Services;
 
 use \Exception;
-use Virgil\CryptoImpl\Data;
+use Virgil\CryptoImpl\Core\Data;
+use Virgil\CryptoImpl\Core\HashAlgorithms;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\InputOutput;
-use Virgil\CryptoImpl\KeyPairType;
-use Virgil\CryptoImpl\SigningMode;
-use Virgil\CryptoImpl\Stream;
-use Virgil\CryptoImpl\VerifyingMode;
-use Virgil\CryptoImpl\VirgilCryptoError;
-use Virgil\CryptoImpl\VirgilKeyPair;
-use Virgil\CryptoImpl\VirgilPrivateKey;
-use Virgil\CryptoImpl\VirgilPublicKey;
+use Virgil\CryptoImpl\Core\InputOutput;
+use Virgil\CryptoImpl\Core\KeyPairType;
+use Virgil\CryptoImpl\Core\SigningMode;
+use Virgil\CryptoImpl\Core\Stream;
+use Virgil\CryptoImpl\Core\VerifyingMode;
+use Virgil\CryptoImpl\Core\VirgilCryptoError;
+use Virgil\CryptoImpl\Core\VirgilKeyPair;
+use Virgil\CryptoImpl\Core\VirgilPrivateKey;
+use Virgil\CryptoImpl\Core\VirgilPublicKey;
 use VirgilCrypto\Foundation\Aes256Gcm;
 use VirgilCrypto\Foundation\CtrDrbg;
 use VirgilCrypto\Foundation\KeyMaterialRng;
 use VirgilCrypto\Foundation\KeyProvider;
+use VirgilCrypto\Foundation\PrivateKey;
+use VirgilCrypto\Foundation\PublicKey;
 use VirgilCrypto\Foundation\Random;
 use VirgilCrypto\Foundation\RecipientCipher;
+use VirgilCrypto\Foundation\Sha224;
+use VirgilCrypto\Foundation\Sha256;
+use VirgilCrypto\Foundation\Sha384;
 use VirgilCrypto\Foundation\Sha512;
 use VirgilCrypto\Foundation\Signer;
 
+/**
+ * Class VirgilCryptoService
+ *
+ * @package Virgil\CryptoImpl\Services
+ */
 class VirgilCryptoService
 {
+    /**
+     * @var
+     */
+    private $defaultKeyType;
+
+    /**
+     * @var
+     */
+    private $useSHA256Fingerprints;
+
     private const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
     private const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
+
+    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false)
+    {
+        $this->defaultKeyType = $defaultKeyType;
+        $this->useSHA256Fingerprints = $useSHA256Fingerprints;
+    }
 
     /**
      * @return CtrDrbg
@@ -85,7 +112,7 @@ class VirgilCryptoService
         try {
             $publicKeyData = $this->exportInternalPublicKey($publicKey);
 
-            $res = $this->computeHash($publicKeyData, HashAlgorithm::SHA256());
+            $res = $this->computeHash($publicKeyData, HashAlgorithms::SHA256());
 
             if (!$this->useSHA256Fingerprints) {
                 $res = substr($res, 0, 8);
@@ -142,7 +169,7 @@ class VirgilCryptoService
                 $keyProvider->setRsaParams($bitLen);
 
             if (!$rng)
-                $rng = $this->rng;
+                $rng = $this->getRandom();
 
             $keyProvider->useRandom($rng);
             $keyProvider->setupDefaults();
@@ -622,7 +649,7 @@ class VirgilCryptoService
         try {
             $signer = new Signer();
 
-            $signer->useRandom($this->rng);
+            $signer->useRandom($this->getRandom());
             $signer->useHash(new Sha512());
 
             $signer->reset();
@@ -692,11 +719,11 @@ class VirgilCryptoService
      * Computes hash
      *
      * @param string $data
-     * @param HashAlgorithm $algorithm
+     * @param HashAlgorithms $algorithm
      *
      * @return null|string
      */
-    public function computeHash(string $data, HashAlgorithm $algorithm): ?string
+    public function computeHash(string $data, HashAlgorithms $algorithm): ?string
     {
         switch ($algorithm) {
             case $algorithm::SHA224():
@@ -731,7 +758,7 @@ class VirgilCryptoService
         try {
             $keyProvider = new KeyProvider();
 
-            $keyProvider->useRandom($this->rng);
+            $keyProvider->useRandom($this->getRandom());
             $keyProvider->setupDefaults();
 
             return $keyProvider->importPrivateKey($data);
@@ -752,7 +779,7 @@ class VirgilCryptoService
         try {
             $keyProvider = new KeyProvider();
 
-            $keyProvider->useRandom($this->rng);
+            $keyProvider->useRandom($this->getRandom());
             $keyProvider->setupDefaults();
 
             return $keyProvider->importPublicKey($data);
@@ -845,7 +872,7 @@ class VirgilCryptoService
         try {
             $keyProvider = new KeyProvider();
 
-            $keyProvider->useRandom($this->rng);
+            $keyProvider->useRandom($this->getRandom());
             $keyProvider->setupDefaults();
 
             return $keyProvider->exportPublicKey($publicKey);
@@ -867,7 +894,7 @@ class VirgilCryptoService
         try {
             $keyProvider = new KeyProvider();
 
-            $keyProvider->useRandom($this->rng);
+            $keyProvider->useRandom($this->getRandom());
             $keyProvider->setupDefaults();
 
             $publicKey = $keyProvider->importPublicKey($data);

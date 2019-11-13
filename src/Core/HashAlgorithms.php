@@ -35,14 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Core;
 
 use MyCLabs\Enum\Enum;
 
 /**
  * Class keeps list of hash algorithms constants.
  */
-class HashAlgorithm extends Enum
+class HashAlgorithms extends Enum
 {
     private const SHA224 = "SHA224";
     private const SHA256 = "SHA256";

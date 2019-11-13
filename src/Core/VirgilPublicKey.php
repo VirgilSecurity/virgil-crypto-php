@@ -35,16 +35,15 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Core;
 
-use Virgil\CryptoApi\PublicKey as CryptoApiPublicKey;
 use VirgilCrypto\Foundation\PublicKey;
 
 /**
  * Class VirgilPrivateKey
  * @package Virgil\CryptoImpl
  */
-class VirgilPublicKey implements CryptoApiPublicKey
+class VirgilPublicKey
 {
     /**
      * @var string

@@ -28,9 +28,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
-
-use Virgil\CryptoImpl\Core\StreamInterface;
+namespace Virgil\CryptoImpl\Core;
 
 /**
  * Class StreamInputOutput

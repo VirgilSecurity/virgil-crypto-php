@@ -35,11 +35,10 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\CryptoImpl\Core;
 
 use MyCLabs\Enum\Enum;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\VirgilCrypto\VirgilCrypto;
 use VirgilCrypto\Foundation\AlgId;
 
 /**
