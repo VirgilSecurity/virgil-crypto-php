@@ -37,8 +37,5 @@ namespace Virgil\CryptoImpl\Core;
  */
 interface InputOutput
 {
-    /**
-     * @return string
-     */
-    public function getInput(): string;
+
 }

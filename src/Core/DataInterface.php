@@ -43,4 +43,9 @@ interface DataInterface extends InputOutput
      * @param string $input
      */
     public function __construct(string $input);
+
+    /**
+     * @return string
+     */
+    public function getInput(): string;
 }

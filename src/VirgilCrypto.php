@@ -35,6 +35,7 @@ use Virgil\CryptoImpl\Core\HashAlgorithms;
 use Virgil\CryptoImpl\Core\InputOutput;
 use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\SigningMode;
+use Virgil\CryptoImpl\Core\InputStream;
 use Virgil\CryptoImpl\Core\VerifyingMode;
 use Virgil\CryptoImpl\Core\VirgilKeyPair;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
@@ -271,5 +272,17 @@ class VirgilCrypto
     {
         return $this->getCryptoService()->decrypt($data, $privateKey, new VerifyingOptions($signersPublicKeys,
             VerifyingMode::DECRYPT_AND_VERIFY()));
+    }
+
+    /**
+     * @param InputStream $inputStream
+     * @param VirgilPrivateKey $virgilPrivateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function generateStreamSignature(InputStream $inputStream, VirgilPrivateKey $virgilPrivateKey): string
+    {
+        return $this->getCryptoService()->generateStreamSignature($inputStream, $virgilPrivateKey);
     }
 }

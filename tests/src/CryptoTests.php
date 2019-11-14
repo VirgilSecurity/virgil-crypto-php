@@ -34,6 +34,8 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use Virgil\CryptoImpl\Core\KeyPairType;
 use Virgil\CryptoImpl\Core\PublicKeyList;
+use Virgil\CryptoImpl\Core\Stream;
+use Virgil\CryptoImpl\Core\InputStream;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\Services\InputOutputService;
 use Virgil\CryptoImpl\VirgilCrypto;
@@ -263,7 +265,34 @@ class CryptoTests extends TestCase
         foreach ($keyTypes as $keyType) {
             $this->checkSignAndEncrypt($crypto, $keyType);
         }
-
     }
+
+    private function checkStreamSign(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        $keyPair1 = $crypto->generateKeyPair($keyPairType);
+        $keyPair2 = $crypto->generateKeyPair($keyPairType);
+
+        $testFileUrl = __DIR__."../data/testData.txt";
+        $inputStream = new InputStream($testFileUrl);
+
+        $signature = $crypto->generateStreamSignature($inputStream, $keyPair1->getPrivateKey());
+    }
+
+
+//private func checkStreamSign(crypto: VirgilCrypto, keyPairType: KeyPairType) throws {
+//let keyPair1 = try crypto.generateKeyPair(ofType: keyPairType)
+//let keyPair2 = try crypto.generateKeyPair(ofType: keyPairType)
+//
+//let testFileURL = Bundle(for: type(of: self)).url(forResource: "testData", withExtension: "txt")!
+//let inputStream = InputStream(url: testFileURL)!
+//
+//let signature = try crypto.generateStreamSignature(of: inputStream, using: keyPair1.privateKey)
+//
+//let verifyStream1 = InputStream(url: testFileURL)!
+//let verifyStream2 = InputStream(url: testFileURL)!
+//
+//XCTAssert(try! crypto.verifyStreamSignature(signature, of: verifyStream1, with: keyPair1.publicKey))
+//XCTAssert(!(try! crypto.verifyStreamSignature(signature, of: verifyStream2, with: keyPair2.publicKey)))
+//}
 
 }

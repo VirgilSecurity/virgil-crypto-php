@@ -36,6 +36,7 @@ use Virgil\CryptoImpl\Core\DataInterface;
 use Virgil\CryptoImpl\Core\HashAlgorithms;
 use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\SigningOptions;
+use Virgil\CryptoImpl\Core\InputStream;
 use Virgil\CryptoImpl\Core\StreamInterface;
 use Virgil\CryptoImpl\Core\VerifyingOptions;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
@@ -105,8 +106,6 @@ class VirgilCryptoService
             throw new VirgilCryptoException($e->getMessage());
         }
     }
-
-    /// Key Generation --->
 
     /**
      * @param PublicKey $publicKey
@@ -196,8 +195,6 @@ class VirgilCryptoService
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
-
-    /// <--- Key Generation
 
     /**
      * Generates digital signature of data using private key
@@ -335,11 +332,11 @@ class VirgilCryptoService
                     //      outputStream.open()
                     //  }
 
-                    $this->streamUtils->write($cipher->packMessageInfo(), $inputOutput->getOutput());
-                    $data = $this->streamUtils->forEachChunk($inputOutput->getInput(), $inputOutput->getStreamSize());
-                    $this->streamUtils->write($data, $inputOutput->getOutput());
+                    StreamService::write($cipher->packMessageInfo(), $inputOutput->getOutput());
+                    $data = StreamService::forEachChunk($inputOutput->getInput(), $inputOutput->getStreamSize());
+                    StreamService::write($data, $inputOutput->getOutput());
 
-                    $this->streamUtils->write($cipher->finishEncryption(), $inputOutput->getOutput());
+                    StreamService::write($cipher->finishEncryption(), $inputOutput->getOutput());
 
                     if ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT())
                         $this->streamUtils->write($cipher->packMessageInfoFooter(), $inputOutput->getOutput());
@@ -642,10 +639,10 @@ class VirgilCryptoService
      * @param InputStream $streamInput
      * @param VirgilPrivateKey $virgilPrivateKey
      *
-     * @return void
+     * @return string
      * @throws VirgilCryptoException
      */
-    public function generateStreamSignature(InputStream $streamInput, VirgilPrivateKey $virgilPrivateKey)
+    public function generateStreamSignature(InputStream $streamInput, VirgilPrivateKey $virgilPrivateKey): string
     {
         try {
             $signer = new Signer();
@@ -659,7 +656,7 @@ class VirgilCryptoService
             // $data = $streamUtils->forEachChunk($streamInput, $streamSize);
             // $signer->appendData($data);
 
-            $signer->sign($virgilPrivateKey->getPrivateKey());
+            return $signer->sign($virgilPrivateKey->getPrivateKey());
 
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());

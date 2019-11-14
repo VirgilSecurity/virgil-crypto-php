@@ -31,62 +31,32 @@
 namespace Virgil\CryptoImpl\Core;
 
 /**
- * Class StreamInputOutput
+ * Class StreamInput
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\CryptoImpl\Core
  */
-class Stream implements StreamInterface
+class InputStream
 {
     /**
-     * @var InputStream
+     * @var string
      */
-    private $inputStream;
+    private $input;
 
     /**
-     * @var OutputStream
-     */
-    private $outputStream;
-
-    /**
-     * @var int|null
-     */
-    private $streamSize;
-
-    /**
-     * Stream constructor.
+     * StreamInput constructor.
      *
-     * @param InputStream $inputStream
-     * @param OutputStream $outputStream
-     * @param int|null $streamSize
+     * @param string $input
      */
-    public function __construct(InputStream $inputStream, OutputStream $outputStream, int $streamSize = null)
+    public function __construct(string $input)
     {
-        $this->inputStream = $inputStream;
-        $this->outputStream = $outputStream;
-        $this->streamSize = $streamSize;
+        $this->input = $input;
     }
 
     /**
-     * @return InputStream
+     * @return string
      */
-    public function getInputStream(): InputStream
+    public function getInput(): string
     {
-        return $this->inputStream;
-    }
-
-    /**
-     * @return OutputStream
-     */
-    public function getOutputStream(): OutputStream
-    {
-        return $this->outputStream;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getStreamSize(): ?int
-    {
-        return $this->streamSize;
+        return $this->input;
     }
 }

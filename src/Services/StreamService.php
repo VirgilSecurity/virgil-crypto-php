@@ -37,12 +37,17 @@ namespace Virgil\CryptoImpl\Services;
  */
 class StreamService
 {
-    public function write()
+    public static function read()
     {
 
     }
 
-    public function forEachChunk()
+    public static function write()
+    {
+
+    }
+
+    public static function forEachChunk()
     {
 
     }

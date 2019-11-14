@@ -40,19 +40,24 @@ interface StreamInterface extends InputOutput
     /**
      * StreamInterface constructor.
      *
-     * @param string $streamInput
-     * @param string $streamOutput
+     * @param InputStream $inputStream
+     * @param OutputStream $outputStream
      * @param int|null $streamSize
      */
-    public function __construct(string $streamInput, string $streamOutput, int $streamSize = null);
+    public function __construct(InputStream $inputStream, OutputStream $outputStream, int $streamSize = null);
+
+    /**
+     * @return InputStream
+     */
+    public function getInputStream(): InputStream;
+
+    /**
+     * @return OutputStream
+     */
+    public function getOutputStream(): OutputStream;
 
     /**
      * @return int|null
      */
     public function getStreamSize(): ?int;
-
-    /**
-     * @return string
-     */
-    public function getOutput(): string;
 }
