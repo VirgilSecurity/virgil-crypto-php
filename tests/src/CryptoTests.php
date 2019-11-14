@@ -30,10 +30,13 @@
 
 namespace Virgil\Tests;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
-use Virgil\CryptoImpl\Core\Data;
 use Virgil\CryptoImpl\Core\KeyPairType;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use Virgil\CryptoImpl\Services\InputOutputService;
 use Virgil\CryptoImpl\VirgilCrypto;
+use VirgilCrypto\Foundation\CtrDrbg;
 
 /**
  * Class CryptoTests
@@ -42,6 +45,11 @@ use Virgil\CryptoImpl\VirgilCrypto;
  */
 class CryptoTests extends TestCase
 {
+    private function getIOService(): InputOutputService
+    {
+        return new InputOutputService();
+    }
+
     /**
      * @param VirgilCrypto $crypto
      * @param KeyPairType $keyPairType
@@ -114,32 +122,85 @@ class CryptoTests extends TestCase
         }
     }
 
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     */
     private function checkEncryption(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
         $keyPair1 = $crypto->generateKeyPair($keyPairType);
         $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-        $data = new Data("test_data");
+        $rawData = "test1";
+        $data = $this->getIOService()->convertStringToData($rawData);
 
         $encryptedData = $crypto->encrypt($data, [$keyPair1->getPublicKey()]);
+        $encryptedData = $this->getIOService()->convertStringToData($encryptedData);
+
+        $decryptedData = $crypto->decrypt($encryptedData, $keyPair1->getPrivateKey());
+
+        self::assertEquals($rawData, $decryptedData);
+
+        try {
+            $crypto->decrypt($encryptedData, $keyPair2->getPrivateKey());
+        } catch (Exception $e) {
+            self::assertTrue($e instanceof VirgilCryptoException);
+        }
     }
 
-//private func checkEncryption(crypto: VirgilCrypto, keyPairType: KeyPairType) throws {
-//let keyPair1 = try crypto.generateKeyPair(ofType: keyPairType)
-//let keyPair2 = try crypto.generateKeyPair(ofType: keyPairType)
-//
-//let data = UUID().uuidString.data(using: .utf8)!
-//
-//let encryptedData = try crypto.encrypt(data, for: [keyPair1.publicKey])
-//
-//let decryptedData = try crypto.decrypt(encryptedData, with: keyPair1.privateKey)
-//
-//XCTAssert(data == decryptedData)
-//
-//do {
-//_ = try crypto.decrypt(encryptedData, with: keyPair2.privateKey)
-//XCTFail()
-//}
-//catch { }
-//}
+    /**
+     *
+     */
+    public function test03EncryptionSomeDataShouldMatch()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::CURVE25519(), KeyPairType::ED25519(), KeyPairType::SECP256R1(),
+            KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkEncryption($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkSignature(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        $keyPair1 = $crypto->generateKeyPair($keyPairType);
+        $keyPair2 = $crypto->generateKeyPair($keyPairType);
+
+        $rawData = "test2";
+
+        $signature = $crypto->generateSignature($rawData, $keyPair1->getPrivateKey());
+
+        $res1 = $crypto->verifySignature($signature, $rawData, $keyPair1->getPublicKey());
+        self::assertTrue($res1);
+
+        try {
+            $crypto->verifySignature($signature, $rawData, $keyPair2->getPublicKey());
+        } catch (Exception $e) {
+            self::assertTrue($e instanceof VirgilCryptoException);
+        }
+    }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    public function test04SignatureSomeDataShouldVerify()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkSignature($crypto, $keyType);
+        }
+    }
 }

@@ -61,6 +61,7 @@ use VirgilCrypto\Foundation\Sha256;
 use VirgilCrypto\Foundation\Sha384;
 use VirgilCrypto\Foundation\Sha512;
 use VirgilCrypto\Foundation\Signer;
+use VirgilCrypto\Foundation\Verifier;
 
 /**
  * Class VirgilCryptoService
@@ -316,10 +317,10 @@ class VirgilCryptoService
                     $result .= $cipher->processEncryption($inputOutput->getInput());
                     $result .= $cipher->finishEncryption();
 
-                    if ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT())
+                    if (($signingOptions) && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
                         $result .= $cipher->packMessageInfoFooter();
-
                     break;
+
                 case $inputOutput instanceof Stream:
 
                     // TODO!
