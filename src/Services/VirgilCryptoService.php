@@ -32,7 +32,11 @@ namespace Virgil\CryptoImpl\Services;
 
 use \Exception;
 use Virgil\CryptoImpl\Core\Data;
+use Virgil\CryptoImpl\Core\DataInterface;
 use Virgil\CryptoImpl\Core\HashAlgorithms;
+use Virgil\CryptoImpl\Core\SigningOptions;
+use Virgil\CryptoImpl\Core\StreamInterface;
+use Virgil\CryptoImpl\Core\VerifyingOptions;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\Core\InputOutput;
 use Virgil\CryptoImpl\Core\KeyPairType;
@@ -393,7 +397,7 @@ class VirgilCryptoService
             $result = null;
 
             switch ($inputOutput) {
-                case $inputOutput instanceof Stream:
+                case $inputOutput instanceof StreamInterface:
 
                     // TODO!
                     //  if inputStream.streamStatus == .notOpen {
@@ -409,7 +413,7 @@ class VirgilCryptoService
 
                     break;
 
-                case $inputOutput instanceof Data:
+                case $inputOutput instanceof DataInterface:
 
                     $result = $cipher->processDecryption($inputOutput->getInput());
                     $result .= $cipher->finishDecryption();

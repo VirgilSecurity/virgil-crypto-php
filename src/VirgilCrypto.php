@@ -31,18 +31,16 @@
 namespace Virgil\CryptoImpl;
 
 use Virgil\CryptoImpl\Core\HashAlgorithms;
-use Virgil\CryptoImpl\Core\StreamInterface;
+use Virgil\CryptoImpl\Core\InputOutput;
 use Virgil\CryptoImpl\Core\VirgilKeyPair;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\Core\KeyPairType;
 use Virgil\CryptoImpl\Core\SigningOptions;
 use Virgil\CryptoImpl\Core\VerifyingOptions;
 use Virgil\CryptoImpl\Services\VirgilCryptoService;
-use Virgil\CryptoImpl\Core\irgilKeyPair;
 use Virgil\CryptoImpl\Core\VirgilPrivateKey;
 use Virgil\CryptoImpl\Core\VirgilPublicKey;
 use VirgilCrypto\Foundation\Random;
-use Virgil\CryptoImpl\Core\DataInterface;
 
 /**
  * Wrapper for cryptographic operations.
@@ -131,7 +129,8 @@ class VirgilCrypto
     }
 
     /**
-     *  Encrypts data for passed PublicKeys
+     *
+     * Encrypts data (or stream data) for passed PublicKeys
      *
      * 1. Generates random AES-256 KEY1
      * 2. Encrypts data with KEY1 using AES-256-GCM
@@ -140,38 +139,16 @@ class VirgilCrypto
      * 5. Computes KDF to obtain AES-256 key from shared secret for each recipient
      * 6. Encrypts KEY1 with this key using AES-256-CBC for each recipient
      *
-     * @param DataInterface $data
-     * @param SigningOptions|null $signingOptions
-     * @param array $recipients
-     *
-     * @return null|string
-     * @throws VirgilCryptoException
-     */
-    public function encryptData(DataInterface $data, array $recipients, SigningOptions $signingOptions = null): ?string
-    {
-        return $this->getCryptoService()->encrypt($data, $recipients, $signingOptions);
-    }
-
-    /**
-     * Encrypts data stream for passed PublicKeys
-     *
-     * 1. Generates random AES-256 KEY1
-     * 2. Encrypts data with KEY1 using AES-256-GCM
-     * 3. Generates ephemeral key pair for each recipient
-     * 4. Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key
-     * 5. Computes KDF to obtain AES-256 key from shared secret for each recipient
-     * 6. Encrypts KEY1 with this key using AES-256-CBC for each recipient
-     *
-     * @param StreamInterface $stream
+     * @param InputOutput $inputOutput
      * @param array $recipients
      * @param SigningOptions|null $signingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function encryptStream(StreamInterface $stream, array $recipients, SigningOptions $signingOptions = null): ?string
+    public function encrypt(InputOutput $inputOutput, array $recipients, SigningOptions $signingOptions = null): ?string
     {
-        return $this->getCryptoService()->encrypt($stream, $recipients, $signingOptions);
+        return $this->getCryptoService()->encrypt($inputOutput, $recipients, $signingOptions);
     }
 
     /**
@@ -182,20 +159,9 @@ class VirgilCrypto
      * 3. Decrypts KEY1 using AES-256-CBC
      * 4. Decrypts data using KEY1 and AES-256-GCM
      *
-     * @param DataInterface $data
-     * @param VirgilPrivateKey $privateKey
-     * @param VerifyingOptions|null $verifyingOptions
+     * ============================================
      *
-     * @return string
-     * @throws VirgilCryptoException
-     */
-    public function decryptData(DataInterface $data, VirgilPrivateKey $privateKey, VerifyingOptions $verifyingOptions = null): string
-    {
-        return $this->getCryptoService()->decrypt($data, $privateKey, $verifyingOptions);
-    }
-
-    /**
-     *  Decrypts data stream using passed PrivateKey
+     * Decrypts data stream using passed PrivateKey
      *
      * - Note: Decrypted stream should not be used until decryption of whole InputStream completed due to security
      * reasons
@@ -205,15 +171,16 @@ class VirgilCrypto
      * 3. Decrypts KEY1 using AES-256-CBC
      * 4. Decrypts data using KEY1 and AES-256-GCM
      *
-     * @param StreamInterface $stream
+     * @param InputOutput $inputOutput
      * @param VirgilPrivateKey $privateKey
      * @param VerifyingOptions|null $verifyingOptions
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function decryptStream(StreamInterface $stream, VirgilPrivateKey $privateKey, VerifyingOptions $verifyingOptions = null): string {
-        return $this->getCryptoService()->decrypt($stream, $privateKey, $verifyingOptions);
+    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions $verifyingOptions = null): string
+    {
+        return $this->getCryptoService()->decrypt($inputOutput, $privateKey, $verifyingOptions);
     }
 
     /**
@@ -233,7 +200,7 @@ class VirgilCrypto
      * @return string
      * @throws VirgilCryptoException
      */
-    public function exportPublicKey(VirgilPublicKey $publicKey)
+    public function exportPublicKey(VirgilPublicKey $publicKey) :string
     {
         return $this->getCryptoService()->exportPublicKey($publicKey);
     }
@@ -270,7 +237,7 @@ class VirgilCrypto
      * @return string
      * @throws VirgilCryptoException
      */
-    public function exportPrivateKey(VirgilPrivateKey $privateKey)
+    public function exportPrivateKey(VirgilPrivateKey $privateKey): string
     {
         return $this->getCryptoService()->exportPrivateKey($privateKey);
     }

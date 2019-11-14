@@ -31,6 +31,7 @@
 namespace Virgil\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Virgil\CryptoImpl\Core\Data;
 use Virgil\CryptoImpl\Core\KeyPairType;
 use Virgil\CryptoImpl\VirgilCrypto;
 
@@ -112,4 +113,33 @@ class CryptoTests extends TestCase
             $this->checkKeyImport($crypto, $keyType);
         }
     }
+
+    private function checkEncryption(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        $keyPair1 = $crypto->generateKeyPair($keyPairType);
+        $keyPair2 = $crypto->generateKeyPair($keyPairType);
+
+        $data = new Data("test_data");
+
+        $encryptedData = $crypto->encrypt($data, [$keyPair1->getPublicKey()]);
+    }
+
+//private func checkEncryption(crypto: VirgilCrypto, keyPairType: KeyPairType) throws {
+//let keyPair1 = try crypto.generateKeyPair(ofType: keyPairType)
+//let keyPair2 = try crypto.generateKeyPair(ofType: keyPairType)
+//
+//let data = UUID().uuidString.data(using: .utf8)!
+//
+//let encryptedData = try crypto.encrypt(data, for: [keyPair1.publicKey])
+//
+//let decryptedData = try crypto.decrypt(encryptedData, with: keyPair1.privateKey)
+//
+//XCTAssert(data == decryptedData)
+//
+//do {
+//_ = try crypto.decrypt(encryptedData, with: keyPair2.privateKey)
+//XCTFail()
+//}
+//catch { }
+//}
 }
