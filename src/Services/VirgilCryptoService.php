@@ -258,6 +258,8 @@ class VirgilCryptoService
                             case $inputOutput instanceof Stream:
                                 throw new VirgilCryptoException("signAndEncrypt is not supported for streams");
                         }
+
+                        $cipher->startEncryption();
                         break;
 
                     case $signingMode::SIGN_THEN_ENCRYPT():
@@ -320,6 +322,7 @@ class VirgilCryptoService
 
                     if (($signingOptions) && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
                         $result .= $cipher->packMessageInfoFooter();
+
                     break;
 
                 case $inputOutput instanceof Stream:
@@ -345,6 +348,7 @@ class VirgilCryptoService
             }
 
             return $result;
+
 
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
@@ -447,7 +451,7 @@ class VirgilCryptoService
                 throw new VirgilCryptoException("signAndEncrypt is not supported for streams");
 
             if (1 == $publicKeys->getAmountOfKeys()) {
-                $signerPublicKey = $publicKeys[0];
+                $signerPublicKey = $publicKeys->getFirst();
 
             } else {
 
@@ -589,6 +593,7 @@ class VirgilCryptoService
             $cipher = new RecipientCipher();
 
             $cipher->useRandom($this->getRandom());
+
             $cipher->startDecryptionWithKey($privateKey->getIdentifier(), $privateKey->getPrivateKey(), $messageInfo);
 
             $result = $this->processDecryption($cipher, $inputOutput);

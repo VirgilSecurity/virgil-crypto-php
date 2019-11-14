@@ -60,9 +60,9 @@ class VerifyingOptions
     }
 
     /**
-     * @return array
+     * @return PublicKeyList
      */
-    public function getVirgilPublicKeys(): array
+    public function getVirgilPublicKeys(): PublicKeyList
     {
         return $this->virgilPublicKeys;
     }
@@ -70,7 +70,7 @@ class VerifyingOptions
     /**
      * @return VerifyingMode
      */
-    public function getVerifyingMode()
+    public function getVerifyingMode(): VerifyingMode
     {
         return $this->verifyingMode;
     }

@@ -62,7 +62,7 @@ class SigningOptions
     /**
      * @return VirgilPrivateKey
      */
-    public function getVirgilPrivateKey()
+    public function getVirgilPrivateKey(): VirgilPrivateKey
     {
         return $this->virgilPrivateKey;
     }
@@ -70,7 +70,7 @@ class SigningOptions
     /**
      * @return SigningMode
      */
-    public function getSigningMode()
+    public function getSigningMode(): SigningMode
     {
         return $this->signingMode;
     }

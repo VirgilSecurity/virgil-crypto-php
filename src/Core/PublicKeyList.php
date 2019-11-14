@@ -46,18 +46,20 @@ class PublicKeyList
 
     /**
      * PublicKeyList constructor.
+     *
+     * @param VirgilPublicKey ...$publicKey
      */
-    public function __construct()
+    public function __construct(VirgilPublicKey ...$publicKey)
     {
-        $this->list = null;
+        $this->list[] = $publicKey;
     }
 
     /**
-     * @param VirgilPublicKey $publicKey
+     * @param VirgilPublicKey ...$publicKey
      *
      * @return PublicKeyList
      */
-    public function addPublicKey(VirgilPublicKey $publicKey): PublicKeyList
+    public function addPublicKey(VirgilPublicKey ...$publicKey): PublicKeyList
     {
         $this->list[] = $publicKey;
         return $this;
@@ -69,10 +71,18 @@ class PublicKeyList
      */
     public function getAsArray(): array
     {
-        if(empty($this->list))
-            throw new VirgilCryptoException("Empty VirgilPublicKey list");
+        if($this->check())
+            return $this->list[0];
+    }
 
-        return $this->list;
+    /**
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoException
+     */
+    public function getFirst(): VirgilPublicKey
+    {
+        if($this->check())
+            return $this->list[0][0];
     }
 
     /**
@@ -81,5 +91,16 @@ class PublicKeyList
     public function getAmountOfKeys(): int
     {
         return count($this->list);
+    }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    private function check()
+    {
+        if(empty($this->list))
+            throw new VirgilCryptoException("Empty VirgilPublicKey list");
+
+        return true;
     }
 }

@@ -136,9 +136,9 @@ class CryptoTests extends TestCase
         $rawData = "test1";
         $data = $this->getIOService()->convertStringToData($rawData);
 
-        $pk = (new PublicKeyList)->addPublicKey($keyPair1->getPublicKey());
+        $pkl = new PublicKeyList($keyPair1->getPublicKey());
 
-        $encryptedData = $crypto->encrypt($data, $pk);
+        $encryptedData = $crypto->encrypt($data, $pkl);
         $encryptedData = $this->getIOService()->convertStringToData($encryptedData);
 
         $decryptedData = $crypto->decrypt($encryptedData, $keyPair1->getPrivateKey());
@@ -208,6 +208,12 @@ class CryptoTests extends TestCase
         }
     }
 
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
     private function checkSignAndEncrypt(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
         $rawData = "test3";
@@ -217,7 +223,47 @@ class CryptoTests extends TestCase
         $keyPair2 = $crypto->generateKeyPair($keyPairType);
         $keyPair3 = $crypto->generateKeyPair($keyPairType);
 
-        $encrypted = $crypto->signAndEncrypt($data, [$keyPair1->getPublicKey(), $keyPair2->getPublicKey()],
-            $keyPair1->getPrivateKey());
+        $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+
+        $encrypted = $crypto->signAndEncrypt($data, $keyPair1->getPrivateKey(), $pkl);
+
+        $encrypted = $this->getIOService()->convertStringToData($encrypted);
+
+        $pkl1 = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+        $pkl2 = new PublicKeyList($keyPair3->getPublicKey());
+
+        $decrypted = $crypto->decryptAndVerify($encrypted, $keyPair2->getPrivateKey(), $pkl1);
+
+        self::assertEquals($rawData, $decrypted);
+
+        try {
+            $res1 = $crypto->decryptAndVerify($encrypted, $keyPair3->getPrivateKey(), $pkl1);
+            self::assertTrue(empty($res1));
+        } catch (Exception $e) {
+            self::assertTrue($e instanceof VirgilCryptoException);
+        }
+
+        try {
+            $res2 = $crypto->decryptAndVerify($encrypted, $keyPair2->getPrivateKey(), $pkl2);
+            self::assertTrue(empty($res2));
+        } catch (Exception $e) {
+            self::assertTrue($e instanceof VirgilCryptoException);
+        }
     }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    public function test05SignAndEncryptSomeDataShouldDecryptAndVerify()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkSignAndEncrypt($crypto, $keyType);
+        }
+
+    }
+
 }
