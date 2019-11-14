@@ -30,8 +30,12 @@
 
 namespace Virgil\CryptoImpl;
 
+use Virgil\CryptoImpl\Core\DataInterface;
 use Virgil\CryptoImpl\Core\HashAlgorithms;
 use Virgil\CryptoImpl\Core\InputOutput;
+use Virgil\CryptoImpl\Core\PublicKeyList;
+use Virgil\CryptoImpl\Core\SigningMode;
+use Virgil\CryptoImpl\Core\VerifyingMode;
 use Virgil\CryptoImpl\Core\VirgilKeyPair;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\Core\KeyPairType;
@@ -140,13 +144,13 @@ class VirgilCrypto
      * 6. Encrypts KEY1 with this key using AES-256-CBC for each recipient
      *
      * @param InputOutput $inputOutput
-     * @param array $recipients
+     * @param PublicKeyList $recipients
      * @param SigningOptions|null $signingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function encrypt(InputOutput $inputOutput, array $recipients, SigningOptions $signingOptions = null): ?string
+    public function encrypt(InputOutput $inputOutput, PublicKeyList $recipients, SigningOptions $signingOptions = null): ?string
     {
         return $this->getCryptoService()->encrypt($inputOutput, $recipients, $signingOptions);
     }
@@ -240,5 +244,32 @@ class VirgilCrypto
     public function exportPrivateKey(VirgilPrivateKey $privateKey): string
     {
         return $this->getCryptoService()->exportPrivateKey($privateKey);
+    }
+
+    /**
+     * @param DataInterface $data
+     * @param PublicKeyList $recipients
+     * @param VirgilPrivateKey $privateKey
+     *
+     * @return null|string
+     * @throws VirgilCryptoException
+     */
+    public function signAndEncrypt(DataInterface $data, VirgilPrivateKey $privateKey, PublicKeyList $recipients): ?string
+    {
+        return $this->getCryptoService()->encrypt($data, $recipients, new SigningOptions($privateKey, SigningMode::SIGN_AND_ENCRYPT()));
+    }
+
+    /**
+     * @param DataInterface $data
+     * @param VirgilPrivateKey $privateKey
+     * @param PublicKeyList $signersPublicKeys
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function decryptAndVerify(DataInterface $data, VirgilPrivateKey $privateKey, PublicKeyList $signersPublicKeys)
+    {
+        return $this->getCryptoService()->decrypt($data, $privateKey, new VerifyingOptions($signersPublicKeys,
+            VerifyingMode::DECRYPT_AND_VERIFY()));
     }
 }

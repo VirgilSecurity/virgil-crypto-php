@@ -34,6 +34,7 @@ use \Exception;
 use Virgil\CryptoImpl\Core\Data;
 use Virgil\CryptoImpl\Core\DataInterface;
 use Virgil\CryptoImpl\Core\HashAlgorithms;
+use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\SigningOptions;
 use Virgil\CryptoImpl\Core\StreamInterface;
 use Virgil\CryptoImpl\Core\VerifyingOptions;
@@ -352,13 +353,13 @@ class VirgilCryptoService
 
     /**
      * @param InputOutput $inputOutput
-     * @param array $recipients
+     * @param PublicKeyList $recipients
      * @param SigningOptions|null $signingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function encrypt(InputOutput $inputOutput, array $recipients, SigningOptions $signingOptions = null)
+    public function encrypt(InputOutput $inputOutput, PublicKeyList $recipients, SigningOptions $signingOptions = null)
     {
         try {
 
@@ -368,10 +369,7 @@ class VirgilCryptoService
             $cipher->useEncryptionCipher($aesGcm);
             $cipher->useRandom($this->getRandom());
 
-            foreach ($recipients as $recipient) {
-                if (!$recipient instanceof VirgilPublicKey)
-                    throw new VirgilCryptoException("Recipient must be an instance of VirgilPublicKey");
-
+            foreach ($recipients->getAsArray() as $recipient) {
                 $cipher->addKeyRecipient($recipient->getIdentifier(), $recipient->getPublicKey());
             }
 
@@ -433,27 +431,22 @@ class VirgilCryptoService
      * @param RecipientCipher $cipher
      * @param InputOutput $inputOutput
      * @param string|null $result
-     * @param array $publicKeys
+     * @param PublicKeyList $publicKeys
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    private function verifyPlainSignature(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null, array $publicKeys): bool
+    private function verifyPlainSignature(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null, PublicKeyList
+    $publicKeys): bool
     {
         try {
 
             $signerPublicKey = null;
 
-            if ($inputOutput instanceof Stream)
+            if ($inputOutput instanceof StreamInterface)
                 throw new VirgilCryptoException("signAndEncrypt is not supported for streams");
 
-            // TODO! Add helper func
-            foreach ($publicKeys as $publicKey) {
-                if (!$publicKey instanceof VirgilPublicKey)
-                    throw new VirgilCryptoException("Recipient must be an instance of VirgilPublicKey");
-            }
-
-            if (1 == count($publicKeys)) {
+            if (1 == $publicKeys->getAmountOfKeys()) {
                 $signerPublicKey = $publicKeys[0];
 
             } else {
@@ -463,7 +456,7 @@ class VirgilCryptoService
                 if (!$signerId)
                     throw new VirgilCryptoException(VirgilCryptoError::SIGNER_NOT_FOUND());
 
-                foreach ($publicKeys as $publicKey) {
+                foreach ($publicKeys->getAsArray() as $publicKey) {
                     if ($publicKey->getIdentifier() == $signerId) {
                         $signerPublicKey = $publicKey;
                         break;
@@ -493,12 +486,12 @@ class VirgilCryptoService
 
     /**
      * @param RecipientCipher $cipher
-     * @param array $publicKeys
+     * @param PublicKeyList $publicKeys
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    private function verifyEncryptedSignature(RecipientCipher $cipher, array $publicKeys): bool
+    private function verifyEncryptedSignature(RecipientCipher $cipher, PublicKeyList $publicKeys): bool
     {
         try {
 
@@ -515,10 +508,7 @@ class VirgilCryptoService
 
             $signerInfo = $signerInfoList->item();
 
-            // TODO! Add helper func
-            foreach ($publicKeys as $publicKey) {
-                if (!$publicKey instanceof VirgilPublicKey)
-                    throw new VirgilCryptoException("Recipient must be an instance of VirgilPublicKey");
+            foreach ($publicKeys->getAsArray() as $publicKey) {
 
                 if ($publicKey->getIdentifier() == $signerInfo->signerId()) {
                     $signerPublicKey = $publicKey;

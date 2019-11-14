@@ -33,10 +33,10 @@ namespace Virgil\Tests;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Virgil\CryptoImpl\Core\KeyPairType;
+use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\Services\InputOutputService;
 use Virgil\CryptoImpl\VirgilCrypto;
-use VirgilCrypto\Foundation\CtrDrbg;
 
 /**
  * Class CryptoTests
@@ -136,7 +136,9 @@ class CryptoTests extends TestCase
         $rawData = "test1";
         $data = $this->getIOService()->convertStringToData($rawData);
 
-        $encryptedData = $crypto->encrypt($data, [$keyPair1->getPublicKey()]);
+        $pk = (new PublicKeyList)->addPublicKey($keyPair1->getPublicKey());
+
+        $encryptedData = $crypto->encrypt($data, $pk);
         $encryptedData = $this->getIOService()->convertStringToData($encryptedData);
 
         $decryptedData = $crypto->decrypt($encryptedData, $keyPair1->getPrivateKey());
@@ -144,7 +146,8 @@ class CryptoTests extends TestCase
         self::assertEquals($rawData, $decryptedData);
 
         try {
-            $crypto->decrypt($encryptedData, $keyPair2->getPrivateKey());
+            $tempRes = $crypto->decrypt($encryptedData, $keyPair2->getPrivateKey());
+            self::assertTrue(empty($tempRes));
         } catch (Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
@@ -184,7 +187,8 @@ class CryptoTests extends TestCase
         self::assertTrue($res1);
 
         try {
-            $crypto->verifySignature($signature, $rawData, $keyPair2->getPublicKey());
+            $res2 = $crypto->verifySignature($signature, $rawData, $keyPair2->getPublicKey());
+            self::assertTrue(empty($res2));
         } catch (Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
@@ -202,5 +206,18 @@ class CryptoTests extends TestCase
         foreach ($keyTypes as $keyType) {
             $this->checkSignature($crypto, $keyType);
         }
+    }
+
+    private function checkSignAndEncrypt(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        $rawData = "test3";
+        $data = $this->getIOService()->convertStringToData($rawData);
+
+        $keyPair1 = $crypto->generateKeyPair($keyPairType);
+        $keyPair2 = $crypto->generateKeyPair($keyPairType);
+        $keyPair3 = $crypto->generateKeyPair($keyPairType);
+
+        $encrypted = $crypto->signAndEncrypt($data, [$keyPair1->getPublicKey(), $keyPair2->getPublicKey()],
+            $keyPair1->getPrivateKey());
     }
 }

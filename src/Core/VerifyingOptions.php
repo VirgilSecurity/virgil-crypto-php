@@ -50,10 +50,10 @@ class VerifyingOptions
     /**
      * VerifyingOptions constructor.
      *
-     * @param array $virgilPublicKeys
+     * @param PublicKeyList $virgilPublicKeys
      * @param VerifyingMode $verifyingMode
      */
-    public function __construct(array $virgilPublicKeys, VerifyingMode $verifyingMode)
+    public function __construct(PublicKeyList $virgilPublicKeys, VerifyingMode $verifyingMode)
     {
         $this->virgilPublicKeys = $virgilPublicKeys;
         $this->verifyingMode = $verifyingMode;
@@ -62,7 +62,7 @@ class VerifyingOptions
     /**
      * @return array
      */
-    public function getVirgilPublicKeys()
+    public function getVirgilPublicKeys(): array
     {
         return $this->virgilPublicKeys;
     }

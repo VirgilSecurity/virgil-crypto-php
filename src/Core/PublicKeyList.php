@@ -30,49 +30,56 @@
 
 namespace Virgil\CryptoImpl\Core;
 
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+
 /**
- * Class SigningOptions
+ * Class PublicKeyList
  *
  * @package Virgil\CryptoImpl\Services
  */
-class SigningOptions
+class PublicKeyList
 {
     /**
-     * @var VirgilPrivateKey
+     * @var array
      */
-    private $virgilPrivateKey;
+    private $list = [];
 
     /**
-     * @var SigningMode
+     * PublicKeyList constructor.
      */
-    private $signingMode;
+    public function __construct()
+    {
+        $this->list = null;
+    }
 
     /**
-     * SigningOptions constructor.
+     * @param VirgilPublicKey $publicKey
      *
-     * @param VirgilPrivateKey $virgilPrivateKey
-     * @param SigningMode $signingMode
+     * @return PublicKeyList
      */
-    public function __construct(VirgilPrivateKey $virgilPrivateKey, SigningMode $signingMode)
+    public function addPublicKey(VirgilPublicKey $publicKey): PublicKeyList
     {
-        $this->virgilPrivateKey = $virgilPrivateKey;
-        $this->signingMode = $signingMode;
+        $this->list[] = $publicKey;
+        return $this;
     }
 
     /**
-     * @return VirgilPrivateKey
+     * @return array
+     * @throws VirgilCryptoException
      */
-    public function getVirgilPrivateKey()
+    public function getAsArray(): array
     {
-        return $this->virgilPrivateKey;
+        if(empty($this->list))
+            throw new VirgilCryptoException("Empty VirgilPublicKey list");
+
+        return $this->list;
     }
 
     /**
-     * @return SigningMode
+     * @return int
      */
-    public function getSigningMode()
+    public function getAmountOfKeys(): int
     {
-        return $this->signingMode;
+        return count($this->list);
     }
-
 }
