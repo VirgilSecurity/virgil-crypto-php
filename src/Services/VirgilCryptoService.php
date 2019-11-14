@@ -44,6 +44,7 @@ use Virgil\CryptoImpl\Core\VirgilKeyPair;
 use Virgil\CryptoImpl\Core\VirgilPrivateKey;
 use Virgil\CryptoImpl\Core\VirgilPublicKey;
 use VirgilCrypto\Foundation\Aes256Gcm;
+use VirgilCrypto\Foundation\AlgId;
 use VirgilCrypto\Foundation\CtrDrbg;
 use VirgilCrypto\Foundation\KeyMaterialRng;
 use VirgilCrypto\Foundation\KeyProvider;
@@ -804,7 +805,8 @@ class VirgilCryptoService
                 $keyType = KeyPairType::getRsaKeyType($privateKey->bitLen());
             } else {
                 $algId = $privateKey->algId();
-                $keyType = KeyPairType::$algId();
+
+                $keyType = KeyPairType::getFromAlgId($algId);
             }
 
             $publicKey = $privateKey->extractPublicKey();
@@ -832,7 +834,7 @@ class VirgilCryptoService
         try {
             $keyProvider = new KeyProvider();
 
-            $keyProvider->useRandom($this->rnd);
+            $keyProvider->useRandom($this->getRandom());
             $keyProvider->setupDefaults();
 
             return $keyProvider->exportPrivateKey($privateKey);
@@ -903,7 +905,7 @@ class VirgilCryptoService
                 $keyType = KeyPairType::getRsaKeyType($publicKey->bitLen());
             } else {
                 $algId = $publicKey->algId();
-                $keyType = KeyPairType::$algId();
+                $keyType = KeyPairType::getFromAlgId($algId);
             }
 
             $keyId = $this->computePublicKeyIdentifier($publicKey);

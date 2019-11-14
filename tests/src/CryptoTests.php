@@ -31,6 +31,8 @@
 namespace Virgil\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Virgil\CryptoImpl\Core\KeyPairType;
+use Virgil\CryptoImpl\VirgilCrypto;
 
 /**
  * Class CryptoTests
@@ -39,8 +41,75 @@ use PHPUnit\Framework\TestCase;
  */
 class CryptoTests extends TestCase
 {
-    public function testTemp()
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     */
+    private function checkKeyGeneration(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
-        $this->assertTrue(true);
+        $keyPair = $crypto->generateKeyPair($keyPairType);
+
+        $a1 = $keyPair->getPrivateKey()->getIdentifier();
+        $a2 = $keyPair->getPublicKey()->getIdentifier();
+
+        self::assertEquals($a1, $a2);
+    }
+
+    /**
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     */
+    public function test01KeyGenerationGenerateOneKeyShouldSucceed()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::CURVE25519(), KeyPairType::ED25519(), KeyPairType::SECP256R1(),
+            KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkKeyGeneration($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     */
+    private function checkKeyImport(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        $keyPair = $crypto->generateKeyPair($keyPairType);
+        $data1 = $crypto->exportPrivateKey($keyPair->getPrivateKey());
+        $privateKey = $crypto->importPrivateKey($data1);
+
+        $a1 = $keyPair->getPrivateKey()->getIdentifier();
+        $a2 = $privateKey->getIdentifier();
+
+        self::assertEquals($a1, $a2);
+
+        $data2 = $crypto->exportPublicKey($keyPair->getPublicKey());
+        $publicKey = $crypto->importPublicKey($data2);
+
+        $b1 = $keyPair->getPublicKey()->getIdentifier();
+        $b2 = $publicKey->getIdentifier();
+
+        self::assertEquals($b1, $b2);
+    }
+
+    /**
+     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     */
+    public function test02KeyImportAllKeysShouldMatch()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::CURVE25519(), KeyPairType::ED25519(), KeyPairType::SECP256R1(),
+            KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkKeyImport($crypto, $keyType);
+        }
     }
 }

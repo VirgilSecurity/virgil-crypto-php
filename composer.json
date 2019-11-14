@@ -40,7 +40,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Virgil\\CryptoImpl\\": "Virgil/CryptoImpl/"
+      "Virgil\\CryptoImpl\\": "src/"
     }
   },
   "autoload-dev": {

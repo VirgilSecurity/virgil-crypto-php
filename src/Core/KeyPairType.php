@@ -53,12 +53,10 @@ class KeyPairType extends Enum
     private const RSA4096 = "RSA4096";
     private const RSA8192 = "RSA8192";
 
-    private $algId;
-
     /**
      * @param KeyPairType $keyPairType
      *
-     * @return int
+     * @return null|int
      */
     public function getRsaBitLen(KeyPairType $keyPairType): ?int
     {
@@ -85,7 +83,7 @@ class KeyPairType extends Enum
      * @return KeyPairType
      * @throws VirgilCryptoException
      */
-    public function getRsaKeyType(int $bitLen): KeyPairType
+    public static function getRsaKeyType(int $bitLen): KeyPairType
     {
         switch ($bitLen) {
             case 2048:
@@ -107,53 +105,55 @@ class KeyPairType extends Enum
     /**
      * @param AlgId $algId
      *
-     * @return void
+     * @return KeyPairType
      * @throws VirgilCryptoException
      */
-    public function setAlgId(AlgId $algId)
+    public static function getFromAlgId(AlgId $algId): KeyPairType
     {
         switch ($algId) {
             case $algId::ED25519():
-                $this->algId = KeyPairType::ED25519();
+                $res = KeyPairType::ED25519();
                 break;
             case $algId::CURVE25519():
-                $this->algId = KeyPairType::CURVE25519();
+                $res = KeyPairType::CURVE25519();
                 break;
             case $algId::SECP256R1():
-                $this->algId = KeyPairType::SECP256R1();
+                $res = KeyPairType::SECP256R1();
                 break;
             case $algId::RSA():
                 throw new VirgilCryptoException(VirgilCryptoError::RSA_SHOULD_BE_CONSTRUCTED_DIRECTLY());
             default:
                 throw new VirgilCryptoException(VirgilCryptoError::UNKNOWN_ALG_ID());
         }
+
+        return $res;
     }
 
     /**
-     * @param KeyPairType $algId
+     * @param KeyPairType $keyPairType
      *
-     * @return null|AlgId
+     * @return AlgId
      * @throws VirgilCryptoException
      */
-    public function getAlgId(KeyPairType $algId): ?AlgId
+    public function getAlgId(KeyPairType $keyPairType): AlgId
     {
-        switch ($algId) {
-            case $algId::ED25519():
+        switch ($keyPairType) {
+            case $keyPairType::ED25519():
                 $res = AlgId::ED25519();
                 break;
-            case $algId::CURVE25519():
+            case $keyPairType::CURVE25519():
                 $res = AlgId::CURVE25519();
                 break;
-            case $algId::SECP256R1():
+            case $keyPairType::SECP256R1():
                 $res = AlgId::SECP256R1();
                 break;
-            case $algId::RSA2048():
+            case $keyPairType::RSA2048():
                 $res = AlgId::RSA();
                 break;
-            case $algId::RSA4096():
+            case $keyPairType::RSA4096():
                 $res = AlgId::RSA();
                 break;
-            case $algId::RSA8192():
+            case $keyPairType::RSA8192():
                 $res = AlgId::RSA();
                 break;
             default:

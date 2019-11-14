@@ -237,4 +237,41 @@ class VirgilCrypto
     {
         return $this->getCryptoService()->exportPublicKey($publicKey);
     }
+
+    /**
+     * @param string $data
+     *
+     * @return VirgilKeyPair
+     * @throws VirgilCryptoException
+     */
+    public function importPrivateKey(string $data): VirgilKeyPair
+    {
+        return $this->getCryptoService()->importPrivateKey($data);
+    }
+
+    /**
+     * Imports public key from DER or PEM format
+     *
+     * @param string $data
+     *
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoException
+     */
+    public function importPublicKey(string $data): VirgilPublicKey
+    {
+        return $this->getCryptoService()->importPublicKey($data);
+    }
+
+    /**
+     * Export private key
+     *
+     * @param VirgilPrivateKey $privateKey
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function exportPrivateKey(VirgilPrivateKey $privateKey)
+    {
+        return $this->getCryptoService()->exportPrivateKey($privateKey);
+    }
 }
