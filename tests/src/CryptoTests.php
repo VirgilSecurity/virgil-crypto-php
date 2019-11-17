@@ -32,11 +32,14 @@ namespace Virgil\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Virgil\CryptoImpl\Core\Data;
 use Virgil\CryptoImpl\Core\KeyPairType;
+use Virgil\CryptoImpl\Core\OutputStream;
 use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\Stream;
 use Virgil\CryptoImpl\Core\InputStream;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
 use Virgil\CryptoImpl\Services\InputOutputService;
 use Virgil\CryptoImpl\VirgilCrypto;
 
@@ -267,32 +270,215 @@ class CryptoTests extends TestCase
         }
     }
 
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
     private function checkStreamSign(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
-        $keyPair1 = $crypto->generateKeyPair($keyPairType);
-        $keyPair2 = $crypto->generateKeyPair($keyPairType);
+        try {
+            $keyPair1 = $crypto->generateKeyPair($keyPairType);
+            $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-        $testFileUrl = __DIR__."../data/testData.txt";
-        $inputStream = new InputStream($testFileUrl);
+            $testFileUrl = __DIR__."/../data/testData.txt";
+            $inputStream = new InputStream($testFileUrl);
 
-        $signature = $crypto->generateStreamSignature($inputStream, $keyPair1->getPrivateKey());
+            $signature = $crypto->generateStreamSignature($inputStream, $keyPair1->getPrivateKey());
+
+            $verifyStream1 = new InputStream($testFileUrl);
+            $verifyStream2 = new InputStream($testFileUrl);
+
+            $res1 = $crypto->verifyStreamSignature($signature, $verifyStream1, $keyPair1->getPublicKey());
+            self::assertTrue($res1);
+
+            try {
+                $res2 = $crypto->verifyStreamSignature($signature, $verifyStream2, $keyPair2->getPublicKey());
+                self::assertTrue(empty($res2));
+            } catch (Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+        }
+        catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
     }
 
+    public function test06SignStreamFileShouldVerify()
+    {
+        $crypto = new VirgilCrypto();
 
-//private func checkStreamSign(crypto: VirgilCrypto, keyPairType: KeyPairType) throws {
-//let keyPair1 = try crypto.generateKeyPair(ofType: keyPairType)
-//let keyPair2 = try crypto.generateKeyPair(ofType: keyPairType)
-//
-//let testFileURL = Bundle(for: type(of: self)).url(forResource: "testData", withExtension: "txt")!
-//let inputStream = InputStream(url: testFileURL)!
-//
-//let signature = try crypto.generateStreamSignature(of: inputStream, using: keyPair1.privateKey)
-//
-//let verifyStream1 = InputStream(url: testFileURL)!
-//let verifyStream2 = InputStream(url: testFileURL)!
-//
-//XCTAssert(try! crypto.verifyStreamSignature(signature, of: verifyStream1, with: keyPair1.publicKey))
-//XCTAssert(!(try! crypto.verifyStreamSignature(signature, of: verifyStream2, with: keyPair2.publicKey)))
-//}
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
 
+        foreach ($keyTypes as $keyType) {
+            $this->checkStreamSign($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkStreamEncryption(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        try {
+            $keyPair1 = $crypto->generateKeyPair($keyPairType);
+            $keyPair2 = $crypto->generateKeyPair($keyPairType);
+
+            $testFileUrl = __DIR__."/../data/testData.txt";
+            $inputStream = new InputStream($testFileUrl);
+            $outputStream = new OutputStream("", true);
+            $rawData = file_get_contents($testFileUrl);
+
+            $stream = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
+
+            $pkl = new PublicKeyList($keyPair1->getPublicKey());
+
+            $encrypt = $crypto->encrypt($stream, $pkl);
+
+            // TODO!
+            $encryptedData = "";
+            //let encryptedData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+
+            $inputStream1 = new InputStream($encryptedData);
+            $inputStream2 = new InputStream($encryptedData);
+
+            $outputStream1 = new OutputStream("", true);
+            $outputStream2 = new OutputStream("", true);
+
+            $stream1 = new Stream($inputStream1, $outputStream1, $crypto->getChunkSize());
+            $decrypt = $crypto->decrypt($stream1, $keyPair1->getPrivateKey());
+
+            // TODO!
+            $decryptedData = "";
+            //let decrtyptedData = outputStream1.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+
+            self::assertEquals($rawData, $decryptedData);
+
+            $stream2 = new Stream($inputStream2, $outputStream2, $crypto->getChunkSize());
+
+            try {
+                $res = $crypto->decrypt($stream2, $keyPair2->getPrivateKey());
+                self::assertTrue(empty($res));
+            } catch (Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    public function test07EncryptStreamFileShouldDecrypt()
+    {
+        self::markTestSkipped("Skipped");
+
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::CURVE25519(), KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkStreamEncryption($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkGenerateKeyUsingSeed(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        try {
+            $seed = $crypto->generateRandomData(32);
+
+            $keyId = $crypto->generateKeyPairUsingSeed($seed)->getIdentifier();
+
+            for ($i = 0; $i < 5; $i++)
+            {
+                $keyPair = $crypto->generateKeyPairUsingSeed($seed);
+
+                $a1 = $keyPair->getPrivateKey()->getIdentifier();
+                self::assertEquals($a1, $keyId);
+
+                $a2 = $keyPair->getPublicKey()->getIdentifier();
+                self::assertEquals($a1, $a2);
+            }
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    public function test08GenerateKeyUsingSeedFixedSeedShouldMatch()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::CURVE25519(), KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkGenerateKeyUsingSeed($crypto, $keyType);
+        }
+    }
+
+    /**
+     *
+     */
+    public function test09MultithreadSignAndEncryptSameKeyShouldWork()
+    {
+        self::markTestSkipped("Skipped");
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkKeyExportImport(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        try {
+            $keyPair = $crypto->generateKeyPair($keyPairType);
+
+            $publicKeyData = $crypto->exportPublicKey($keyPair->getPublicKey());
+            $privateKeyData = $crypto->exportPrivateKey($keyPair->getPrivateKey());
+
+            $publicKey = $crypto->importPublicKey($publicKeyData);
+            $privateKey = $crypto->importPrivateKey($privateKeyData)->getPrivateKey();
+
+            $pkl = new PublicKeyList($publicKey);
+
+            $data = new Data("");
+
+            $res = $crypto->signAndEncrypt($data, $privateKey, $pkl);
+
+            self::assertTrue(!is_null($res));
+            self::assertTrue(is_string($res));
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function test10ImprortExportKeyRandomKeyShouldMatch()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkKeyExportImport($crypto, $keyType);
+        }
+    }
 }

@@ -43,21 +43,32 @@ class OutputStream
     private $output;
 
     /**
-     * StreamOutput constructor.
+     * @var bool
+     */
+    private $toMemory;
+
+    /**
+     * OutputStream constructor.
      *
      * @param string $output
+     * @param bool $toMemory
      */
-    public function __construct(string $output)
+    public function __construct(string $output, bool $toMemory = false)
     {
         $this->output = $output;
+        $this->toMemory = $toMemory;
     }
 
     /**
      * @return string
      */
-    public function getOutput()
+    public function getOutput(): string
     {
-        return $this->output;
-    }
+        $output = $this->output;
 
+        if ($this->toMemory)
+            $output = "php://memory";
+
+        return $output;
+    }
 }

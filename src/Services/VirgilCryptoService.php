@@ -82,13 +82,26 @@ class VirgilCryptoService
      */
     private $useSHA256Fingerprints;
 
+    /**
+     * @var
+     */
+    private $chunkSize;
+
     private const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
     private const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
 
-    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false)
+    /**
+     * VirgilCryptoService constructor.
+     *
+     * @param KeyPairType $defaultKeyType
+     * @param bool $useSHA256Fingerprints
+     * @param int $chunkSize
+     */
+    public function __construct(KeyPairType $defaultKeyType, bool $useSHA256Fingerprints, int $chunkSize)
     {
         $this->defaultKeyType = $defaultKeyType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
+        $this->chunkSize = $chunkSize;
     }
 
     /**
@@ -244,7 +257,7 @@ class VirgilCryptoService
 
                         switch ($inputOutput) {
 
-                            case $inputOutput instanceof Data:
+                            case $inputOutput instanceof DataInterface:
 
                                 $signature = $this->generateSignature($inputOutput->getInput(), $signingOptions->getVirgilPrivateKey());
                                 $cipher->customParams()->addData(self::CUSTOM_PARAM_KEY_SIGNATURE, $signature);
@@ -252,7 +265,7 @@ class VirgilCryptoService
                                     $signingOptions->getVirgilPrivateKey()->getIdentifier());
                                 break;
 
-                            case $inputOutput instanceof Stream:
+                            case $inputOutput instanceof StreamInterface:
                                 throw new VirgilCryptoException("signAndEncrypt is not supported for streams");
                         }
 
@@ -268,12 +281,12 @@ class VirgilCryptoService
 
                         switch ($inputOutput) {
 
-                            case $inputOutput instanceof Data:
+                            case $inputOutput instanceof DataInterface:
 
                                 $size = strlen($inputOutput->getInput());
                                 break;
 
-                            case $inputOutput instanceof Stream:
+                            case $inputOutput instanceof StreamInterface:
 
                                 if (!$inputOutput->getStreamSize())
                                     throw new VirgilCryptoException("signThenEncrypt for streams with unknown size is not supported");
@@ -636,13 +649,13 @@ class VirgilCryptoService
      * - Note: Data inside this function is guaranteed to be hashed with SHA512 at least one time.
      *         It's secure to pass raw data here.
      *
-     * @param InputStream $streamInput
+     * @param InputStream $inputStream
      * @param VirgilPrivateKey $virgilPrivateKey
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function generateStreamSignature(InputStream $streamInput, VirgilPrivateKey $virgilPrivateKey): string
+    public function generateStreamSignature(InputStream $inputStream, VirgilPrivateKey $virgilPrivateKey): string
     {
         try {
             $signer = new Signer();
@@ -652,9 +665,8 @@ class VirgilCryptoService
 
             $signer->reset();
 
-            // TODO!
-            // $data = $streamUtils->forEachChunk($streamInput, $streamSize);
-            // $signer->appendData($data);
+            $data = StreamService::forEachChunk($inputStream, $this->chunkSize);
+            $signer->appendData($data);
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
 
@@ -668,22 +680,21 @@ class VirgilCryptoService
      * - Note: Verification algorithm depends on PublicKey type. Default: EdDSA
      *
      * @param string $signature
-     * @param InputStream $streamInput
+     * @param InputStream $inputStream
      * @param VirgilPublicKey $virgilPublicKey
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    public static function verifyStreamSignature(string $signature, InputStream $streamInput, VirgilPublicKey $virgilPublicKey): bool
+    public function verifyStreamSignature(string $signature, InputStream $inputStream, VirgilPublicKey $virgilPublicKey): bool
     {
         try {
             $verifier = new Verifier();
 
             $verifier->reset($signature);
 
-            // TODO!
-            // $data = $streamUtils->forEachChunk($streamInput, $streamSize);
-            // $signer->appendData($data);
+            $data = StreamService::forEachChunk($inputStream, $this->chunkSize);
+            $verifier->appendData($data);
 
             return $verifier->verify($virgilPublicKey->getPublicKey());
 
@@ -691,10 +702,6 @@ class VirgilCryptoService
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
-
-    /// <--- Signatures
-
-    /// Random --->
 
     /**
      * @param int $size
@@ -705,13 +712,11 @@ class VirgilCryptoService
     public function generateRandomData(int $size): string
     {
         try {
-            return $this->rnd->random($size);
+            return $this->getRandom()->random($size);
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage());
         }
     }
-
-    /// <--- Random
 
     /**
      * Computes hash
@@ -742,8 +747,6 @@ class VirgilCryptoService
 
         return $hash::hash($data);
     }
-
-    /// Key Management --->
 
     /**
      * @param string $data
@@ -947,6 +950,4 @@ class VirgilCryptoService
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
-
-    /// <--- Key Management
 }

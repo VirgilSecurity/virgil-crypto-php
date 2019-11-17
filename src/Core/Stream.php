@@ -57,9 +57,9 @@ class Stream implements StreamInterface
      *
      * @param InputStream $inputStream
      * @param OutputStream $outputStream
-     * @param int|null $streamSize
+     * @param int $streamSize
      */
-    public function __construct(InputStream $inputStream, OutputStream $outputStream, int $streamSize = null)
+    public function __construct(InputStream $inputStream, OutputStream $outputStream, int $streamSize)
     {
         $this->inputStream = $inputStream;
         $this->outputStream = $outputStream;
@@ -83,9 +83,9 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getStreamSize(): ?int
+    public function getStreamSize(): int
     {
         return $this->streamSize;
     }

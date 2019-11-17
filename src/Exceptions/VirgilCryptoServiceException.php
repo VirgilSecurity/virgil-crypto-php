@@ -28,51 +28,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
-
-use Virgil\CryptoImpl\Core\InputStream;
-use Virgil\CryptoImpl\Core\VirgilCryptoError;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
+namespace Virgil\CryptoImpl\Exceptions;
 
 /**
- * Class StreamUtils
+ * Class VirgilCryptoServiceException
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\CryptoImpl\Exceptions
  */
-class StreamService
+class VirgilCryptoServiceException extends VirgilException
 {
-    public static function read()
-    {
 
-    }
-
-    public static function write()
-    {
-
-    }
-
-    /**
-     * @param InputStream $inputStream
-     * @param int $streamSize
-     *
-     * @return string
-     * @throws VirgilCryptoServiceException
-     */
-    public static function forEachChunk(InputStream $inputStream, int $streamSize)
-    {
-        $handle = fopen($inputStream->getInput(), "rb");
-        if (!$handle) {
-            throw new VirgilCryptoServiceException(VirgilCryptoError::INPUT_STREAM_ERROR());
-        }
-
-        $data = "";
-
-        while (!feof($handle)) {
-            $data .= fread($handle, $streamSize);
-        }
-
-        fclose($handle);
-
-        return $data;
-    }
 }

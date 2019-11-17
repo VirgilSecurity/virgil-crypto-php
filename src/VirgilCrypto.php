@@ -90,7 +90,15 @@ class VirgilCrypto
      */
     private function getCryptoService(): VirgilCryptoService
     {
-        return new VirgilCryptoService($this->defaultKeyType, $this->useSHA256Fingerprints);
+        return new VirgilCryptoService($this->defaultKeyType, $this->useSHA256Fingerprints, $this->chunkSize);
+    }
+
+    /**
+     * @return int
+     */
+    public function getChunkSize(): int
+    {
+        return $this->chunkSize;
     }
 
     /**
@@ -103,6 +111,19 @@ class VirgilCrypto
     public function generateKeyPair(KeyPairType $type = null, Random $rng = null): VirgilKeyPair
     {
         return $this->getCryptoService()->generateKeyPair($type, $rng);
+    }
+
+    /**
+     * Generates KeyPair of default type using seed
+     *
+     * @param string $seed
+     *
+     * @return VirgilKeyPair
+     * @throws VirgilCryptoException
+     */
+    public function generateKeyPairUsingSeed(string $seed): VirgilKeyPair
+    {
+        return $this->getCryptoService()->generateKeyPairUsingSeed($seed);
     }
 
     /**
@@ -284,5 +305,32 @@ class VirgilCrypto
     public function generateStreamSignature(InputStream $inputStream, VirgilPrivateKey $virgilPrivateKey): string
     {
         return $this->getCryptoService()->generateStreamSignature($inputStream, $virgilPrivateKey);
+    }
+
+    /**
+     * Verifies digital signature of data stream
+     * - Note: Verification algorithm depends on PublicKey type. Default: EdDSA
+     *
+     * @param string $signature
+     * @param InputStream $streamInput
+     * @param VirgilPublicKey $virgilPublicKey
+     *
+     * @return bool
+     * @throws VirgilCryptoException
+     */
+    public function verifyStreamSignature(string $signature, InputStream $streamInput, VirgilPublicKey $virgilPublicKey): bool
+    {
+        return $this->getCryptoService()->verifyStreamSignature($signature, $streamInput, $virgilPublicKey);
+    }
+
+    /**
+     * @param int $size
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function generateRandomData(int $size): string
+    {
+        return $this->getCryptoService()->generateRandomData($size);
     }
 }

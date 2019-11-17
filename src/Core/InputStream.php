@@ -31,7 +31,7 @@
 namespace Virgil\CryptoImpl\Core;
 
 /**
- * Class StreamInput
+ * Class InputStream
  *
  * @package Virgil\CryptoImpl\Core
  */
@@ -43,7 +43,7 @@ class InputStream
     private $input;
 
     /**
-     * StreamInput constructor.
+     * InputStream constructor.
      *
      * @param string $input
      */
