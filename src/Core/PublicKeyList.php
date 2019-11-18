@@ -42,7 +42,7 @@ class PublicKeyList
     /**
      * @var array
      */
-    private $list = [];
+    private $list;
 
     /**
      * PublicKeyList constructor.
@@ -51,18 +51,16 @@ class PublicKeyList
      */
     public function __construct(VirgilPublicKey ...$publicKey)
     {
-        $this->list[] = $publicKey;
+        if ($publicKey)
+            $this->list[] = $publicKey;
     }
 
     /**
      * @param VirgilPublicKey ...$publicKey
-     *
-     * @return PublicKeyList
      */
-    public function addPublicKey(VirgilPublicKey ...$publicKey): PublicKeyList
+    public function addPublicKey(VirgilPublicKey ...$publicKey): void
     {
         $this->list[] = $publicKey;
-        return $this;
     }
 
     /**
@@ -72,7 +70,7 @@ class PublicKeyList
     public function getAsArray(): array
     {
         if($this->check())
-            return $this->list[0];
+            return $this->list;
     }
 
     /**

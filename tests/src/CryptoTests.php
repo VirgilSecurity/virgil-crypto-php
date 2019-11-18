@@ -558,6 +558,7 @@ class CryptoTests extends TestCase
             $keyPair3 = $crypto->generateKeyPair($keyPairType);
 
             $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+
             $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
 
             $testFileUrl = __DIR__."/../data/testData.txt";

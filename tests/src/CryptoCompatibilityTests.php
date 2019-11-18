@@ -80,6 +80,9 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test001CheckNumberOfTestsInJSON()
     {
+        self::markTestSkipped("skipped");
+
+
         self::assertEquals($this->getDataProvider()->getNumberOfTests(), 8);
     }
 
@@ -88,6 +91,9 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test002DecryptFromSingleRecipientShouldDecrypt()
     {
+        self::markTestSkipped("skipped");
+
+
         $dict = $this->getDataProvider()->getTestData("encrypt_single_recipient");
 
         $privateKeyStr = $dict["private_key"];
@@ -113,6 +119,9 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test003DecryptFromMultipleRecipientsShouldDecypt()
     {
+        self::markTestSkipped("skipped");
+
+
         $dict = $this->getDataProvider()->getTestData("encrypt_multiple_recipients");
 
         $privateKeys = [];
@@ -147,6 +156,9 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test004DecryptAndVerifySingleRecipientShouldDecryptAndVerify()
     {
+        self::markTestSkipped("skipped");
+
+
         $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_single_recipient");
 
         $privateKeyStr = $dict["private_key"];
@@ -174,6 +186,8 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test005DecryptAndVerifyMultipleRecipientsShouldDecryptAndVerify()
     {
+        self::markTestSkipped("skipped");
+
         $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_multiple_recipients");
 
         $privateKeys = [];
@@ -211,6 +225,8 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test006GenerateSignatureShouldBeEqual()
     {
+        self::markTestSkipped("skipped");
+
         $dict = $this->getDataProvider()->getTestData("generate_signature");
 
         $privateKeyStr = $dict["private_key"];
@@ -240,8 +256,6 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
     {
-        self::markTestSkipped("Skipped");
-
         $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_multiple_signers");
 
         $privateKeyStr = $dict["private_key"];
@@ -249,17 +263,14 @@ class CryptoCompatibilityTests extends TestCase
 
         $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
-        $publicKeys = [];
-
         $pkl = new PublicKeyList();
 
         foreach ($dict["public_keys"] as $publicKeyStr)
         {
             $publicKeyData = base64_decode($publicKeyStr);
             $publicKey = $this->getCrypto()->importPublicKey($publicKeyData);
-            $publicKeys[] = $publicKey;
 
-            $pkl = $pkl->addPublicKey($publicKey);
+            $pkl->addPublicKey($publicKey);
         }
 
         $originalDataStr = $dict["original_data"];
@@ -279,6 +290,8 @@ class CryptoCompatibilityTests extends TestCase
      */
     public function test008GenerateEd25519UsingSeedShouldMatch()
     {
+        self::markTestSkipped("skipped");
+
         $dict = $this->getDataProvider()->getTestData("generate_ed25519_using_seed");
 
         $seedStr = $dict["seed"];
@@ -300,7 +313,7 @@ class CryptoCompatibilityTests extends TestCase
 
     public function test009SignThenEncryptShouldMatch()
     {
-        self::markTestSkipped("Skipped");
+        self::markTestSkipped("skipped");
 
         $dict = $this->getDataProvider()->getTestData("auth_encrypt");
 

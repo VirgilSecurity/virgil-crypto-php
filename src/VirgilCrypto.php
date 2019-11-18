@@ -383,7 +383,7 @@ class VirgilCrypto
     public function authDecrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients,
                                 bool $allowNotEncryptedSignature = false)
     {
-        return $this->getCryptoService()->authDecrypt($inputOutput, $privateKey, $recipients);
+        return $this->getCryptoService()->authDecrypt($inputOutput, $privateKey, $recipients, $allowNotEncryptedSignature);
     }
 
     /**

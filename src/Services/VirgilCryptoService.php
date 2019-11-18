@@ -383,7 +383,7 @@ class VirgilCryptoService
             $cipher->useEncryptionCipher($aesGcm);
             $cipher->useRandom($this->getRandom());
 
-            foreach ($recipients->getAsArray() as $recipient) {
+            foreach ($recipients->getAsArray()[0] as $recipient) {
                 $cipher->addKeyRecipient($recipient->getIdentifier(), $recipient->getPublicKey());
             }
 
@@ -412,17 +412,9 @@ class VirgilCryptoService
             switch ($inputOutput) {
                 case $inputOutput instanceof StreamInterface:
 
-                    // TODO!
-                    //  if inputStream.streamStatus == .notOpen {
-                    //      inputStream.open()
-                    //  }
-                    //  if outputStream.streamStatus == .notOpen {
-                    //      outputStream.open()
-                    //  }
-
-                    $data = $this->streamUtils->forEachChunk($inputOutput->getInput(), null);
-                    $this->streamUtils->write($data, $inputOutput->getOutput());
-                    $this->streamUtils->write($cipher->finishDecryption(), $inputOutput->getOutput());
+                    $data = StreamService::forEachChunk($inputOutput->getInput(), null);
+                    StreamService::write($data, $inputOutput->getOutput());
+                    StreamService::write($cipher->finishDecryption(), $inputOutput->getOutput());
 
                     break;
 
@@ -464,13 +456,12 @@ class VirgilCryptoService
                 $signerPublicKey = $publicKeys->getFirst();
 
             } else {
-
                 $signerId = $cipher->customParams()->findData(self::CUSTOM_PARAM_KEY_SIGNER_ID);
 
                 if (!$signerId)
                     throw new VirgilCryptoException(VirgilCryptoError::SIGNER_NOT_FOUND());
 
-                foreach ($publicKeys->getAsArray() as $publicKey) {
+                foreach ($publicKeys->getAsArray()[0] as $publicKey) {
                     if ($publicKey->getIdentifier() == $signerId) {
                         $signerPublicKey = $publicKey;
                         break;
@@ -508,7 +499,6 @@ class VirgilCryptoService
     private function verifyEncryptedSignature(RecipientCipher $cipher, PublicKeyList $publicKeys): bool
     {
         try {
-
             $signerPublicKey = null;
 
             if (!$cipher->isDataSigned())
@@ -522,7 +512,7 @@ class VirgilCryptoService
 
             $signerInfo = $signerInfoList->item();
 
-            foreach ($publicKeys->getAsArray() as $publicKey) {
+            foreach ($publicKeys->getAsArray()[0] as $publicKey) {
 
                 if ($publicKey->getIdentifier() == $signerInfo->signerId()) {
                     $signerPublicKey = $publicKey;
@@ -551,9 +541,11 @@ class VirgilCryptoService
      * @param string|null $result
      * @param VerifyingOptions|null $verifyingOptions
      *
+     * @return void
      * @throws VirgilCryptoException
      */
-    private function finishDecryption(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null, VerifyingOptions $verifyingOptions = null)
+    private function finishDecryption(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null,
+                                      VerifyingOptions $verifyingOptions = null): void
     {
         try {
 
@@ -573,7 +565,7 @@ class VirgilCryptoService
 
                     case VerifyingMode::DECRYPT_AND_VERIFY():
 
-                        $this->verifyPlainSignature($cipher, $inputOutput, $result, $verifyingOptions->getVirgilPublicKeys());
+                        $this->verifyEncryptedSignature($cipher, $verifyingOptions->getVirgilPublicKeys());
                         break;
                 }
 
