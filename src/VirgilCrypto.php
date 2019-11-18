@@ -385,4 +385,17 @@ class VirgilCrypto
     {
         return $this->getCryptoService()->authDecrypt($inputOutput, $privateKey, $recipients);
     }
+
+    /**
+     * Extracts public key from private key
+     *
+     * @param VirgilPrivateKey $virgilPrivateKey
+     *
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoException
+     */
+    public function extractPublicKey(VirgilPrivateKey $virgilPrivateKey): VirgilPublicKey
+    {
+        return $this->getCryptoService()->extractPublicKey($virgilPrivateKey);
+    }
 }

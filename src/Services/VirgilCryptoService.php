@@ -852,7 +852,7 @@ class VirgilCryptoService
      * @return VirgilPublicKey
      * @throws VirgilCryptoException
      */
-    public function extractPublicKey(VirgilPrivateKey $virgilPrivateKey)
+    public function extractPublicKey(VirgilPrivateKey $virgilPrivateKey): VirgilPublicKey
     {
         try {
             $publicKey = $virgilPrivateKey->getPrivateKey()->extractPublicKey();

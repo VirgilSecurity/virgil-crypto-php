@@ -37,85 +37,43 @@
 
 namespace Virgil\Tests\_;
 
+/**
+ * Class CompatibilityDataProvider
+ *
+ * @package Virgil\Tests\_
+ */
 class CompatibilityDataProvider
 {
-    private const CRYPTO_COMPATIBILITY_DATA = "../../data/crypto_compatibility_data.json";
-
+    /**
+     * @var string
+     */
     private $jsonData;
 
-    public function __construct()
+    /**
+     * CompatibilityDataProvider constructor.
+     *
+     * @param string $jsonData
+     */
+    public function __construct(string $jsonData)
     {
-        $this->jsonData = json_decode(file_get_contents(__DIR__.self::CRYPTO_COMPATIBILITY_DATA), true);
+        $this->jsonData = json_decode(file_get_contents($jsonData), true);
     }
 
-    public function getGenerateSignatureData()
+    /**
+     * @return int
+     */
+    public function getNumberOfTests(): int
     {
-        return [$this->jsonData['generate_signature']];
+        return count([$this->jsonData][0]);
     }
 
-    public function getDecryptThenVerifyMultipleSigners()
+    /**
+     * @param string $data
+     *
+     * @return array
+     */
+    public function getTestData(string $data): array
     {
-        return [$this->jsonData['sign_and_encrypt_multiple_signers']];
-    }
-
-    public function getEncryptArgumentsSetWithOriginalContent()
-    {
-        return array_merge(
-            [$this->getEncryptSingleRecipientData()],
-            $this->makeSingleRecipientsFromMultiple($this->getEncryptMultipleRecipients())
-        );
-    }
-
-    public function getSignThenEncryptRecipientsData()
-    {
-        $data = array_merge(
-            [$this->getSignThenEncryptSingleRecipientData()],
-            $this->makeSingleRecipientsFromMultiple($this->getSignThenEncryptMultipleRecipients())
-        );
-        $i = 0;
-        foreach ($data as &$item) {
-            if ($i < 2) {
-                $item['signer_private_key'] = $item['private_key'];
-            } else {
-                $item['signer_private_key'] = $data[1]['signer_private_key'];
-            }
-            $i++;
-        }
-
-        return $data;
-    }
-
-    private function makeSingleRecipientsFromMultiple($multipleRecipients)
-    {
-        $data = [];
-        foreach ($multipleRecipients['private_keys'] as $private_key) {
-            $data[] = [
-                'private_key'   => $private_key,
-                'original_data' => $multipleRecipients['original_data'],
-                'cipher_data'   => $multipleRecipients['cipher_data'],
-            ];
-        }
-
-        return $data;
-    }
-
-    private function getEncryptSingleRecipientData()
-    {
-        return $this->jsonData['encrypt_single_recipient'];
-    }
-
-    private function getEncryptMultipleRecipients()
-    {
-        return $this->jsonData['encrypt_multiple_recipients'];
-    }
-
-    private function getSignThenEncryptMultipleRecipients()
-    {
-        return $this->jsonData['sign_then_encrypt_multiple_recipients'];
-    }
-
-    private function getSignThenEncryptSingleRecipientData()
-    {
-        return $this->jsonData['sign_then_encrypt_single_recipient'];
+        return [$this->jsonData][0][$data];
     }
 }
