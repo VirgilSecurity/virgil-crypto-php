@@ -333,4 +333,56 @@ class VirgilCrypto
     {
         return $this->getCryptoService()->generateRandomData($size);
     }
+
+    /**
+     * Signs (with private key) Then Encrypts data / stream (and signature) for passed PublicKeys
+     * 1. Generates signature depending on KeyType
+     * 2. Generates random AES-256 KEY1
+     * 3. Encrypts data with KEY1 using AES-256-GCM and generates signature
+     * 4. Encrypts signature with KEY1 using AES-256-GCM
+     * 5. Generates ephemeral key pair for each recipient
+     * 6. Uses Diffie-Hellman to obtain shared secret with each recipient's public key & each ephemeral private key
+     * 7. Computes KDF to obtain AES-256 key from shared secret for each recipient
+     * 8. Encrypts KEY1 with this key using AES-256-CBC for each recipient
+     *
+     * @param InputOutput $inputOutput
+     * @param VirgilPrivateKey $privateKey
+     * @param PublicKeyList $recipients
+     *
+     * @return null|string
+     * @throws VirgilCryptoException
+     */
+    public function authEncrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients)
+    {
+        return $this->getCryptoService()->authEncrypt($inputOutput, $privateKey, $recipients);
+    }
+
+    /**
+     * Decrypts (with private key) data and signature and Verifies signature using any of signers' PublicKeys
+     * or
+     * Decrypts (using passed PrivateKey) then verifies (using one of public keys) stream
+     *
+     * - Note: Decrypted stream should not be used until decryption
+     *         of whole InputStream completed due to security reasons
+     *
+     * 1. Uses Diffie-Hellman to obtain shared secret with sender ephemeral public key & recipient's private key
+     * 2. Computes KDF to obtain AES-256 KEY2 from shared secret
+     * 3. Decrypts KEY1 using AES-256-CBC
+     * 4. Decrypts data and signature using KEY1 and AES-256-GCM
+     * 5. Finds corresponding PublicKey according to signer id inside data
+     * 6. Verifies signature
+     *
+     * @param InputOutput $inputOutput
+     * @param VirgilPrivateKey $privateKey
+     * @param PublicKeyList $recipients
+     * @param bool $allowNotEncryptedSignature
+     *
+     * @return string
+     * @throws VirgilCryptoException
+     */
+    public function authDecrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients,
+                                bool $allowNotEncryptedSignature = false)
+    {
+        return $this->getCryptoService()->authDecrypt($inputOutput, $privateKey, $recipients);
+    }
 }

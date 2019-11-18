@@ -39,7 +39,6 @@ use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\Stream;
 use Virgil\CryptoImpl\Core\InputStream;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
 use Virgil\CryptoImpl\Services\InputOutputService;
 use Virgil\CryptoImpl\VirgilCrypto;
 
@@ -471,6 +470,9 @@ class CryptoTests extends TestCase
         }
     }
 
+    /**
+     * @throws VirgilCryptoException
+     */
     public function test10ImprortExportKeyRandomKeyShouldMatch()
     {
         $crypto = new VirgilCrypto();
@@ -479,6 +481,63 @@ class CryptoTests extends TestCase
 
         foreach ($keyTypes as $keyType) {
             $this->checkKeyExportImport($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkAuthEncrypt(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        try {
+            $keyPair1 = $crypto->generateKeyPair($keyPairType);
+            $keyPair2 = $crypto->generateKeyPair($keyPairType);
+            $keyPair3 = $crypto->generateKeyPair($keyPairType);
+
+            $rawData = "test";
+
+            $data = $this->getIOService()->convertStringToData($rawData);
+            $pkl1 = new PublicKeyList($keyPair2->getPublicKey());
+
+            $encrypted = $crypto->authEncrypt($data, $keyPair1->getPrivateKey(), $pkl1);
+            $encrypted = $this->getIOService()->convertStringToData($encrypted);
+
+            $pkl2 = new PublicKeyList($keyPair1->getPublicKey());
+            $decrypted = $crypto->authDecrypt($encrypted, $keyPair2->getPrivateKey(), $pkl2);
+
+            self::assertEquals($rawData, $decrypted);
+
+            try {
+                $res1 = $crypto->authDecrypt($encrypted, $keyPair3->getPrivateKey(), $pkl2);
+                self::assertTrue(empty($res1));
+            } catch (Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+            try {
+                $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
+                $res2 = $crypto->authDecrypt($encrypted, $keyPair2->getPrivateKey(), $pkl3);
+                self::assertTrue(empty($res2));
+            } catch (Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function test11AuthEncryptRandomDataShouldMatch()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkAuthEncrypt($crypto, $keyType);
         }
     }
 }
