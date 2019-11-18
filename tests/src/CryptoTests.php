@@ -530,6 +530,9 @@ class CryptoTests extends TestCase
         }
     }
 
+    /**
+     * @throws VirgilCryptoException
+     */
     public function test11AuthEncryptRandomDataShouldMatch()
     {
         $crypto = new VirgilCrypto();
@@ -538,6 +541,140 @@ class CryptoTests extends TestCase
 
         foreach ($keyTypes as $keyType) {
             $this->checkAuthEncrypt($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkAuthEncryptStream(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        try {
+            $keyPair1 = $crypto->generateKeyPair($keyPairType);
+            $keyPair2 = $crypto->generateKeyPair($keyPairType);
+            $keyPair3 = $crypto->generateKeyPair($keyPairType);
+
+            $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+            $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
+
+            $testFileUrl = __DIR__."/../data/testData.txt";
+            $inputStream = new InputStream($testFileUrl);
+            $outputStream = new OutputStream("", true);
+            $rawData = file_get_contents($testFileUrl);
+            $fileSize = filesize($testFileUrl);
+
+            $stream = new Stream($inputStream, $outputStream, $fileSize);
+
+            $encrypt = $crypto->authEncrypt($stream, $keyPair1->getPrivateKey(), $pkl);
+
+            // TODO!
+            $encryptedData = "";
+            //let encryptedData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+
+            $inputStream1 = new InputStream($encryptedData);
+            $inputStream2 = new InputStream($encryptedData);
+            $inputStream3 = new InputStream($encryptedData);
+
+            $outputStream1 = new OutputStream("", true);
+            $outputStream2 = new OutputStream("", true);
+            $outputStream3 = new OutputStream("", true);
+
+            $stream1 = new Stream($inputStream1, $outputStream1, $crypto->getChunkSize());
+            $stream2 = new Stream($inputStream2, $outputStream2, $crypto->getChunkSize());
+            $stream3 = new Stream($inputStream3, $outputStream3, $crypto->getChunkSize());
+
+            $decrypt = $crypto->authDecrypt($stream1, $keyPair1->getPrivateKey(), $pkl);
+
+            // TODO!
+            $decryptedData = "";
+            //let decrtyptedData = outputStream1.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+
+            self::assertEquals($rawData, $decryptedData);
+
+            try {
+                $res1 = $crypto->authDecrypt($stream2, $keyPair3->getPrivateKey(), $pkl);
+                self::assertTrue(empty($res1));
+            } catch (Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+            try {
+                $res2 = $crypto->authDecrypt($stream3, $keyPair2->getPrivateKey(), $pkl3);
+                self::assertTrue(empty($res2));
+            } catch (Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    public function test12AuthEncryptStreamShouldMatch()
+    {
+        self::markTestSkipped("Skipped");
+
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkAuthEncryptStream($crypto, $keyType);
+        }
+    }
+
+    /**
+     * @param VirgilCrypto $crypto
+     * @param KeyPairType $keyPairType
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkAuthEncryptDeprecated(VirgilCrypto $crypto, KeyPairType $keyPairType)
+    {
+        try {
+            $rawData = "test";
+            $data = $this->getIOService()->convertStringToData($rawData);
+
+            $keyPair1 = $crypto->generateKeyPair($keyPairType);
+            $keyPair2 = $crypto->generateKeyPair($keyPairType);
+
+            $pkl1 = new PublicKeyList($keyPair1->getPublicKey());
+            $pkl2 = new PublicKeyList($keyPair2->getPublicKey());
+
+            $encrypted1 = $crypto->authEncrypt($data, $keyPair1->getPrivateKey(), $pkl2);
+            $encrypted2 = $crypto->signAndEncrypt($data, $keyPair1->getPrivateKey(), $pkl2);
+
+            $encrypted1 = $this->getIOService()->convertStringToData($encrypted1);
+            $encrypted2 = $this->getIOService()->convertStringToData($encrypted2);
+
+            $decrypted1 = $crypto->authDecrypt($encrypted1, $keyPair2->getPrivateKey(), $pkl1, true);
+            $decrypted2 = $crypto->authDecrypt($encrypted2, $keyPair2->getPrivateKey(), $pkl1, true);
+
+            self::assertEquals($rawData, $decrypted1);
+            self::assertEquals($rawData, $decrypted2);
+
+        } catch (Exception $e) {
+            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @throws VirgilCryptoException
+     */
+    public function test13AuthEncryptDeprecatedShouldWork()
+    {
+        $crypto = new VirgilCrypto();
+
+        $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
+
+        foreach ($keyTypes as $keyType) {
+            $this->checkAuthEncryptDeprecated($crypto, $keyType);
         }
     }
 }
