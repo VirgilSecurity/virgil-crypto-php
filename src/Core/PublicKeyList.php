@@ -30,7 +30,7 @@
 
 namespace Virgil\CryptoImpl\Core;
 
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
+use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
 
 /**
  * Class PublicKeyList
@@ -65,7 +65,7 @@ class PublicKeyList
 
     /**
      * @return array
-     * @throws VirgilCryptoException
+     * @throws VirgilCryptoServiceException
      */
     public function getAsArray(): array
     {
@@ -75,7 +75,7 @@ class PublicKeyList
 
     /**
      * @return VirgilPublicKey
-     * @throws VirgilCryptoException
+     * @throws VirgilCryptoServiceException
      */
     public function getFirst(): VirgilPublicKey
     {
@@ -92,12 +92,13 @@ class PublicKeyList
     }
 
     /**
-     * @throws VirgilCryptoException
+     * @return bool
+     * @throws VirgilCryptoServiceException
      */
-    private function check()
+    private function check(): bool
     {
         if(empty($this->list))
-            throw new VirgilCryptoException("Empty VirgilPublicKey list");
+            throw new VirgilCryptoServiceException("Empty VirgilPublicKey list");
 
         return true;
     }

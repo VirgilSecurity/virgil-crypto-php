@@ -137,7 +137,7 @@ class CryptoTests extends TestCase
         $keyPair1 = $crypto->generateKeyPair($keyPairType);
         $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-        $rawData = "test1";
+        $rawData = "test";
         $data = $this->getIOService()->convertStringToData($rawData);
 
         $pkl = new PublicKeyList($keyPair1->getPublicKey());
@@ -183,7 +183,7 @@ class CryptoTests extends TestCase
         $keyPair1 = $crypto->generateKeyPair($keyPairType);
         $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-        $rawData = "test2";
+        $rawData = "test";
 
         $signature = $crypto->generateSignature($rawData, $keyPair1->getPrivateKey());
 
@@ -220,7 +220,7 @@ class CryptoTests extends TestCase
      */
     private function checkSignAndEncrypt(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
-        $rawData = "test3";
+        $rawData = "test";
         $data = $this->getIOService()->convertStringToData($rawData);
 
         $keyPair1 = $crypto->generateKeyPair($keyPairType);
@@ -305,6 +305,9 @@ class CryptoTests extends TestCase
         }
     }
 
+    /**
+     * @throws VirgilCryptoException
+     */
     public function test06SignStreamFileShouldVerify()
     {
         $crypto = new VirgilCrypto();
@@ -377,8 +380,6 @@ class CryptoTests extends TestCase
      */
     public function test07EncryptStreamFileShouldDecrypt()
     {
-        self::markTestSkipped("Skipped");
-
         $crypto = new VirgilCrypto();
 
         $keyTypes = [KeyPairType::CURVE25519(), KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];
@@ -436,7 +437,7 @@ class CryptoTests extends TestCase
      */
     public function test09MultithreadSignAndEncryptSameKeyShouldWork()
     {
-        self::markTestSkipped("Skipped");
+        self::markTestSkipped("Multithread test skipped.");
     }
 
     /**
@@ -619,8 +620,6 @@ class CryptoTests extends TestCase
      */
     public function test12AuthEncryptStreamShouldMatch()
     {
-        self::markTestSkipped("sk stream");
-
         $crypto = new VirgilCrypto();
 
         $keyTypes = [KeyPairType::ED25519(), KeyPairType::SECP256R1(), KeyPairType::RSA2048()];

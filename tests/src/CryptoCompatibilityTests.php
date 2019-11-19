@@ -293,6 +293,9 @@ class CryptoCompatibilityTests extends TestCase
         self::assertEquals($b1, $publicKeyData);
     }
 
+    /**
+     * @throws VirgilCryptoException
+     */
     public function test009SignThenEncryptShouldMatch()
     {
         $dict = $this->getDataProvider()->getTestData("auth_encrypt");
