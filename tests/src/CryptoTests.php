@@ -619,7 +619,7 @@ class CryptoTests extends TestCase
      */
     public function test12AuthEncryptStreamShouldMatch()
     {
-        self::markTestSkipped("Skipped");
+        self::markTestSkipped("sk stream");
 
         $crypto = new VirgilCrypto();
 

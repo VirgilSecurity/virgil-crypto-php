@@ -67,8 +67,9 @@ class CryptoFormatsTest extends TestCase
             HashAlgorithms::SHA512()),0, 8);
         $a2 = $keyPair1->getPrivateKey()->getIdentifier();
 
-        // TODO!
-        // $this->assertEquals($a1, $a2);
+        self::assertEquals(strlen($a1), 8);
+        self::assertEquals(strlen($a2), 8);
+        self::assertEquals($a1, $a2);
 
         $crypto2 = new VirgilCrypto(null, true);
         $keyPair2 = $crypto2->generateKeyPair();
@@ -76,6 +77,8 @@ class CryptoFormatsTest extends TestCase
         $b1 = $crypto1->computeHash($crypto1->exportPublicKey($keyPair2->getPublicKey()), HashAlgorithms::SHA256());
         $b2 = $keyPair2->getPrivateKey()->getIdentifier();
 
+        self::assertEquals(strlen($b1), 32);
+        self::assertEquals(strlen($b2), 32);
         self::assertEquals($b1, $b2);
     }
 }

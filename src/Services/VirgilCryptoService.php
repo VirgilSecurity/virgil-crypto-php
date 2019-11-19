@@ -383,7 +383,7 @@ class VirgilCryptoService
             $cipher->useEncryptionCipher($aesGcm);
             $cipher->useRandom($this->getRandom());
 
-            foreach ($recipients->getAsArray()[0] as $recipient) {
+            foreach ($recipients->getAsArray() as $recipient) {
                 $cipher->addKeyRecipient($recipient->getIdentifier(), $recipient->getPublicKey());
             }
 
@@ -446,7 +446,6 @@ class VirgilCryptoService
     $publicKeys): bool
     {
         try {
-
             $signerPublicKey = null;
 
             if ($inputOutput instanceof StreamInterface)
@@ -461,7 +460,7 @@ class VirgilCryptoService
                 if (!$signerId)
                     throw new VirgilCryptoException(VirgilCryptoError::SIGNER_NOT_FOUND());
 
-                foreach ($publicKeys->getAsArray()[0] as $publicKey) {
+                foreach ($publicKeys->getAsArray() as $publicKey) {
                     if ($publicKey->getIdentifier() == $signerId) {
                         $signerPublicKey = $publicKey;
                         break;
@@ -512,10 +511,9 @@ class VirgilCryptoService
 
             $signerInfo = $signerInfoList->item();
 
-            foreach ($publicKeys->getAsArray()[0] as $publicKey) {
-
+            foreach ($publicKeys->getAsArray() as $publicKey) {
                 if ($publicKey->getIdentifier() == $signerInfo->signerId()) {
-                    $signerPublicKey = $publicKey;
+                    $signerPublicKey = $publicKey->getPublicKey();
                     break;
                 }
             }
@@ -558,13 +556,11 @@ class VirgilCryptoService
                 }
 
                 switch ($mode) {
-                    case VerifyingMode::DECRYPT_THEN_VERIFY():
-
+                    case VerifyingMode::DECRYPT_AND_VERIFY():
                         $this->verifyPlainSignature($cipher,  $inputOutput, $result, $verifyingOptions->getVirgilPublicKeys());
                         break;
 
-                    case VerifyingMode::DECRYPT_AND_VERIFY():
-
+                    case VerifyingMode::DECRYPT_THEN_VERIFY():
                         $this->verifyEncryptedSignature($cipher, $verifyingOptions->getVirgilPublicKeys());
                         break;
                 }
