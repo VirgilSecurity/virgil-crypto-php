@@ -22,12 +22,18 @@ Virgil Security, Inc., guides software developers into the forthcoming security 
 
 #### Generate a key pair
 
-Generate a Private Key with the default algorithm (EC_X25519):
+Generate a key pair with the default algorithm (EC_X25519):
 ```php
 use Virgil\CryptoImpl\VirgilCrypto;
 
-$crypto = new VirgilCrypto();
-$keyPair = $crypto->generateKeys();
+try {
+    $crypto = new VirgilCrypto();
+    
+    $keyPair = $crypto->generateKeyPair();
+    
+} catch (Exception $e) {
+    throw new Exception($e->getMessage(), $e->getCode());
+}
 ```
 
 #### Generate and verify a signature
@@ -36,121 +42,88 @@ Generate signature and sign data with a private key:
 ```php
 use Virgil\CryptoImpl\VirgilCrypto;
 
-$crypto = new VirgilCrypto();
+try {
+    $crypto = new VirgilCrypto();
+    $senderKeyPair = $crypto->generateKeyPair();
 
-// prepare a message
-$messageToSign = "Hello, Bob!";
+    // prepare a message
+    $messageToSign = "Hello, Bob!";
 
-// generate a signature
-$signature = $crypto->generateSignature($messageToSign, $senderPrivateKey);
+    // generate a signature
+    $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
+
+} catch (Exception $e) {
+    throw new Exception($e->getMessage(), $e->getCode());
+}
 ```
 
 Verify a signature with a public key:
 ```php
 use Virgil\CryptoImpl\VirgilCrypto;
 
-$crypto = new VirgilCrypto();
+try {
+    $crypto = new VirgilCrypto();
+    
+    $senderKeyPair = $crypto->generateKeyPair();    
+    
+    // prepare a message
+    $messageToSign = "Hello, Bob!";
 
-// verify a signature
-$crypto->verifySignature($signature, $dataToSign, $senderPublicKey);
+    // generate a signature
+    $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
+    
+    // verify a signature
+    $verified = $crypto->verifySignature($signature, $messageToSign, $senderKeyPair->getPublicKey());
+
+} catch (Exception $e) {
+    throw new Exception($e->getMessage(), $e->getCode());
+}
 ```
 #### Encrypt and decrypt data
 
 Encrypt Data on a Public Key:
 
 ```php
+use Virgil\CryptoImpl\Core\Data;
+use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\VirgilCrypto;
 
-$crypto = new VirgilCrypto();
+try {
+    $crypto = new VirgilCrypto();
+    $receiverKeyPair = $crypto->generateKeyPair();
 
-// prepare a message
-$messageToEncrypt = "Hello, Bob!";
+    // prepare a message
+    $messageToEncrypt = "Hello, Bob!";
 
-// encrypt the message
-$encryptedData = $crypto->encrypt($messageToEncrypt, $receiverPublicKey);
+    // encrypt the message
+    $encryptedData = $crypto->encrypt(new Data($messageToEncrypt), new PublicKeyList($receiverKeyPair->getPublicKey()));
+
+} catch (Exception $e) {
+    throw new Exception($e->getMessage(), $e->getCode());
+}
 ```
 Decrypt the encrypted data with a Private Key:
 ```php
+use Virgil\CryptoImpl\Core\Data;
+use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\VirgilCrypto;
 
-$crypto = new VirgilCrypto();
+try {
+    $crypto = new VirgilCrypto();
+    $receiverKeyPair = $crypto->generateKeyPair();
 
-// prepare data to be decrypted
-$decryptedData = $crypto->decrypt($encryptedData, $receiverPrivateKey);
-```
-#### Encrypt and decrypt files (size: 2Mb+)
+    // prepare a message
+    $messageToEncrypt = "Hello, Bob!";
 
-Encrypt file:
+    // encrypt the message
+    $encryptedData = $crypto->encrypt(new Data($messageToEncrypt), new PublicKeyList($receiverKeyPair->getPublicKey()));
 
-```php
-use Virgil\CryptoImpl\Cryptography\Cipher\VirgilSeqCipher;
-        
-$seqCipher = new VirgilSeqCipher();
+    // prepare data to be decrypted and decrypt the encrypted data using a private key
+    $decryptedData = $crypto->decrypt(new Data($encryptedData), $receiverKeyPair->getPrivateKey());
 
-// add recipient`s identity and public key
-$seqCipher->addKeyRecipient($recipientId, $publicKey);
-
-// path to input/output (encrypted) file
-$inputFilePath = "/path/to/input.extension";
-$outputFilePath = "/path/to/output.enc";
-
-// add input/output handlers
-$inputHandler = fopen($inputFilePath, "rb");
-$outputHandler = fopen($outputFilePath, "w");
-
-// add encryption header to file
-fwrite($outputHandler, $seqCipher->startEncryption());
-
-// encrypt each 1024 byts of the file content
-while (!feof($inputHandler)) {
-    $inputData = fread($inputHandler, 1024);
-    $encryptedData = $seqCipher->process($inputData);
-    if(!empty($encryptedData))
-        fwrite($outputHandler, $encryptedData);
+} catch (Exception $e) {
+    throw new Exception($e->getMessage(), $e->getCode());
 }
-
-// add last encrypted block to the file
-$lastBlock = $seqCipher->finish();
-if(!empty($lastBlock))
-    fwrite($outputHandler, $lastBlock);
-
-// close input/output handlers
-fclose($inputHandler);
-fclose($outputHandler);
-```
-Decrypt file:
-```php
-use Virgil\CryptoImpl\Cryptography\Cipher\VirgilSeqCipher;
-        
-$seqCipher = new VirgilSeqCipher();
-
-// path to input/output (encrypted) file
-$inputFilePath = "/path/to/input.enc";
-$outputFilePath = "/path/to/output.extension";
-
-// add input/output handlers
-$inputHandler = fopen($inputFilePath, "rb");
-$outputHandler = fopen($outputFilePath, "w");
-
-// add decryption header to file and recipient`s identity and private key
-fwrite($outputHandler, $seqCipher->startDecryptionWithKey($recipientId, $privateKey));
-
-// decrypt each 1024 byts of the file content
-while (!feof($inputHandler)) {
-    $inputData = fread($inputHandler, 1024);
-    $encryptedData = $seqCipher->process($inputData);
-    if(!empty($encryptedData))
-        fwrite($outputHandler, $encryptedData);
-}
-
-// add last decrypted block to the file
-$lastBlock = $seqCipher->finish();
-if(!empty($lastBlock))
-    fwrite($outputHandler, $lastBlock);
-
-// close input/output handlers
-fclose($inputHandler);
-fclose($outputHandler);
 ```
 Need more examples? Visit our [developer documentation](https://developer.virgilsecurity.com/docs/how-to#cryptography).
 
@@ -158,12 +131,10 @@ Need more examples? Visit our [developer documentation](https://developer.virgil
 
 ### Requirements
 
-* PHP 5.6 and newer
-* virgil_crypto_php extension
+* **PHP 7.2** and newer
+* **vscf_foundation_php** extension
 
 #### Installation via composer
-
-Add **virgil_crypto_php** extension before install virgil/crypto! Read more [here](#add-the-crypto-extension-into-your-server).
 
 ```bash
 composer require virgil/crypto
@@ -171,7 +142,7 @@ composer require virgil/crypto
 
 ## Additional information
 
-### Add the crypto extension into your server
+### Manual adding the crypto extension into your server
 
 - [Download](https://github.com/VirgilSecurity/virgil-crypto-php/releases) *virgil-test.zip*, unzip it and execute on your server [virgil-test.php](/_help/virgil-test.php) file.
 
@@ -181,15 +152,15 @@ composer require virgil/crypto
 - Copy extension files to the extensions directory.
     - For Linux/Darwin:
     ```
-     $ path="%PATH_TO_EXTENSIONS_DIR%" && cp virgil_crypto_php.so $path
+     $ path="%PATH_TO_EXTENSIONS_DIR%" && cp vscf_foundation_php.so $path
     ```
     - For Windows:
     ```
-     $ set path=%PATH_TO_EXTENSIONS_DIR% && copy virgil_crypto_php.dll %path%
+     $ set path=%PATH_TO_EXTENSIONS_DIR% && copy vscf_foundation_php.dll %path%
     ```
 - Add the extensions into the php.ini file 
     ```
-    $ echo -e "extension=virgil_crypto_php” >> %PATH_TO_PHP.INI%
+    $ echo -e "extension=vscf_foundation_php” >> %PATH_TO_PHP.INI%
     ```
     
 - Restart your server or php-fpm service
