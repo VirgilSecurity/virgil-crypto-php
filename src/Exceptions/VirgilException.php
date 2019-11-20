@@ -37,7 +37,14 @@
 
 namespace Virgil\CryptoImpl\Exceptions;
 
-class VirgilException extends \Exception
+use Exception;
+
+/**
+ * Class VirgilException
+ *
+ * @package Virgil\CryptoImpl\Exceptions
+ */
+class VirgilException extends Exception
 {
 
 }
