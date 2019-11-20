@@ -2,8 +2,5 @@
 .idea/
 vendor/
 _dev/
-tests/src/data/
-!/tests/src/data/test-key.pdf
-!/tests/src/data/test-password.pdf
 composer_dev.json
 composer_dev.lock

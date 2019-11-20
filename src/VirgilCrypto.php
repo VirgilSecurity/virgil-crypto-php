@@ -36,6 +36,7 @@ use Virgil\CryptoImpl\Core\InputOutput;
 use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\SigningMode;
 use Virgil\CryptoImpl\Core\InputStream;
+use Virgil\CryptoImpl\Core\StreamInterface;
 use Virgil\CryptoImpl\Core\VerifyingMode;
 use Virgil\CryptoImpl\Core\VirgilKeyPair;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
@@ -201,10 +202,11 @@ class VirgilCrypto
      * @param VirgilPrivateKey $privateKey
      * @param VerifyingOptions|null $verifyingOptions
      *
-     * @return string
+     * @return null|string
      * @throws VirgilCryptoException
      */
-    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions $verifyingOptions = null): string
+    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions
+    $verifyingOptions = null): ?string
     {
         return $this->getCryptoService()->decrypt($inputOutput, $privateKey, $verifyingOptions);
     }
@@ -296,15 +298,15 @@ class VirgilCrypto
     }
 
     /**
-     * @param InputStream $inputStream
+     * @param StreamInterface $stream
      * @param VirgilPrivateKey $virgilPrivateKey
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function generateStreamSignature(InputStream $inputStream, VirgilPrivateKey $virgilPrivateKey): string
+    public function generateStreamSignature(StreamInterface $stream, VirgilPrivateKey $virgilPrivateKey): string
     {
-        return $this->getCryptoService()->generateStreamSignature($inputStream, $virgilPrivateKey);
+        return $this->getCryptoService()->generateStreamSignature($stream, $virgilPrivateKey);
     }
 
     /**
@@ -312,15 +314,15 @@ class VirgilCrypto
      * - Note: Verification algorithm depends on PublicKey type. Default: EdDSA
      *
      * @param string $signature
-     * @param InputStream $streamInput
+     * @param StreamInterface $stream
      * @param VirgilPublicKey $virgilPublicKey
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    public function verifyStreamSignature(string $signature, InputStream $streamInput, VirgilPublicKey $virgilPublicKey): bool
+    public function verifyStreamSignature(string $signature, StreamInterface $stream, VirgilPublicKey $virgilPublicKey): bool
     {
-        return $this->getCryptoService()->verifyStreamSignature($signature, $streamInput, $virgilPublicKey);
+        return $this->getCryptoService()->verifyStreamSignature($signature, $stream, $virgilPublicKey);
     }
 
     /**

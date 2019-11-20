@@ -30,7 +30,8 @@
 
 namespace Virgil\CryptoImpl\Services;
 
-use Virgil\CryptoImpl\Core\InputStream;
+use Virgil\CryptoImpl\Core\OutputStream;
+use Virgil\CryptoImpl\Core\StreamInterface;
 use Virgil\CryptoImpl\Core\VirgilCryptoError;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
 
@@ -41,38 +42,50 @@ use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
  */
 class StreamService
 {
-    public static function read()
+    /**
+     * @param string $data
+     * @param OutputStream $outputStream
+     *
+     * @throws VirgilCryptoServiceException
+     */
+    public static function write(string $data, OutputStream $outputStream)
     {
+        $handle = fopen($outputStream->getOutput(), "a");
+        if (!$handle)
+            throw new VirgilCryptoServiceException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
 
-    }
-
-    public static function write()
-    {
-
+        fwrite($handle, $data);
+        fclose($handle);
     }
 
     /**
-     * @param InputStream $inputStream
-     * @param int $streamSize
+     * @param StreamInterface $stream
+     * @param int|null $streamSize
+     * @param callable $chunkClosure
+     * @param bool $withReturn
      *
-     * @return string
      * @throws VirgilCryptoServiceException
      */
-    public static function forEachChunk(InputStream $inputStream, int $streamSize)
+    public static function forEachChunk(StreamInterface $stream, int $streamSize = null, callable $chunkClosure, bool
+    $withReturn = true)
     {
-        $handle = fopen($inputStream->getInput(), "rb");
+        $handle = fopen($stream->getInputStream()->getInput(), "rb");
         if (!$handle) {
             throw new VirgilCryptoServiceException(VirgilCryptoError::INPUT_STREAM_ERROR());
         }
 
-        $data = "";
-
         while (!feof($handle)) {
-            $data .= fread($handle, $streamSize);
+            if (!$streamSize)
+                $streamSize = filesize($stream->getInputStream()->getInput());
+
+            $content = fread($handle, $streamSize);
+
+            if($withReturn) {
+                $data = $chunkClosure($content);
+                self::write($data, $stream->getOutputStream());
+            } else {
+                $chunkClosure($content);
+            }
         }
-
-        fclose($handle);
-
-        return $data;
     }
 }

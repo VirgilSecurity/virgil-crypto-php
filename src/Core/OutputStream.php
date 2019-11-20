@@ -43,20 +43,13 @@ class OutputStream
     private $output;
 
     /**
-     * @var bool
-     */
-    private $toMemory;
-
-    /**
      * OutputStream constructor.
      *
      * @param string $output
-     * @param bool $toMemory
      */
-    public function __construct(string $output, bool $toMemory = false)
+    public function __construct(string $output)
     {
         $this->output = $output;
-        $this->toMemory = $toMemory;
     }
 
     /**

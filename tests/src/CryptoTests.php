@@ -49,9 +49,24 @@ use Virgil\CryptoImpl\VirgilCrypto;
  */
 class CryptoTests extends TestCase
 {
+    /**
+     * @return InputOutputService
+     */
     private function getIOService(): InputOutputService
     {
         return new InputOutputService();
+    }
+
+    /**
+     * @param array $files
+     */
+    private function unlinkFiles(array $files): void
+    {
+        foreach ($files as $file)
+        {
+            if(file_exists($file))
+                unlink($file);
+        }
     }
 
     /**
@@ -282,12 +297,16 @@ class CryptoTests extends TestCase
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
             $testFileUrl = __DIR__."/../data/testData.txt";
+            $encTestFileUrl = __DIR__."/../data/testData_enc.txt";
+
             $inputStream = new InputStream($testFileUrl);
+            $outputStream = new OutputStream($encTestFileUrl);
+            $stream = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
 
-            $signature = $crypto->generateStreamSignature($inputStream, $keyPair1->getPrivateKey());
+            $signature = $crypto->generateStreamSignature($stream, $keyPair1->getPrivateKey());
 
-            $verifyStream1 = new InputStream($testFileUrl);
-            $verifyStream2 = new InputStream($testFileUrl);
+            $verifyStream1 = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
+            $verifyStream2 = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
 
             $res1 = $crypto->verifyStreamSignature($signature, $verifyStream1, $keyPair1->getPublicKey());
             self::assertTrue($res1);
@@ -299,6 +318,7 @@ class CryptoTests extends TestCase
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
+            $this->unlinkFiles([$encTestFileUrl]);
         }
         catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
@@ -332,36 +352,28 @@ class CryptoTests extends TestCase
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
             $testFileUrl = __DIR__."/../data/testData.txt";
-            $inputStream = new InputStream($testFileUrl);
-            $outputStream = new OutputStream("", true);
-            $rawData = file_get_contents($testFileUrl);
 
+            $encTestFileUrl = __DIR__."/../data/testData_encrypted.txt";
+            $decTestFileUrl = __DIR__."/../data/testData_decrypted.txt";
+
+            $inputStream = new InputStream($testFileUrl);
+            $outputStream = new OutputStream($encTestFileUrl);
             $stream = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
+
+            $rawData = file_get_contents($testFileUrl);
 
             $pkl = new PublicKeyList($keyPair1->getPublicKey());
 
             $encrypt = $crypto->encrypt($stream, $pkl);
 
-            // TODO!
-            $encryptedData = "";
-            //let encryptedData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+            $stream1 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
+            $stream2 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
 
-            $inputStream1 = new InputStream($encryptedData);
-            $inputStream2 = new InputStream($encryptedData);
-
-            $outputStream1 = new OutputStream("", true);
-            $outputStream2 = new OutputStream("", true);
-
-            $stream1 = new Stream($inputStream1, $outputStream1, $crypto->getChunkSize());
             $decrypt = $crypto->decrypt($stream1, $keyPair1->getPrivateKey());
 
-            // TODO!
-            $decryptedData = "";
-            //let decrtyptedData = outputStream1.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+            $decryptedData = file_get_contents($decTestFileUrl);
 
             self::assertEquals($rawData, $decryptedData);
-
-            $stream2 = new Stream($inputStream2, $outputStream2, $crypto->getChunkSize());
 
             try {
                 $res = $crypto->decrypt($stream2, $keyPair2->getPrivateKey());
@@ -369,6 +381,8 @@ class CryptoTests extends TestCase
             } catch (Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
+
+            $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
@@ -433,14 +447,6 @@ class CryptoTests extends TestCase
     }
 
     /**
-     *
-     */
-    public function test09MultithreadSignAndEncryptSameKeyShouldWork()
-    {
-        self::markTestSkipped("Multithread test skipped.");
-    }
-
-    /**
      * @param VirgilCrypto $crypto
      * @param KeyPairType $keyPairType
      *
@@ -474,7 +480,7 @@ class CryptoTests extends TestCase
     /**
      * @throws VirgilCryptoException
      */
-    public function test10ImprortExportKeyRandomKeyShouldMatch()
+    public function test10ImportExportKeyRandomKeyShouldMatch()
     {
         $crypto = new VirgilCrypto();
 
@@ -559,40 +565,23 @@ class CryptoTests extends TestCase
             $keyPair3 = $crypto->generateKeyPair($keyPairType);
 
             $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
-
             $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
 
             $testFileUrl = __DIR__."/../data/testData.txt";
-            $inputStream = new InputStream($testFileUrl);
-            $outputStream = new OutputStream("", true);
-            $rawData = file_get_contents($testFileUrl);
-            $fileSize = filesize($testFileUrl);
+            $encTestFileUrl = __DIR__."/../data/testData_encrypted.txt";
+            $decTestFileUrl = __DIR__."/../data/testData_decrypted.txt";
 
-            $stream = new Stream($inputStream, $outputStream, $fileSize);
+            $rawData = file_get_contents($testFileUrl);
+            $stream = new Stream(new InputStream($testFileUrl), new OutputStream($encTestFileUrl), filesize($testFileUrl));
 
             $encrypt = $crypto->authEncrypt($stream, $keyPair1->getPrivateKey(), $pkl);
 
-            // TODO!
-            $encryptedData = "";
-            //let encryptedData = outputStream.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
-
-            $inputStream1 = new InputStream($encryptedData);
-            $inputStream2 = new InputStream($encryptedData);
-            $inputStream3 = new InputStream($encryptedData);
-
-            $outputStream1 = new OutputStream("", true);
-            $outputStream2 = new OutputStream("", true);
-            $outputStream3 = new OutputStream("", true);
-
-            $stream1 = new Stream($inputStream1, $outputStream1, $crypto->getChunkSize());
-            $stream2 = new Stream($inputStream2, $outputStream2, $crypto->getChunkSize());
-            $stream3 = new Stream($inputStream3, $outputStream3, $crypto->getChunkSize());
+            $stream1 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
+            $stream2 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
+            $stream3 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
 
             $decrypt = $crypto->authDecrypt($stream1, $keyPair1->getPrivateKey(), $pkl);
-
-            // TODO!
-            $decryptedData = "";
-            //let decrtyptedData = outputStream1.property(forKey: Stream.PropertyKey.dataWrittenToMemoryStreamKey) as! Data
+            $decryptedData = file_get_contents($decTestFileUrl);
 
             self::assertEquals($rawData, $decryptedData);
 
@@ -609,6 +598,8 @@ class CryptoTests extends TestCase
             } catch (Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
+
+            $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());

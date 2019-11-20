@@ -31,19 +31,16 @@
 namespace Virgil\CryptoImpl\Services;
 
 use \Exception;
-use Virgil\CryptoImpl\Core\Data;
 use Virgil\CryptoImpl\Core\DataInterface;
 use Virgil\CryptoImpl\Core\HashAlgorithms;
 use Virgil\CryptoImpl\Core\PublicKeyList;
 use Virgil\CryptoImpl\Core\SigningOptions;
-use Virgil\CryptoImpl\Core\InputStream;
 use Virgil\CryptoImpl\Core\StreamInterface;
 use Virgil\CryptoImpl\Core\VerifyingOptions;
 use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
 use Virgil\CryptoImpl\Core\InputOutput;
 use Virgil\CryptoImpl\Core\KeyPairType;
 use Virgil\CryptoImpl\Core\SigningMode;
-use Virgil\CryptoImpl\Core\Stream;
 use Virgil\CryptoImpl\Core\VerifyingMode;
 use Virgil\CryptoImpl\Core\VirgilCryptoError;
 use Virgil\CryptoImpl\Core\VirgilKeyPair;
@@ -324,7 +321,7 @@ class VirgilCryptoService
             $result = null;
 
             switch ($inputOutput) {
-                case $inputOutput instanceof Data:
+                case $inputOutput instanceof DataInterface:
 
                     $result = $cipher->packMessageInfo();
                     $result .= $cipher->processEncryption($inputOutput->getInput());
@@ -335,30 +332,22 @@ class VirgilCryptoService
 
                     break;
 
-                case $inputOutput instanceof Stream:
+                case $inputOutput instanceof StreamInterface:
 
-                    // TODO!
-                    //  if inputStream.streamStatus == .notOpen {
-                    //      inputStream.open()
-                    //  }
-                    //  if outputStream.streamStatus == .notOpen {
-                    //      outputStream.open()
-                    //  }
+                    StreamService::write($cipher->packMessageInfo(), $inputOutput->getOutputStream());
 
-                    StreamService::write($cipher->packMessageInfo(), $inputOutput->getOutput());
-                    $data = StreamService::forEachChunk($inputOutput->getInput(), $inputOutput->getStreamSize());
-                    StreamService::write($data, $inputOutput->getOutput());
+                    $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processEncryption($chunk); };
+                    StreamService::forEachChunk($inputOutput, $this->chunkSize, $chunkClosure, true);
 
-                    StreamService::write($cipher->finishEncryption(), $inputOutput->getOutput());
+                    StreamService::write($cipher->finishEncryption(), $inputOutput->getOutputStream());
 
-                    if ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT())
-                        $this->streamUtils->write($cipher->packMessageInfoFooter(), $inputOutput->getOutput());
+                    if ($signingOptions && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
+                        StreamService::write($cipher->packMessageInfoFooter(), $inputOutput->getOutputStream());
 
                     break;
             }
 
             return $result;
-
 
         } catch (Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
@@ -412,9 +401,10 @@ class VirgilCryptoService
             switch ($inputOutput) {
                 case $inputOutput instanceof StreamInterface:
 
-                    $data = StreamService::forEachChunk($inputOutput->getInput(), null);
-                    StreamService::write($data, $inputOutput->getOutput());
-                    StreamService::write($cipher->finishDecryption(), $inputOutput->getOutput());
+                    $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processDecryption($chunk); };
+
+                    StreamService::forEachChunk($inputOutput, $inputOutput->getStreamSize(), $chunkClosure, true);
+                    StreamService::write($cipher->finishDecryption(), $inputOutput->getOutputStream());
 
                     break;
 
@@ -579,10 +569,11 @@ class VirgilCryptoService
      * @param VerifyingOptions|null $verifyingOptions
      * @param VirgilPrivateKey $privateKey
      *
-     * @return string
+     * @return null|string
      * @throws VirgilCryptoException
      */
-    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions $verifyingOptions = null): string
+    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions
+    $verifyingOptions = null): ?string
     {
         try {
 
@@ -604,8 +595,6 @@ class VirgilCryptoService
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
-
-    /// Signatures --->
 
     /**
      * Verifies digital signature of data
@@ -637,13 +626,13 @@ class VirgilCryptoService
      * - Note: Data inside this function is guaranteed to be hashed with SHA512 at least one time.
      *         It's secure to pass raw data here.
      *
-     * @param InputStream $inputStream
+     * @param StreamInterface $stream
      * @param VirgilPrivateKey $virgilPrivateKey
      *
      * @return string
      * @throws VirgilCryptoException
      */
-    public function generateStreamSignature(InputStream $inputStream, VirgilPrivateKey $virgilPrivateKey): string
+    public function generateStreamSignature(StreamInterface $stream, VirgilPrivateKey $virgilPrivateKey): string
     {
         try {
             $signer = new Signer();
@@ -653,8 +642,8 @@ class VirgilCryptoService
 
             $signer->reset();
 
-            $data = StreamService::forEachChunk($inputStream, $this->chunkSize);
-            $signer->appendData($data);
+            $chunkClosure = function ($chunk) use ($signer) { $signer->appendData($chunk); };
+            StreamService::forEachChunk($stream, null, $chunkClosure, false);
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
 
@@ -668,21 +657,21 @@ class VirgilCryptoService
      * - Note: Verification algorithm depends on PublicKey type. Default: EdDSA
      *
      * @param string $signature
-     * @param InputStream $inputStream
+     * @param StreamInterface $inputStream
      * @param VirgilPublicKey $virgilPublicKey
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    public function verifyStreamSignature(string $signature, InputStream $inputStream, VirgilPublicKey $virgilPublicKey): bool
+    public function verifyStreamSignature(string $signature, StreamInterface $inputStream, VirgilPublicKey $virgilPublicKey): bool
     {
         try {
             $verifier = new Verifier();
 
             $verifier->reset($signature);
 
-            $data = StreamService::forEachChunk($inputStream, $this->chunkSize);
-            $verifier->appendData($data);
+            $chunkClosure = function ($chunk) use ($verifier) { $verifier->appendData($chunk); };
+            StreamService::forEachChunk($inputStream, $this->chunkSize, $chunkClosure, false);
 
             return $verifier->verify($virgilPublicKey->getPublicKey());
 
