@@ -31,8 +31,8 @@
 namespace Virgil\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Virgil\CryptoImpl\Core\HashAlgorithms;
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\Core\HashAlgorithms;
+use Virgil\Crypto\VirgilCrypto;
 
 /**
  * Class СryptoFormatsTests
@@ -42,7 +42,7 @@ use Virgil\CryptoImpl\VirgilCrypto;
 class CryptoFormatsTest extends TestCase
 {
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test001SignatureHash()
     {
@@ -54,7 +54,7 @@ class CryptoFormatsTest extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test004KeyIdentifierIsCorrect()
     {
@@ -63,8 +63,7 @@ class CryptoFormatsTest extends TestCase
 
         self::assertEquals($keyPair1->getPrivateKey()->getIdentifier(), $keyPair1->getPublicKey()->getIdentifier());
 
-        $a1 = substr($crypto1->computeHash($crypto1->exportPublicKey($keyPair1->getPublicKey()),
-            HashAlgorithms::SHA512()),0, 8);
+        $a1 = substr($crypto1->computeHash($crypto1->exportPublicKey($keyPair1->getPublicKey()), HashAlgorithms::SHA512()),0, 8);
         $a2 = $keyPair1->getPrivateKey()->getIdentifier();
 
         self::assertEquals(strlen($a1), 8);

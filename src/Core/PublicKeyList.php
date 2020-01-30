@@ -28,14 +28,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
+use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
 
 /**
  * Class PublicKeyList
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Crypto\Services
  */
 class PublicKeyList
 {

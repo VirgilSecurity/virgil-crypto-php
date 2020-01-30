@@ -28,14 +28,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
 use MyCLabs\Enum\Enum;
 
 /**
  * Class SingingMode
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Crypto\Services
  */
 class SigningMode extends Enum
 {

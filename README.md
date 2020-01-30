@@ -24,7 +24,7 @@ Virgil Security, Inc., guides software developers into the forthcoming security 
 
 Generate a key pair with the default algorithm (EC_X25519):
 ```php
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\VirgilCrypto;
 
 try {
     $crypto = new VirgilCrypto();
@@ -40,7 +40,7 @@ try {
 
 Generate signature and sign data with a private key:
 ```php
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\VirgilCrypto;
 
 try {
     $crypto = new VirgilCrypto();
@@ -59,7 +59,7 @@ try {
 
 Verify a signature with a public key:
 ```php
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\VirgilCrypto;
 
 try {
     $crypto = new VirgilCrypto();
@@ -84,9 +84,9 @@ try {
 Encrypt Data on a Public Key:
 
 ```php
-use Virgil\CryptoImpl\Core\Data;
-use Virgil\CryptoImpl\Core\PublicKeyList;
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\Core\Data;
+use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\VirgilCrypto;
 
 try {
     $crypto = new VirgilCrypto();
@@ -104,9 +104,9 @@ try {
 ```
 Decrypt the encrypted data with a Private Key:
 ```php
-use Virgil\CryptoImpl\Core\Data;
-use Virgil\CryptoImpl\Core\PublicKeyList;
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\Core\Data;
+use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\VirgilCrypto;
 
 try {
     $crypto = new VirgilCrypto();

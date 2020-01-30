@@ -28,12 +28,12 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Exceptions;
+namespace Virgil\Crypto\Exceptions;
 
 /**
  * Class VirgilCryptoServiceException
  *
- * @package Virgil\CryptoImpl\Exceptions
+ * @package Virgil\Crypto\Exceptions
  */
 class VirgilCryptoServiceException extends VirgilException
 {

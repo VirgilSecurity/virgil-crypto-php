@@ -35,11 +35,11 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
 /**
  * Class VirgilKeyPair
- * @package Virgil\CryptoImpl
+ * @package Virgil\Crypto
  */
 class VirgilKeyPair
 {

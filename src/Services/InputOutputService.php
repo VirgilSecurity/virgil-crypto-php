@@ -28,14 +28,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
+namespace Virgil\Crypto\Services;
 
-use Virgil\CryptoImpl\Core\Data;
+use Virgil\Crypto\Core\Data;
 
 /**
  * Class InputOutputService
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Crypto\Services
  */
 class InputOutputService
 {

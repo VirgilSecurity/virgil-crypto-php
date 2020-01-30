@@ -28,12 +28,12 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
 /**
  * Class SigningOptions
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Crypto\Services
  */
 class SigningOptions
 {

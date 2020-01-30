@@ -32,15 +32,15 @@ namespace Virgil\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Virgil\CryptoImpl\Core\Data;
-use Virgil\CryptoImpl\Core\KeyPairType;
-use Virgil\CryptoImpl\Core\OutputStream;
-use Virgil\CryptoImpl\Core\PublicKeyList;
-use Virgil\CryptoImpl\Core\Stream;
-use Virgil\CryptoImpl\Core\InputStream;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\Services\InputOutputService;
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\Core\Data;
+use Virgil\Crypto\Core\KeyPairType;
+use Virgil\Crypto\Core\OutputStream;
+use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Core\Stream;
+use Virgil\Crypto\Core\InputStream;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+use Virgil\Crypto\Services\InputOutputService;
+use Virgil\Crypto\VirgilCrypto;
 
 /**
  * Class CryptoTests
@@ -73,7 +73,7 @@ class CryptoTests extends TestCase
      * @param VirgilCrypto $crypto
      * @param KeyPairType $keyPairType
      *
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     private function checkKeyGeneration(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
@@ -86,7 +86,7 @@ class CryptoTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test01KeyGenerationGenerateOneKeyShouldSucceed()
     {
@@ -104,7 +104,7 @@ class CryptoTests extends TestCase
      * @param VirgilCrypto $crypto
      * @param KeyPairType $keyPairType
      *
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     private function checkKeyImport(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
@@ -127,7 +127,7 @@ class CryptoTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test02KeyImportAllKeysShouldMatch()
     {
@@ -145,7 +145,7 @@ class CryptoTests extends TestCase
      * @param VirgilCrypto $crypto
      * @param KeyPairType $keyPairType
      *
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     private function checkEncryption(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
@@ -296,8 +296,8 @@ class CryptoTests extends TestCase
             $keyPair1 = $crypto->generateKeyPair($keyPairType);
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-            $testFileUrl = __DIR__."/../data/testData.txt";
-            $encTestFileUrl = __DIR__."/../data/testData_enc.txt";
+            $testFileUrl = __DIR__ . "/data/testData.txt";
+            $encTestFileUrl = __DIR__."/data/testData_enc.txt";
 
             $inputStream = new InputStream($testFileUrl);
             $outputStream = new OutputStream($encTestFileUrl);
@@ -351,10 +351,10 @@ class CryptoTests extends TestCase
             $keyPair1 = $crypto->generateKeyPair($keyPairType);
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-            $testFileUrl = __DIR__."/../data/testData.txt";
+            $testFileUrl = __DIR__ . "/data/testData.txt";
 
-            $encTestFileUrl = __DIR__."/../data/testData_encrypted.txt";
-            $decTestFileUrl = __DIR__."/../data/testData_decrypted.txt";
+            $encTestFileUrl = __DIR__."/data/testData_encrypted.txt";
+            $decTestFileUrl = __DIR__."/data/testData_decrypted.txt";
 
             $inputStream = new InputStream($testFileUrl);
             $outputStream = new OutputStream($encTestFileUrl);
@@ -567,9 +567,9 @@ class CryptoTests extends TestCase
             $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
             $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
 
-            $testFileUrl = __DIR__."/../data/testData.txt";
-            $encTestFileUrl = __DIR__."/../data/testData_encrypted.txt";
-            $decTestFileUrl = __DIR__."/../data/testData_decrypted.txt";
+            $testFileUrl = __DIR__ . "/data/testData.txt";
+            $encTestFileUrl = __DIR__."/data/testData_encrypted.txt";
+            $decTestFileUrl = __DIR__."/data/testData_decrypted.txt";
 
             $rawData = file_get_contents($testFileUrl);
             $stream = new Stream(new InputStream($testFileUrl), new OutputStream($encTestFileUrl), filesize($testFileUrl));

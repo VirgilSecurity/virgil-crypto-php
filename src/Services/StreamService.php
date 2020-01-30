@@ -28,17 +28,17 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
+namespace Virgil\Crypto\Services;
 
-use Virgil\CryptoImpl\Core\OutputStream;
-use Virgil\CryptoImpl\Core\StreamInterface;
-use Virgil\CryptoImpl\Core\VirgilCryptoError;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoServiceException;
+use Virgil\Crypto\Core\OutputStream;
+use Virgil\Crypto\Core\StreamInterface;
+use Virgil\Crypto\Core\VirgilCryptoError;
+use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
 
 /**
  * Class StreamUtils
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Crypto\Services
  */
 class StreamService
 {

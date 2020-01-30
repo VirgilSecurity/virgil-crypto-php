@@ -28,25 +28,25 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl;
+namespace Virgil\Crypto;
 
-use Virgil\CryptoImpl\Core\DataInterface;
-use Virgil\CryptoImpl\Core\HashAlgorithms;
-use Virgil\CryptoImpl\Core\InputOutput;
-use Virgil\CryptoImpl\Core\PublicKeyList;
-use Virgil\CryptoImpl\Core\SigningMode;
-use Virgil\CryptoImpl\Core\InputStream;
-use Virgil\CryptoImpl\Core\StreamInterface;
-use Virgil\CryptoImpl\Core\VerifyingMode;
-use Virgil\CryptoImpl\Core\VirgilKeyPair;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\Core\KeyPairType;
-use Virgil\CryptoImpl\Core\SigningOptions;
-use Virgil\CryptoImpl\Core\VerifyingOptions;
-use Virgil\CryptoImpl\Services\VirgilCryptoService;
-use Virgil\CryptoImpl\Core\VirgilPrivateKey;
-use Virgil\CryptoImpl\Core\VirgilPublicKey;
-use VirgilCrypto\Foundation\Random;
+use Virgil\Crypto\Core\DataInterface;
+use Virgil\Crypto\Core\HashAlgorithms;
+use Virgil\Crypto\Core\InputOutput;
+use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Core\SigningMode;
+use Virgil\Crypto\Core\StreamInterface;
+use Virgil\Crypto\Core\VerifyingMode;
+use Virgil\Crypto\Core\VirgilKeyPair;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+use Virgil\Crypto\Core\KeyPairType;
+use Virgil\Crypto\Core\SigningOptions;
+use Virgil\Crypto\Core\VerifyingOptions;
+use Virgil\Crypto\Services\VirgilCryptoService;
+use Virgil\Crypto\Core\VirgilPrivateKey;
+use Virgil\Crypto\Core\VirgilPublicKey;
+use Virgil\CryptoWrapper\Foundation\CtrDrbg;
+use Virgil\CryptoWrapper\Foundation\Random;
 
 /**
  * Wrapper for cryptographic operations.
@@ -54,7 +54,7 @@ use VirgilCrypto\Foundation\Random;
  * signature generation and verification, and encryption and decryption
  * Class VirgilCrypto
  *
- * @package Virgil\CryptoImpl
+ * @package Virgil\Crypto
  */
 class VirgilCrypto
 {
@@ -73,17 +73,29 @@ class VirgilCrypto
      */
     private $chunkSize = 1024;
 
+    private $rng;
+
     /**
      * VirgilCrypto constructor.
      *
      * @param KeyPairType|null $defaultKeyType
      * @param bool $useSHA256Fingerprints
+     * @param Random|null $rng
      *
+     * @throws \Exception
      */
-    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false)
+    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false, Random $rng
+    = null)
     {
         $this->defaultKeyType = is_null($defaultKeyType) ? KeyPairType::ED25519() : $defaultKeyType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
+
+        if (is_null($rng)) {
+            $rng = new CtrDrbg();
+            $rng->setupDefaults();
+        }
+
+        $this->rng = $rng;
     }
 
     /**
@@ -91,7 +103,7 @@ class VirgilCrypto
      */
     private function getCryptoService(): VirgilCryptoService
     {
-        return new VirgilCryptoService($this->defaultKeyType, $this->useSHA256Fingerprints, $this->chunkSize);
+        return new VirgilCryptoService($this->defaultKeyType, $this->useSHA256Fingerprints, $this->chunkSize, $this->rng);
     }
 
     /**

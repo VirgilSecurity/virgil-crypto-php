@@ -35,13 +35,13 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
-use VirgilCrypto\Foundation\PublicKey;
+use Virgil\CryptoWrapper\Foundation\PublicKey;
 
 /**
  * Class VirgilPrivateKey
- * @package Virgil\CryptoImpl
+ * @package Virgil\Crypto
  */
 class VirgilPublicKey
 {

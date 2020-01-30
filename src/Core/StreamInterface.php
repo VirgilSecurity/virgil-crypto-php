@@ -28,12 +28,12 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
 /**
  * Interface Stream
  *
- * @package Virgil\CryptoImpl\Core
+ * @package Virgil\Crypto\Core
  */
 interface StreamInterface extends InputOutput
 {

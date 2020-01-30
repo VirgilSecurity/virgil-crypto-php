@@ -32,11 +32,11 @@ namespace Virgil\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Virgil\CryptoImpl\Core\HashAlgorithms;
-use Virgil\CryptoImpl\Core\PublicKeyList;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\Services\InputOutputService;
-use Virgil\CryptoImpl\VirgilCrypto;
+use Virgil\Crypto\Core\HashAlgorithms;
+use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+use Virgil\Crypto\Services\InputOutputService;
+use Virgil\Crypto\VirgilCrypto;
 use Virgil\Tests\_\CompatibilityDataProvider;
 
 /**
@@ -49,10 +49,11 @@ class CryptoCompatibilityTests extends TestCase
     /**
      *
      */
-    const JSON_DATA = "/../data/crypto_compatibility_data.json";
+    const JSON_DATA = "/data/crypto_compatibility_data.json";
 
     /**
      * @return VirgilCrypto
+     * @throws Exception
      */
     private function getCrypto(): VirgilCrypto
     {
@@ -84,7 +85,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test002DecryptFromSingleRecipientShouldDecrypt()
     {
@@ -109,7 +110,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test003DecryptFromMultipleRecipientsShouldDecypt()
     {
@@ -143,7 +144,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test004DecryptAndVerifySingleRecipientShouldDecryptAndVerify()
     {
@@ -170,7 +171,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test005DecryptAndVerifyMultipleRecipientsShouldDecryptAndVerify()
     {
@@ -207,7 +208,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws VirgilCryptoException
      */
     public function test006GenerateSignatureShouldBeEqual()
     {
@@ -236,7 +237,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
     {
@@ -270,7 +271,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @throws \Virgil\CryptoImpl\Exceptions\VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test008GenerateEd25519UsingSeedShouldMatch()
     {

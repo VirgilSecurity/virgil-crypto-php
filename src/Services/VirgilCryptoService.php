@@ -28,44 +28,44 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Services;
+namespace Virgil\Crypto\Services;
 
 use \Exception;
-use Virgil\CryptoImpl\Core\DataInterface;
-use Virgil\CryptoImpl\Core\HashAlgorithms;
-use Virgil\CryptoImpl\Core\PublicKeyList;
-use Virgil\CryptoImpl\Core\SigningOptions;
-use Virgil\CryptoImpl\Core\StreamInterface;
-use Virgil\CryptoImpl\Core\VerifyingOptions;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use Virgil\CryptoImpl\Core\InputOutput;
-use Virgil\CryptoImpl\Core\KeyPairType;
-use Virgil\CryptoImpl\Core\SigningMode;
-use Virgil\CryptoImpl\Core\VerifyingMode;
-use Virgil\CryptoImpl\Core\VirgilCryptoError;
-use Virgil\CryptoImpl\Core\VirgilKeyPair;
-use Virgil\CryptoImpl\Core\VirgilPrivateKey;
-use Virgil\CryptoImpl\Core\VirgilPublicKey;
-use VirgilCrypto\Foundation\Aes256Gcm;
-use VirgilCrypto\Foundation\AlgId;
-use VirgilCrypto\Foundation\CtrDrbg;
-use VirgilCrypto\Foundation\KeyMaterialRng;
-use VirgilCrypto\Foundation\KeyProvider;
-use VirgilCrypto\Foundation\PrivateKey;
-use VirgilCrypto\Foundation\PublicKey;
-use VirgilCrypto\Foundation\Random;
-use VirgilCrypto\Foundation\RecipientCipher;
-use VirgilCrypto\Foundation\Sha224;
-use VirgilCrypto\Foundation\Sha256;
-use VirgilCrypto\Foundation\Sha384;
-use VirgilCrypto\Foundation\Sha512;
-use VirgilCrypto\Foundation\Signer;
-use VirgilCrypto\Foundation\Verifier;
+use Virgil\Crypto\Core\DataInterface;
+use Virgil\Crypto\Core\HashAlgorithms;
+use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Core\SigningOptions;
+use Virgil\Crypto\Core\StreamInterface;
+use Virgil\Crypto\Core\VerifyingOptions;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+use Virgil\Crypto\Core\InputOutput;
+use Virgil\Crypto\Core\KeyPairType;
+use Virgil\Crypto\Core\SigningMode;
+use Virgil\Crypto\Core\VerifyingMode;
+use Virgil\Crypto\Core\VirgilCryptoError;
+use Virgil\Crypto\Core\VirgilKeyPair;
+use Virgil\Crypto\Core\VirgilPrivateKey;
+use Virgil\Crypto\Core\VirgilPublicKey;
+use Virgil\CryptoWrapper\Foundation\KeyMaterialRng;
+use Virgil\CryptoWrapper\Foundation\Random;
+use Virgil\CryptoWrapper\Foundation\Aes256Gcm;
+use Virgil\CryptoWrapper\Foundation\AlgId;
+use Virgil\CryptoWrapper\Foundation\CtrDrbg;
+use Virgil\CryptoWrapper\Foundation\KeyProvider;
+use Virgil\CryptoWrapper\Foundation\PrivateKey;
+use Virgil\CryptoWrapper\Foundation\PublicKey;
+use Virgil\CryptoWrapper\Foundation\RecipientCipher;
+use Virgil\CryptoWrapper\Foundation\Sha224;
+use Virgil\CryptoWrapper\Foundation\Sha256;
+use Virgil\CryptoWrapper\Foundation\Sha384;
+use Virgil\CryptoWrapper\Foundation\Sha512;
+use Virgil\CryptoWrapper\Foundation\Signer;
+use Virgil\CryptoWrapper\Foundation\Verifier;
 
 /**
  * Class VirgilCryptoService
  *
- * @package Virgil\CryptoImpl\Services
+ * @package Virgil\Crypto\Services
  */
 class VirgilCryptoService
 {
@@ -84,6 +84,11 @@ class VirgilCryptoService
      */
     private $chunkSize;
 
+    /**
+     * @var Random
+     */
+    private $rng;
+
     private const CUSTOM_PARAM_KEY_SIGNATURE = "VIRGIL-DATA-SIGNATURE";
     private const CUSTOM_PARAM_KEY_SIGNER_ID = "VIRGIL-DATA-SIGNER-ID";
 
@@ -93,28 +98,22 @@ class VirgilCryptoService
      * @param KeyPairType $defaultKeyType
      * @param bool $useSHA256Fingerprints
      * @param int $chunkSize
+     * @param Random $rng
      */
-    public function __construct(KeyPairType $defaultKeyType, bool $useSHA256Fingerprints, int $chunkSize)
+    public function __construct(KeyPairType $defaultKeyType, bool $useSHA256Fingerprints, int $chunkSize, Random $rng)
     {
         $this->defaultKeyType = $defaultKeyType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
         $this->chunkSize = $chunkSize;
+        $this->rng = $rng;
     }
 
     /**
      * @return CtrDrbg
-     * @throws VirgilCryptoException
      */
-    private function getRandom(): CtrDrbg
+    private function getRandom(): Random
     {
-        try {
-            $rng = new CtrDrbg();
-            $rng->setupDefaults();
-
-            return $rng;
-        } catch (Exception $e) {
-            throw new VirgilCryptoException($e->getMessage());
-        }
+        return $this->rng;
     }
 
     /**
@@ -128,9 +127,10 @@ class VirgilCryptoService
         try {
             $publicKeyData = $this->exportInternalPublicKey($publicKey);
 
-            $res = $this->computeHash($publicKeyData, HashAlgorithms::SHA256());
-
-            if (!$this->useSHA256Fingerprints) {
+            if ($this->useSHA256Fingerprints) {
+                $res = $this->computeHash($publicKeyData, HashAlgorithms::SHA256());
+            } else {
+                $res = $this->computeHash($publicKeyData, HashAlgorithms::SHA512());
                 $res = substr($res, 0, 8);
             }
 

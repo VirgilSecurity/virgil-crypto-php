@@ -35,14 +35,14 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Exceptions;
+namespace Virgil\Crypto\Exceptions;
 
 use Exception;
 
 /**
  * Class VirgilException
  *
- * @package Virgil\CryptoImpl\Exceptions
+ * @package Virgil\Crypto\Exceptions
  */
 class VirgilException extends Exception
 {

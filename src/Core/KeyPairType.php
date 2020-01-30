@@ -35,11 +35,11 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoImpl\Core;
+namespace Virgil\Crypto\Core;
 
 use MyCLabs\Enum\Enum;
-use Virgil\CryptoImpl\Exceptions\VirgilCryptoException;
-use VirgilCrypto\Foundation\AlgId;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+use Virgil\CryptoWrapper\Foundation\AlgId;
 
 /**
  * Class keeps list of key pair types constants.

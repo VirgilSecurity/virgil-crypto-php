@@ -4,3 +4,4 @@ vendor/
 _dev/
 composer_dev.json
 composer_dev.lock
+.phpunit.result.cache
