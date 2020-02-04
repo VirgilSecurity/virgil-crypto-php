@@ -73,6 +73,9 @@ class VirgilCrypto
      */
     private $chunkSize = 1024;
 
+    /**
+     * @var null|Random
+     */
     private $rng;
 
     /**
@@ -411,5 +414,13 @@ class VirgilCrypto
     public function extractPublicKey(VirgilPrivateKey $virgilPrivateKey): VirgilPublicKey
     {
         return $this->getCryptoService()->extractPublicKey($virgilPrivateKey);
+    }
+
+    /**
+     * @return Random
+     */
+    public function getRng(): Random
+    {
+        return $this->rng;
     }
 }
