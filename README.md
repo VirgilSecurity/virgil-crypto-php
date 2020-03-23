@@ -145,7 +145,6 @@ composer require virgil/crypto
 
 ## Docs
 - [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto)
-- [More usage examples](https://developer.virgilsecurity.com/docs/how-to#cryptography)
 
 ## License
 
