@@ -131,8 +131,7 @@ Need more examples? Visit our [developer documentation](https://developer.virgil
 
 ### Requirements
 
-* **PHP 7.2** and newer
-* **vscf_foundation_php** extension
+**PHP 7.2 / 7.3 / 7.4**
 
 #### Installation via composer
 
@@ -142,28 +141,7 @@ composer require virgil/crypto
 
 ## Additional information
 
-### Manual adding the crypto extension into your server
-
-- [Download](https://github.com/VirgilSecurity/virgil-crypto-php/releases) *virgil-test.zip*, unzip it and execute on your server [virgil-test.php](/_help/virgil-test.php) file.
-
-- [Download](https://github.com/VirgilSecurity/virgil-crypto-php/releases) and unzip *%YOUR_OS%_extension.zip* archive according to your server operating system and PHP version.
-
-- Make sure you have access to edit the php.ini file (for example, use *root* for the Linux/Darwin or run *cmd* under administrator for the Windows).
-- Copy extension files to the extensions directory.
-    - For Linux/Darwin:
-    ```
-     $ path="%PATH_TO_EXTENSIONS_DIR%" && cp vscf_foundation_php.so $path
-    ```
-    - For Windows:
-    ```
-     $ set path=%PATH_TO_EXTENSIONS_DIR% && copy vscf_foundation_php.dll %path%
-    ```
-- Add the extensions into the php.ini file 
-    ```
-    $ echo -e "extension=vscf_foundation_php” >> %PATH_TO_PHP.INI%
-    ```
-    
-- Restart your server or php-fpm service
+- [Manual adding the crypto extension into your server](https://github.com/VirgilSecurity/virgil-cryptowrapper-php#additional-information)
 
 ## Docs
 - [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto)
