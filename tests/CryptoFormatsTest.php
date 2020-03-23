@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2019 Virgil Security Inc.
+ * Copyright (C) 2015-2020 Virgil Security Inc.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,7 +28,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Tests;
+namespace Virgil\CryptoTests;
 
 use PHPUnit\Framework\TestCase;
 use Virgil\Crypto\Core\HashAlgorithms;
@@ -42,6 +42,7 @@ use Virgil\Crypto\VirgilCrypto;
 class CryptoFormatsTest extends TestCase
 {
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test001SignatureHash()
@@ -54,6 +55,7 @@ class CryptoFormatsTest extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test004KeyIdentifierIsCorrect()

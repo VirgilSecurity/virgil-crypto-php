@@ -34,6 +34,7 @@
   "require": {
     "php": "^7.2",
     "myclabs/php-enum": "^1.7",
+    "virgil/crypto-wrapper": "*",
     "ext-json": "*"
   },
   "require-dev": {
@@ -46,7 +47,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Virgil\\Tests\\": "tests/src/"
+      "Virgil\\CryptoTests\\": "tests/"
     }
   }
 }

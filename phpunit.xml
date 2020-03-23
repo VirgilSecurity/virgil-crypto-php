@@ -2,12 +2,15 @@
 <phpunit bootstrap="vendor/autoload.php"
          colors="true"
          verbose="true"
-         stopOnFailure="false">
+         stopOnFailure="true">
     <testsuites>
         <testsuite name="tests">
             <directory suffix=".php">./tests/</directory>
-            <exclude>./tests/_/</exclude>
-            <exclude>./tests/data/</exclude>
         </testsuite>
     </testsuites>
+    <groups>
+        <exclude>
+            <group>f</group>
+        </exclude>
+    </groups>
 </phpunit>

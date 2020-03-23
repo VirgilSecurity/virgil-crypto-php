@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2019 Virgil Security Inc.
+ * Copyright (C) 2015-2020 Virgil Security Inc.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,7 +28,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Tests;
+namespace Virgil\CryptoTests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -86,6 +86,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test01KeyGenerationGenerateOneKeyShouldSucceed()
@@ -127,6 +128,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test02KeyImportAllKeysShouldMatch()
@@ -173,7 +175,7 @@ class CryptoTests extends TestCase
     }
 
     /**
-     *
+     * @group
      */
     public function test03EncryptionSomeDataShouldMatch()
     {
@@ -214,6 +216,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test04SignatureSomeDataShouldVerify()
@@ -271,6 +274,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test05SignAndEncryptSomeDataShouldDecryptAndVerify()
@@ -326,6 +330,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test06SignStreamFileShouldVerify()
@@ -390,6 +395,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test07EncryptStreamFileShouldDecrypt()
@@ -433,6 +439,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test08GenerateKeyUsingSeedFixedSeedShouldMatch()
@@ -478,6 +485,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test10ImportExportKeyRandomKeyShouldMatch()
@@ -538,6 +546,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test11AuthEncryptRandomDataShouldMatch()
@@ -607,6 +616,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test12AuthEncryptStreamShouldMatch()
@@ -656,6 +666,7 @@ class CryptoTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test13AuthEncryptDeprecatedShouldWork()

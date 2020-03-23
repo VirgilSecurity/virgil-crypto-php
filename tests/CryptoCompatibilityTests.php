@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2019 Virgil Security Inc.
+ * Copyright (C) 2015-2020 Virgil Security Inc.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,7 +28,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Tests;
+namespace Virgil\CryptoTests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +37,7 @@ use Virgil\Crypto\Core\PublicKeyList;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
 use Virgil\Crypto\Services\InputOutputService;
 use Virgil\Crypto\VirgilCrypto;
-use Virgil\Tests\_\CompatibilityDataProvider;
+use Virgil\CryptoTests\_\CompatibilityDataProvider;
 
 /**
  * Class CryptoCompatibilityTests
@@ -77,7 +77,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     *
+     * @group
      */
     public function test001CheckNumberOfTestsInJSON()
     {
@@ -110,6 +110,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test003DecryptFromMultipleRecipientsShouldDecypt()
@@ -144,6 +145,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test004DecryptAndVerifySingleRecipientShouldDecryptAndVerify()
@@ -171,6 +173,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test005DecryptAndVerifyMultipleRecipientsShouldDecryptAndVerify()
@@ -208,6 +211,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group
      * @throws VirgilCryptoException
      */
     public function test006GenerateSignatureShouldBeEqual()
@@ -237,6 +241,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
@@ -271,6 +276,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group
      * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test008GenerateEd25519UsingSeedShouldMatch()
@@ -295,6 +301,7 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
+     * @group f
      * @throws VirgilCryptoException
      */
     public function test009SignThenEncryptShouldMatch()
@@ -326,14 +333,14 @@ class CryptoCompatibilityTests extends TestCase
         try {
             $res1 = $this->getCrypto()->authDecrypt($cipherData, $keyPair2->getPrivateKey(), $pkl);
             self::assertTrue(empty($res1));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
 
         try {
             $res2 = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl2);
             self::assertTrue(empty($res2));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
     }

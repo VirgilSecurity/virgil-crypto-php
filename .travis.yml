@@ -12,13 +12,9 @@ install:
 - travis_retry sudo apt-get update
 - travis_retry sudo apt install -y php7.2 php7.2-dev php7.2-cli
   php7.2-mbstring php7.2-curl php7.2-xml php7.2-intl
-- travis_retry wget https://phar.phpunit.de/phpunit-7.5.1.phar
-- chmod +x phpunit-7.5.1.phar
-- sudo mv phpunit-7.5.1.phar /usr/bin/phpunit
 - curl -sS https://getcomposer.org/installer -o composer-setup.php
 - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 before_script:
-- sudo cp $TRAVIS_BUILD_DIR/_travis/virgil_crypto_php.so /usr/lib/php/20170718
-- sudo sh -c "echo 'extension=virgil_crypto_php.so' >> /etc/php/7.2/cli/php.ini"
 - composer install
-script: phpunit --configuration phpunit.xml
+- sh $TRAVIS_BUILD_DIR/vendor/virgil/crypto-wrapper/_extensions/setup.sh -all -vendor
+script: vendor/bin/phpunit --configuration phpunit.xml
