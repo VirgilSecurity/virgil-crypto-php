@@ -30,12 +30,10 @@
 
 namespace Virgil\CryptoTests;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
-use Virgil\Crypto\Core\HashAlgorithms;
-use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Core\Enum\HashAlgorithms;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
-use Virgil\Crypto\Services\InputOutputService;
 use Virgil\Crypto\VirgilCrypto;
 use Virgil\CryptoTests\_\CompatibilityDataProvider;
 
@@ -53,7 +51,7 @@ class CryptoCompatibilityTests extends TestCase
 
     /**
      * @return VirgilCrypto
-     * @throws Exception
+     * @throws \Exception
      */
     private function getCrypto(): VirgilCrypto
     {
@@ -66,14 +64,6 @@ class CryptoCompatibilityTests extends TestCase
     private function getDataProvider(): CompatibilityDataProvider
     {
         return new CompatibilityDataProvider(__DIR__.self::JSON_DATA);
-    }
-
-    /**
-     * @return InputOutputService
-     */
-    private function getIOService(): InputOutputService
-    {
-        return new InputOutputService();
     }
 
     /**
@@ -100,8 +90,6 @@ class CryptoCompatibilityTests extends TestCase
 
         $cipherDataStr = $dict["cipher_data"];
         $cipherData = base64_decode($cipherDataStr);
-
-        $cipherData = $this->getIOService()->convertStringToData($cipherData);
 
         $decryptedData = $this->getCrypto()->decrypt($cipherData, $privateKey);
         $decryptedDataStr = base64_encode($decryptedData);
@@ -133,7 +121,6 @@ class CryptoCompatibilityTests extends TestCase
 
         $cipherDataStr = $dict["cipher_data"];
         $cipherData = base64_decode($cipherDataStr);
-        $cipherData = $this->getIOService()->convertStringToData($cipherData);
 
         foreach ($privateKeys as $privateKey)
         {
@@ -158,14 +145,13 @@ class CryptoCompatibilityTests extends TestCase
         $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
         $publicKey = $this->getCrypto()->extractPublicKey($privateKey);
-        $pkl = new PublicKeyList($publicKey);
+        $pkl = new VirgilPublicKeyCollection($publicKey);
 
         $originalDataStr = $dict["original_data"];
         $originalData = base64_decode($originalDataStr);
 
         $cipherDataStr = $dict["cipher_data"];
         $cipherData = base64_decode($cipherDataStr);
-        $cipherData = $this->getIOService()->convertStringToData($cipherData);
 
         $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
 
@@ -196,10 +182,9 @@ class CryptoCompatibilityTests extends TestCase
 
         $cipherDataStr = $dict["cipher_data"];
         $cipherData = base64_decode($cipherDataStr);
-        $cipherData = $this->getIOService()->convertStringToData($cipherData);
 
         $signerPublicKey = $this->getCrypto()->extractPublicKey($privateKeys[0]);
-        $pkl = new PublicKeyList($signerPublicKey);
+        $pkl = new VirgilPublicKeyCollection($signerPublicKey);
 
         foreach ($privateKeys as $privateKey)
         {
@@ -253,7 +238,7 @@ class CryptoCompatibilityTests extends TestCase
 
         $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
-        $pkl = new PublicKeyList();
+        $pkl = new VirgilPublicKeyCollection();
 
         foreach ($dict["public_keys"] as $publicKeyStr)
         {
@@ -267,7 +252,6 @@ class CryptoCompatibilityTests extends TestCase
 
         $cipherDataStr = $dict["cipher_data"];
         $cipherData = base64_decode($cipherDataStr);
-        $cipherData = $this->getIOService()->convertStringToData($cipherData);
 
         $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
         $decryptedDataStr = base64_encode($decryptedData);
@@ -301,8 +285,9 @@ class CryptoCompatibilityTests extends TestCase
     }
 
     /**
-     * @group f
      * @throws VirgilCryptoException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoServiceException
+     * @group f
      */
     public function test009SignThenEncryptShouldMatch()
     {
@@ -317,12 +302,11 @@ class CryptoCompatibilityTests extends TestCase
         $privateKey1 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey1Str))->getPrivateKey();
         $keyPair2 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey2Str));
         $publicKey = $this->getCrypto()->importPublicKey(base64_decode($publicKeyStr));
-        $pkl = new PublicKeyList($publicKey);
-        $pkl2 = new PublicKeyList($keyPair2->getPublicKey());
+        $pkl = new VirgilPublicKeyCollection($publicKey);
+        $pkl2 = new VirgilPublicKeyCollection($keyPair2->getPublicKey());
 
         $dataSha512 = base64_decode($dataSha512Str);
         $cipherData = base64_decode($cipherDataStr);
-        $cipherData = $this->getIOService()->convertStringToData($cipherData);
 
         $data = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl);
 

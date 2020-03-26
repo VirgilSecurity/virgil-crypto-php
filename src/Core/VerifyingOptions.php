@@ -30,6 +30,9 @@
 
 namespace Virgil\Crypto\Core;
 
+use Virgil\Crypto\Core\Enum\VerifyingMode;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
+
 /**
  * Class VerifyingOptions
  *
@@ -50,19 +53,19 @@ class VerifyingOptions
     /**
      * VerifyingOptions constructor.
      *
-     * @param PublicKeyList $virgilPublicKeys
+     * @param VirgilPublicKeyCollection $virgilPublicKeys
      * @param VerifyingMode $verifyingMode
      */
-    public function __construct(PublicKeyList $virgilPublicKeys, VerifyingMode $verifyingMode)
+    public function __construct(VirgilPublicKeyCollection $virgilPublicKeys, VerifyingMode $verifyingMode)
     {
         $this->virgilPublicKeys = $virgilPublicKeys;
         $this->verifyingMode = $verifyingMode;
     }
 
     /**
-     * @return PublicKeyList
+     * @return VirgilPublicKeyCollection
      */
-    public function getVirgilPublicKeys(): PublicKeyList
+    public function getVirgilPublicKeys(): VirgilPublicKeyCollection
     {
         return $this->virgilPublicKeys;
     }

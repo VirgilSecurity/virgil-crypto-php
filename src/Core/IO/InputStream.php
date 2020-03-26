@@ -28,36 +28,19 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\IO;
 
 /**
- * Interface Stream
+ * Interface InputStream
  *
- * @package Virgil\Crypto\Core
+ * @package Virgil\Crypto\Core\IO
  */
-interface StreamInterface extends InputOutput
+interface InputStream
 {
     /**
-     * StreamInterface constructor.
+     * @param string $chunk
      *
-     * @param InputStream $inputStream
-     * @param OutputStream $outputStream
-     * @param int $streamSize
-     */
-    public function __construct(InputStream $inputStream, OutputStream $outputStream, int $streamSize);
-
-    /**
-     * @return InputStream
-     */
-    public function getInputStream(): InputStream;
-
-    /**
-     * @return OutputStream
-     */
-    public function getOutputStream(): OutputStream;
-
-    /**
      * @return int
      */
-    public function getStreamSize(): int;
+    public function read(string $chunk): int;
 }

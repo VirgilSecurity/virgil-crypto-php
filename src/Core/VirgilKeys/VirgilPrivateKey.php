@@ -35,17 +35,67 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\VirgilKeys;
 
-use MyCLabs\Enum\Enum;
+use Virgil\Crypto\Core\Enum\KeyPairType;
+use Virgil\CryptoWrapper\Foundation\PrivateKey;
 
 /**
- * Class keeps list of hash algorithms constants.
+ * Class VirgilPrivateKey
+ * @package Virgil\Crypto
  */
-class HashAlgorithms extends Enum
+class VirgilPrivateKey
 {
-    private const SHA224 = "SHA224";
-    private const SHA256 = "SHA256";
-    private const SHA384 = "SHA384";
-    private const SHA512 = "SHA512";
+    /**
+     * @var string
+     */
+    private $identifier;
+
+    /**
+     * @var PrivateKey
+     */
+    private $privateKey;
+
+    /**
+     * @var KeyPairType
+     */
+    private $keyType;
+
+    /**
+     * VirgilPrivateKey constructor.
+     *
+     * @param string $identifier
+     * @param PrivateKey $privateKey
+     * @param KeyPairType $keyType
+     */
+    public function __construct(string $identifier, PrivateKey $privateKey, KeyPairType $keyType)
+    {
+        $this->identifier = $identifier;
+        $this->privateKey = $privateKey;
+        $this->keyType = $keyType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @return PrivateKey
+     */
+    public function getPrivateKey(): PrivateKey
+    {
+        return $this->privateKey;
+    }
+
+    /**
+     * @return KeyPairType
+     */
+    public function getKeyType(): KeyPairType
+    {
+        return $this->keyType;
+    }
 }

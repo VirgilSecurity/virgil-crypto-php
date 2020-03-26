@@ -32,14 +32,10 @@ namespace Virgil\CryptoTests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Virgil\Crypto\Core\Data;
-use Virgil\Crypto\Core\KeyPairType;
-use Virgil\Crypto\Core\OutputStream;
-use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Core\Enum\KeyPairType;
 use Virgil\Crypto\Core\Stream;
-use Virgil\Crypto\Core\InputStream;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
-use Virgil\Crypto\Services\InputOutputService;
 use Virgil\Crypto\VirgilCrypto;
 
 /**
@@ -49,14 +45,6 @@ use Virgil\Crypto\VirgilCrypto;
  */
 class CryptoTests extends TestCase
 {
-    /**
-     * @return InputOutputService
-     */
-    private function getIOService(): InputOutputService
-    {
-        return new InputOutputService();
-    }
-
     /**
      * @param array $files
      */
@@ -154,14 +142,11 @@ class CryptoTests extends TestCase
         $keyPair1 = $crypto->generateKeyPair($keyPairType);
         $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-        $rawData = "test";
-        $data = $this->getIOService()->convertStringToData($rawData);
+        $data = "test";
 
-        $pkl = new PublicKeyList($keyPair1->getPublicKey());
+        $pkl = new VirgilPublicKeyCollection($keyPair1->getPublicKey());
 
         $encryptedData = $crypto->encrypt($data, $pkl);
-        $encryptedData = $this->getIOService()->convertStringToData($encryptedData);
-
         $decryptedData = $crypto->decrypt($encryptedData, $keyPair1->getPrivateKey());
 
         self::assertEquals($rawData, $decryptedData);
@@ -169,7 +154,7 @@ class CryptoTests extends TestCase
         try {
             $tempRes = $crypto->decrypt($encryptedData, $keyPair2->getPrivateKey());
             self::assertTrue(empty($tempRes));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
     }
@@ -210,7 +195,7 @@ class CryptoTests extends TestCase
         try {
             $res2 = $crypto->verifySignature($signature, $rawData, $keyPair2->getPublicKey());
             self::assertTrue(empty($res2));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
     }
@@ -238,37 +223,34 @@ class CryptoTests extends TestCase
      */
     private function checkSignAndEncrypt(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
-        $rawData = "test";
-        $data = $this->getIOService()->convertStringToData($rawData);
+        $data = "test";
 
         $keyPair1 = $crypto->generateKeyPair($keyPairType);
         $keyPair2 = $crypto->generateKeyPair($keyPairType);
         $keyPair3 = $crypto->generateKeyPair($keyPairType);
 
-        $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+        $pkl = new VirgilPublicKeyCollection($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
 
         $encrypted = $crypto->signAndEncrypt($data, $keyPair1->getPrivateKey(), $pkl);
 
-        $encrypted = $this->getIOService()->convertStringToData($encrypted);
-
-        $pkl1 = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
-        $pkl2 = new PublicKeyList($keyPair3->getPublicKey());
+        $pkl1 = new VirgilPublicKeyCollection($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+        $pkl2 = new VirgilPublicKeyCollection($keyPair3->getPublicKey());
 
         $decrypted = $crypto->decryptAndVerify($encrypted, $keyPair2->getPrivateKey(), $pkl1);
 
-        self::assertEquals($rawData, $decrypted);
+        self::assertEquals($data, $decrypted);
 
         try {
             $res1 = $crypto->decryptAndVerify($encrypted, $keyPair3->getPrivateKey(), $pkl1);
             self::assertTrue(empty($res1));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
 
         try {
             $res2 = $crypto->decryptAndVerify($encrypted, $keyPair2->getPrivateKey(), $pkl2);
             self::assertTrue(empty($res2));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::assertTrue($e instanceof VirgilCryptoException);
         }
     }
@@ -330,7 +312,7 @@ class CryptoTests extends TestCase
     }
 
     /**
-     * @group
+     * @group f
      * @throws VirgilCryptoException
      */
     public function test06SignStreamFileShouldVerify()
@@ -395,7 +377,7 @@ class CryptoTests extends TestCase
     }
 
     /**
-     * @group
+     * @group f
      * @throws VirgilCryptoException
      */
     public function test07EncryptStreamFileShouldDecrypt()
@@ -433,7 +415,7 @@ class CryptoTests extends TestCase
                 self::assertEquals($a1, $a2);
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -470,16 +452,13 @@ class CryptoTests extends TestCase
             $publicKey = $crypto->importPublicKey($publicKeyData);
             $privateKey = $crypto->importPrivateKey($privateKeyData)->getPrivateKey();
 
-            $pkl = new PublicKeyList($publicKey);
-
-            $data = new Data("");
-
-            $res = $crypto->signAndEncrypt($data, $privateKey, $pkl);
+            $pkl = new VirgilPublicKeyCollection($publicKey);
+            $res = $crypto->signAndEncrypt("", $privateKey, $pkl);
 
             self::assertTrue(!is_null($res));
             self::assertTrue(is_string($res));
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -512,35 +491,33 @@ class CryptoTests extends TestCase
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
             $keyPair3 = $crypto->generateKeyPair($keyPairType);
 
-            $rawData = "test";
+            $data = "test";
 
-            $data = $this->getIOService()->convertStringToData($rawData);
-            $pkl1 = new PublicKeyList($keyPair2->getPublicKey());
+            $pkl1 = new VirgilPublicKeyCollection($keyPair2->getPublicKey());
 
             $encrypted = $crypto->authEncrypt($data, $keyPair1->getPrivateKey(), $pkl1);
-            $encrypted = $this->getIOService()->convertStringToData($encrypted);
 
-            $pkl2 = new PublicKeyList($keyPair1->getPublicKey());
+            $pkl2 = new VirgilPublicKeyCollection($keyPair1->getPublicKey());
             $decrypted = $crypto->authDecrypt($encrypted, $keyPair2->getPrivateKey(), $pkl2);
 
-            self::assertEquals($rawData, $decrypted);
+            self::assertEquals($data, $decrypted);
 
             try {
                 $res1 = $crypto->authDecrypt($encrypted, $keyPair3->getPrivateKey(), $pkl2);
                 self::assertTrue(empty($res1));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
             try {
-                $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
+                $pkl3 = new VirgilPublicKeyCollection($keyPair3->getPublicKey());
                 $res2 = $crypto->authDecrypt($encrypted, $keyPair2->getPrivateKey(), $pkl3);
                 self::assertTrue(empty($res2));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -573,8 +550,8 @@ class CryptoTests extends TestCase
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
             $keyPair3 = $crypto->generateKeyPair($keyPairType);
 
-            $pkl = new PublicKeyList($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
-            $pkl3 = new PublicKeyList($keyPair3->getPublicKey());
+            $pkl = new VirgilPublicKeyCollection($keyPair1->getPublicKey(), $keyPair2->getPublicKey());
+            $pkl3 = new VirgilPublicKeyCollection($keyPair3->getPublicKey());
 
             $testFileUrl = __DIR__ . "/data/testData.txt";
             $encTestFileUrl = __DIR__."/data/testData_encrypted.txt";
@@ -610,13 +587,13 @@ class CryptoTests extends TestCase
 
             $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
-     * @group
+     * @group f
      * @throws VirgilCryptoException
      */
     public function test12AuthEncryptStreamShouldMatch()
@@ -639,28 +616,24 @@ class CryptoTests extends TestCase
     private function checkAuthEncryptDeprecated(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
         try {
-            $rawData = "test";
-            $data = $this->getIOService()->convertStringToData($rawData);
+            $data = "test";
 
             $keyPair1 = $crypto->generateKeyPair($keyPairType);
             $keyPair2 = $crypto->generateKeyPair($keyPairType);
 
-            $pkl1 = new PublicKeyList($keyPair1->getPublicKey());
-            $pkl2 = new PublicKeyList($keyPair2->getPublicKey());
+            $pkl1 = new VirgilPublicKeyCollection($keyPair1->getPublicKey());
+            $pkl2 = new VirgilPublicKeyCollection($keyPair2->getPublicKey());
 
             $encrypted1 = $crypto->authEncrypt($data, $keyPair1->getPrivateKey(), $pkl2);
             $encrypted2 = $crypto->signAndEncrypt($data, $keyPair1->getPrivateKey(), $pkl2);
 
-            $encrypted1 = $this->getIOService()->convertStringToData($encrypted1);
-            $encrypted2 = $this->getIOService()->convertStringToData($encrypted2);
-
             $decrypted1 = $crypto->authDecrypt($encrypted1, $keyPair2->getPrivateKey(), $pkl1, true);
             $decrypted2 = $crypto->authDecrypt($encrypted2, $keyPair2->getPrivateKey(), $pkl1, true);
 
-            self::assertEquals($rawData, $decrypted1);
-            self::assertEquals($rawData, $decrypted2);
+            self::assertEquals($data, $decrypted1);
+            self::assertEquals($data, $decrypted2);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }

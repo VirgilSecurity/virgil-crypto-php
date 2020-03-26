@@ -1,19 +1,25 @@
 <?php
 /**
  * Copyright (C) 2015-2020 Virgil Security Inc.
+ *
  * All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
+ *
  *     (1) Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
+ *
  *     (2) Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
  *     distribution.
+ *
  *     (3) Neither the name of the copyright holder nor the names of its
  *     contributors may be used to endorse or promote products derived from
  *     this software without specific prior written permission.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,21 +31,71 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\VirgilKeys;
 
-use MyCLabs\Enum\Enum;
+use Virgil\Crypto\Core\Enum\KeyPairType;
+use Virgil\CryptoWrapper\Foundation\PublicKey;
 
 /**
- * Class VerifyingMode
- *
- * @package Virgil\Crypto\Services
+ * Class VirgilPrivateKey
+ * @package Virgil\Crypto
  */
-class VerifyingMode extends Enum
+class VirgilPublicKey
 {
-    private const DECRYPT_AND_VERIFY = "DECRYPT_AND_VERIFY";
-    private const DECRYPT_THEN_VERIFY = "DECRYPT_THEN_VERIFY";
-    private const ANY = "ANY";
+    /**
+     * @var string
+     */
+    private $identifier;
+
+    /**
+     * @var PublicKey
+     */
+    private $publicKey;
+
+    /**
+     * @var KeyPairType
+     */
+    private $keyType;
+
+    /**
+     * VirgilPublicKey constructor.
+     *
+     * @param string $identifier
+     * @param PublicKey $publicKey
+     * @param KeyPairType $keyType
+     */
+    public function __construct(string $identifier, PublicKey $publicKey, KeyPairType $keyType)
+    {
+        $this->identifier = $identifier;
+        $this->publicKey = $publicKey;
+        $this->keyType = $keyType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @return PublicKey
+     */
+    public function getPublicKey(): PublicKey
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * @return KeyPairType
+     */
+    public function getKeyType(): KeyPairType
+    {
+        return $this->keyType;
+    }
 }

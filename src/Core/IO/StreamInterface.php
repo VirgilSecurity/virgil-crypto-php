@@ -28,35 +28,17 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\IO;
 
 /**
- * Class OutputStream
+ * Interface StreamInterface
  *
- * @package Virgil\Crypto\Core
+ * @package Virgil\Crypto\Core\IO
  */
-class OutputStream
+interface StreamInterface extends InputStream, OutputStream
 {
     /**
-     * @var string
+     * @return int
      */
-    private $output;
-
-    /**
-     * OutputStream constructor.
-     *
-     * @param string $output
-     */
-    public function __construct(string $output)
-    {
-        $this->output = $output;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOutput(): string
-    {
-        return $this->output;
-    }
+    public function getStreamSize(): int;
 }

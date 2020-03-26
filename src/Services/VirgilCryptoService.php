@@ -31,21 +31,20 @@
 namespace Virgil\Crypto\Services;
 
 use \Exception;
-use Virgil\Crypto\Core\DataInterface;
-use Virgil\Crypto\Core\HashAlgorithms;
-use Virgil\Crypto\Core\PublicKeyList;
+use Virgil\Crypto\Core\Enum\HashAlgorithms;
+use Virgil\Crypto\Core\Enum\KeyPairType;
+use Virgil\Crypto\Core\Enum\SigningMode;
+use Virgil\Crypto\Core\Enum\VerifyingMode;
+use Virgil\Crypto\Core\Enum\VirgilCryptoError;
+use Virgil\Crypto\Core\IO\StreamInterface;
 use Virgil\Crypto\Core\SigningOptions;
-use Virgil\Crypto\Core\StreamInterface;
 use Virgil\Crypto\Core\VerifyingOptions;
+use Virgil\Crypto\Core\VirgilKeys\VirgilKeyPair;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPrivateKey;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKey;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
-use Virgil\Crypto\Core\InputOutput;
-use Virgil\Crypto\Core\KeyPairType;
-use Virgil\Crypto\Core\SigningMode;
-use Virgil\Crypto\Core\VerifyingMode;
-use Virgil\Crypto\Core\VirgilCryptoError;
-use Virgil\Crypto\Core\VirgilKeyPair;
-use Virgil\Crypto\Core\VirgilPrivateKey;
-use Virgil\Crypto\Core\VirgilPublicKey;
+use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
 use Virgil\CryptoWrapper\Foundation\KeyMaterialRng;
 use Virgil\CryptoWrapper\Foundation\Random;
 use Virgil\CryptoWrapper\Foundation\Aes256Gcm;
@@ -136,14 +135,12 @@ class VirgilCryptoService
 
             return $res;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
-     * Generates KeyPair of default type using seed
-     *
      * @param string $seed
      *
      * @return VirgilKeyPair
@@ -159,7 +156,7 @@ class VirgilCryptoService
             $seedRng->resetKeyMaterial($seed);
 
             return $this->generateKeyPair($this->defaultKeyType, $seedRng);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -201,7 +198,7 @@ class VirgilCryptoService
 
             return new VirgilKeyPair($virgilPrivateKey, $virgilPublicKey);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -230,19 +227,19 @@ class VirgilCryptoService
             $signer->appendData($data);
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage());
         }
     }
 
     /**
      * @param RecipientCipher $cipher
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param SigningOptions|null $signingOptions
      *
      * @throws VirgilCryptoException
      */
-    private function startEncryption(RecipientCipher $cipher, InputOutput $inputOutput, SigningOptions $signingOptions = null)
+    private function startEncryption(RecipientCipher $cipher, $inputOutput, SigningOptions $signingOptions = null)
     {
         try {
 
@@ -254,9 +251,9 @@ class VirgilCryptoService
 
                         switch ($inputOutput) {
 
-                            case $inputOutput instanceof DataInterface:
+                            case is_string($inputOutput):
 
-                                $signature = $this->generateSignature($inputOutput->getInput(), $signingOptions->getVirgilPrivateKey());
+                                $signature = $this->generateSignature($inputOutput, $signingOptions->getVirgilPrivateKey());
                                 $cipher->customParams()->addData(self::CUSTOM_PARAM_KEY_SIGNATURE, $signature);
                                 $cipher->customParams()->addData(self::CUSTOM_PARAM_KEY_SIGNER_ID,
                                     $signingOptions->getVirgilPrivateKey()->getIdentifier());
@@ -278,9 +275,9 @@ class VirgilCryptoService
 
                         switch ($inputOutput) {
 
-                            case $inputOutput instanceof DataInterface:
+                            case is_string($inputOutput):
 
-                                $size = strlen($inputOutput->getInput());
+                                $size = strlen($inputOutput);
                                 break;
 
                             case $inputOutput instanceof StreamInterface:
@@ -302,29 +299,29 @@ class VirgilCryptoService
 
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
      * @param RecipientCipher $cipher
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param SigningOptions|null $signingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    private function processEncryption(RecipientCipher $cipher, InputOutput $inputOutput, SigningOptions $signingOptions = null)
+    private function processEncryption(RecipientCipher $cipher, $inputOutput, SigningOptions $signingOptions = null)
     {
         try {
             $result = null;
 
             switch ($inputOutput) {
-                case $inputOutput instanceof DataInterface:
+                case is_string($inputOutput):
 
                     $result = $cipher->packMessageInfo();
-                    $result .= $cipher->processEncryption($inputOutput->getInput());
+                    $result .= $cipher->processEncryption($inputOutput);
                     $result .= $cipher->finishEncryption();
 
                     if (($signingOptions) && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
@@ -349,20 +346,20 @@ class VirgilCryptoService
 
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
-     * @param InputOutput $inputOutput
-     * @param PublicKeyList $recipients
+     * @param $inputOutput
+     * @param VirgilPublicKeyCollection $recipients
      * @param SigningOptions|null $signingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function encrypt(InputOutput $inputOutput, PublicKeyList $recipients, SigningOptions $signingOptions = null)
+    public function encrypt($inputOutput, VirgilPublicKeyCollection $recipients, SigningOptions $signingOptions = null)
     {
         try {
 
@@ -380,19 +377,19 @@ class VirgilCryptoService
 
             return $this->processEncryption($cipher, $inputOutput, $signingOptions);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
      * @param RecipientCipher $cipher
-     * @param InputOutput $inputOutput
+     * @param mixed $inputOutput
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    private function processDecryption(RecipientCipher $cipher, InputOutput $inputOutput)
+    private function processDecryption(RecipientCipher $cipher, $inputOutput)
     {
         try {
 
@@ -408,9 +405,9 @@ class VirgilCryptoService
 
                     break;
 
-                case $inputOutput instanceof DataInterface:
+                case is_string($inputOutput):
 
-                    $result = $cipher->processDecryption($inputOutput->getInput());
+                    $result = $cipher->processDecryption($inputOutput);
                     $result .= $cipher->finishDecryption();
 
                     break;
@@ -425,15 +422,15 @@ class VirgilCryptoService
 
     /**
      * @param RecipientCipher $cipher
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param string|null $result
-     * @param PublicKeyList $publicKeys
+     * @param VirgilPublicKeyCollection $publicKeys
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    private function verifyPlainSignature(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null, PublicKeyList
-    $publicKeys): bool
+    private function verifyPlainSignature(RecipientCipher $cipher, $inputOutput, string $result = null,
+                                          VirgilPublicKeyCollection $publicKeys): bool
     {
         try {
             $signerPublicKey = null;
@@ -473,19 +470,19 @@ class VirgilCryptoService
 
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
      * @param RecipientCipher $cipher
-     * @param PublicKeyList $publicKeys
+     * @param VirgilPublicKeyCollection $publicKeys
      *
      * @return bool
      * @throws VirgilCryptoException
      */
-    private function verifyEncryptedSignature(RecipientCipher $cipher, PublicKeyList $publicKeys): bool
+    private function verifyEncryptedSignature(RecipientCipher $cipher, VirgilPublicKeyCollection $publicKeys): bool
     {
         try {
             $signerPublicKey = null;
@@ -518,21 +515,20 @@ class VirgilCryptoService
 
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
     /**
      * @param RecipientCipher $cipher
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param string|null $result
      * @param VerifyingOptions|null $verifyingOptions
      *
-     * @return void
      * @throws VirgilCryptoException
      */
-    private function finishDecryption(RecipientCipher $cipher, InputOutput $inputOutput, string $result = null,
+    private function finishDecryption(RecipientCipher $cipher, $inputOutput, string $result = null,
                                       VerifyingOptions $verifyingOptions = null): void
     {
         try {
@@ -559,20 +555,21 @@ class VirgilCryptoService
                 return;
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
 
+
     /**
-     * @param InputOutput $inputOutput
-     * @param VerifyingOptions|null $verifyingOptions
+     * @param $inputOutput
      * @param VirgilPrivateKey $privateKey
+     * @param VerifyingOptions|null $verifyingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions
+    public function decrypt($inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions
     $verifyingOptions = null): ?string
     {
         try {
@@ -591,7 +588,7 @@ class VirgilCryptoService
 
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -615,7 +612,7 @@ class VirgilCryptoService
             $verifier->appendData($data);
 
             return $verifier->verify($virgilPublicKey->getPublicKey());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage());
         }
     }
@@ -647,7 +644,7 @@ class VirgilCryptoService
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -675,7 +672,7 @@ class VirgilCryptoService
 
             return $verifier->verify($virgilPublicKey->getPublicKey());
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -690,7 +687,7 @@ class VirgilCryptoService
     {
         try {
             return $this->getRandom()->random($size);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage());
         }
     }
@@ -741,7 +738,7 @@ class VirgilCryptoService
 
             return $keyProvider->importPrivateKey($data);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -762,7 +759,7 @@ class VirgilCryptoService
 
             return $keyProvider->importPublicKey($data);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -795,7 +792,7 @@ class VirgilCryptoService
 
             return new VirgilKeyPair($virgilPrivateKey, $virgilPublicKey);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -816,7 +813,7 @@ class VirgilCryptoService
 
             return $keyProvider->exportPrivateKey($privateKey);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -835,7 +832,7 @@ class VirgilCryptoService
             $publicKey = $virgilPrivateKey->getPrivateKey()->extractPublicKey();
 
             return new VirgilPublicKey($virgilPrivateKey->getIdentifier(), $publicKey, $virgilPrivateKey->getKeyType());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -855,7 +852,7 @@ class VirgilCryptoService
             $keyProvider->setupDefaults();
 
             return $keyProvider->exportPublicKey($publicKey);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -889,7 +886,7 @@ class VirgilCryptoService
 
             return new VirgilPublicKey($keyId, $publicKey, $keyType);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -939,20 +936,20 @@ class VirgilCryptoService
      * 7. Computes KDF to obtain AES-256 key from shared secret for each recipient
      * 8. Encrypts KEY1 with this key using AES-256-CBC for each recipient
      *
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param VirgilPrivateKey $privateKey
-     * @param PublicKeyList $recipients
+     * @param VirgilPublicKeyCollection $recipients
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function authEncrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients)
+    public function authEncrypt($inputOutput, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients)
     {
         try {
             $signingOptions = new SigningOptions($privateKey, SigningMode::SIGN_THEN_ENCRYPT());
             return $this->encrypt($inputOutput, $recipients, $signingOptions);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }
@@ -972,25 +969,28 @@ class VirgilCryptoService
      * 5. Finds corresponding PublicKey according to signer id inside data
      * 6. Verifies signature
      *
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param VirgilPrivateKey $privateKey
-     * @param PublicKeyList $recipients
+     * @param VirgilPublicKeyCollection $recipients
      * @param bool $allowNotEncryptedSignature
      *
-     * @return string
+     * @return null|string
      * @throws VirgilCryptoException
+     * @throws VirgilCryptoServiceException
      */
-    public function authDecrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients,
+    public function authDecrypt($inputOutput, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients,
                                 bool $allowNotEncryptedSignature = false)
     {
         try {
-
             $verifyMode = $allowNotEncryptedSignature ? VerifyingMode::ANY() : VerifyingMode::DECRYPT_THEN_VERIFY();
             $verifyingOptions = new VerifyingOptions($recipients, $verifyMode);
 
             return $this->decrypt($inputOutput, $privateKey, $verifyingOptions);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            if ($e instanceof VirgilCryptoServiceException)
+                throw $e;
+
             throw new VirgilCryptoException($e->getMessage(), $e->getCode());
         }
     }

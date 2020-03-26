@@ -31,7 +31,7 @@
 namespace Virgil\CryptoTests;
 
 use PHPUnit\Framework\TestCase;
-use Virgil\Crypto\Core\HashAlgorithms;
+use Virgil\Crypto\Core\Enum\HashAlgorithms;
 use Virgil\Crypto\VirgilCrypto;
 
 /**

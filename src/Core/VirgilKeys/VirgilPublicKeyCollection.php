@@ -28,17 +28,78 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\VirgilKeys;
 
-use MyCLabs\Enum\Enum;
+use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
 
 /**
- * Class SingingMode
+ * Class PublicKeyList
  *
  * @package Virgil\Crypto\Services
  */
-class SigningMode extends Enum
+class VirgilPublicKeyCollection
 {
-    private const SIGN_AND_ENCRYPT = "SIGN_AND_ENCRYPT";
-    private const SIGN_THEN_ENCRYPT = "SIGN_THEN_ENCRYPT";
+    /**
+     * @var array
+     */
+    private $list = [];
+
+    /**
+     * PublicKeyList constructor.
+     *
+     * @param VirgilPublicKey ...$publicKey
+     */
+    public function __construct(VirgilPublicKey ...$publicKey)
+    {
+        if ($publicKey)
+            array_push($this->list, ...$publicKey);
+    }
+
+    /**
+     * @param VirgilPublicKey ...$publicKey
+     */
+    public function addPublicKey(VirgilPublicKey ...$publicKey): void
+    {
+        array_push($this->list, ...$publicKey);
+    }
+
+    /**
+     * @return array
+     * @throws VirgilCryptoServiceException
+     */
+    public function getAsArray(): array
+    {
+        if($this->check())
+            return $this->list;
+    }
+
+    /**
+     * @return VirgilPublicKey
+     * @throws VirgilCryptoServiceException
+     */
+    public function getFirst(): VirgilPublicKey
+    {
+        if($this->check())
+            return $this->list[0];
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmountOfKeys(): int
+    {
+        return count($this->list);
+    }
+
+    /**
+     * @return bool
+     * @throws VirgilCryptoServiceException
+     */
+    private function check(): bool
+    {
+        if(empty($this->list))
+            throw new VirgilCryptoServiceException("Empty VirgilPublicKey list");
+
+        return true;
+    }
 }

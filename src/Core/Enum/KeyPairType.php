@@ -35,7 +35,7 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\Enum;
 
 use MyCLabs\Enum\Enum;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;

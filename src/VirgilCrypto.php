@@ -30,21 +30,19 @@
 
 namespace Virgil\Crypto;
 
-use Virgil\Crypto\Core\DataInterface;
-use Virgil\Crypto\Core\HashAlgorithms;
-use Virgil\Crypto\Core\InputOutput;
-use Virgil\Crypto\Core\PublicKeyList;
-use Virgil\Crypto\Core\SigningMode;
-use Virgil\Crypto\Core\StreamInterface;
-use Virgil\Crypto\Core\VerifyingMode;
-use Virgil\Crypto\Core\VirgilKeyPair;
+use Virgil\Crypto\Core\Enum\HashAlgorithms;
+use Virgil\Crypto\Core\Enum\KeyPairType;
+use Virgil\Crypto\Core\Enum\SigningMode;
+use Virgil\Crypto\Core\Enum\VerifyingMode;
+use Virgil\Crypto\Core\IO\StreamInterface;
+use Virgil\Crypto\Core\VirgilKeys\VirgilKeyPair;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPrivateKey;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKey;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
-use Virgil\Crypto\Core\KeyPairType;
 use Virgil\Crypto\Core\SigningOptions;
 use Virgil\Crypto\Core\VerifyingOptions;
 use Virgil\Crypto\Services\VirgilCryptoService;
-use Virgil\Crypto\Core\VirgilPrivateKey;
-use Virgil\Crypto\Core\VirgilPublicKey;
 use Virgil\CryptoWrapper\Foundation\CtrDrbg;
 use Virgil\CryptoWrapper\Foundation\Random;
 
@@ -181,15 +179,16 @@ class VirgilCrypto
      * 5. Computes KDF to obtain AES-256 key from shared secret for each recipient
      * 6. Encrypts KEY1 with this key using AES-256-CBC for each recipient
      *
-     * @param InputOutput $inputOutput
-     * @param PublicKeyList $recipients
+     * @param $inputOutput
+     * @param VirgilPublicKeyCollection $recipients
      * @param SigningOptions|null $signingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function encrypt(InputOutput $inputOutput, PublicKeyList $recipients, SigningOptions $signingOptions = null): ?string
+    public function encrypt($inputOutput, VirgilPublicKeyCollection $recipients, SigningOptions $signingOptions = null): ?string
     {
+        $this->checkDataOrStream($inputOutput);
         return $this->getCryptoService()->encrypt($inputOutput, $recipients, $signingOptions);
     }
 
@@ -213,16 +212,17 @@ class VirgilCrypto
      * 3. Decrypts KEY1 using AES-256-CBC
      * 4. Decrypts data using KEY1 and AES-256-GCM
      *
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param VirgilPrivateKey $privateKey
      * @param VerifyingOptions|null $verifyingOptions
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function decrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions
+    public function decrypt($inputOutput, VirgilPrivateKey $privateKey, VerifyingOptions
     $verifyingOptions = null): ?string
     {
+        $this->checkDataOrStream($inputOutput);
         return $this->getCryptoService()->decrypt($inputOutput, $privateKey, $verifyingOptions);
     }
 
@@ -286,27 +286,27 @@ class VirgilCrypto
     }
 
     /**
-     * @param DataInterface $data
-     * @param PublicKeyList $recipients
+     * @param string $data
      * @param VirgilPrivateKey $privateKey
+     * @param VirgilPublicKeyCollection $recipients
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function signAndEncrypt(DataInterface $data, VirgilPrivateKey $privateKey, PublicKeyList $recipients): ?string
+    public function signAndEncrypt(string $data, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients): ?string
     {
         return $this->getCryptoService()->encrypt($data, $recipients, new SigningOptions($privateKey, SigningMode::SIGN_AND_ENCRYPT()));
     }
 
     /**
-     * @param DataInterface $data
+     * @param string $data
      * @param VirgilPrivateKey $privateKey
-     * @param PublicKeyList $signersPublicKeys
+     * @param VirgilPublicKeyCollection $signersPublicKeys
      *
-     * @return string
+     * @return null|string
      * @throws VirgilCryptoException
      */
-    public function decryptAndVerify(DataInterface $data, VirgilPrivateKey $privateKey, PublicKeyList $signersPublicKeys)
+    public function decryptAndVerify(string $data, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $signersPublicKeys)
     {
         return $this->getCryptoService()->decrypt($data, $privateKey, new VerifyingOptions($signersPublicKeys,
             VerifyingMode::DECRYPT_AND_VERIFY()));
@@ -362,15 +362,16 @@ class VirgilCrypto
      * 7. Computes KDF to obtain AES-256 key from shared secret for each recipient
      * 8. Encrypts KEY1 with this key using AES-256-CBC for each recipient
      *
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param VirgilPrivateKey $privateKey
-     * @param PublicKeyList $recipients
+     * @param VirgilPublicKeyCollection $recipients
      *
      * @return null|string
      * @throws VirgilCryptoException
      */
-    public function authEncrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients)
+    public function authEncrypt($inputOutput, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients)
     {
+        $this->checkDataOrStream($inputOutput);
         return $this->getCryptoService()->authEncrypt($inputOutput, $privateKey, $recipients);
     }
 
@@ -389,17 +390,20 @@ class VirgilCrypto
      * 5. Finds corresponding PublicKey according to signer id inside data
      * 6. Verifies signature
      *
-     * @param InputOutput $inputOutput
+     * @param $inputOutput
      * @param VirgilPrivateKey $privateKey
-     * @param PublicKeyList $recipients
+     * @param VirgilPublicKeyCollection $recipients
      * @param bool $allowNotEncryptedSignature
      *
-     * @return string
+     * @return null|string
+     * @throws Exceptions\VirgilCryptoServiceException
      * @throws VirgilCryptoException
      */
-    public function authDecrypt(InputOutput $inputOutput, VirgilPrivateKey $privateKey, PublicKeyList $recipients,
+    public function authDecrypt($inputOutput, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients,
                                 bool $allowNotEncryptedSignature = false)
     {
+        $this->checkDataOrStream($inputOutput);
+
         return $this->getCryptoService()->authDecrypt($inputOutput, $privateKey, $recipients, $allowNotEncryptedSignature);
     }
 
@@ -422,5 +426,16 @@ class VirgilCrypto
     public function getRng(): Random
     {
         return $this->rng;
+    }
+
+    /**
+     * @param $inputOutput
+     *
+     * @throws VirgilCryptoException
+     */
+    private function checkDataOrStream($inputOutput): void
+    {
+        if (!is_string($inputOutput) || !($inputOutput instanceof StreamInterface))
+            throw new VirgilCryptoException("Invalid type of input/IO data");
     }
 }

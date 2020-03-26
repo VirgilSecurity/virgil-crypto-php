@@ -28,35 +28,18 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\Crypto\Core;
+namespace Virgil\Crypto\Core\Enum;
+
+use MyCLabs\Enum\Enum;
 
 /**
- * Class DataInputOutput
+ * Class VerifyingMode
  *
  * @package Virgil\Crypto\Services
  */
-class Data implements DataInterface
+class VerifyingMode extends Enum
 {
-    /**
-     * @var string
-     */
-    private $input;
-
-    /**
-     * DataInputOutput constructor.
-     *
-     * @param string $input
-     */
-    public function __construct(string $input)
-    {
-        $this->input = $input;
-    }
-
-    /**
-     * @return string
-     */
-    public function getInput(): string
-    {
-        return $this->input;
-    }
+    private const DECRYPT_AND_VERIFY = "DECRYPT_AND_VERIFY";
+    private const DECRYPT_THEN_VERIFY = "DECRYPT_THEN_VERIFY";
+    private const ANY = "ANY";
 }

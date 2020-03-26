@@ -30,6 +30,9 @@
 
 namespace Virgil\Crypto\Core;
 
+use Virgil\Crypto\Core\Enum\SigningMode;
+use Virgil\Crypto\Core\VirgilKeys\VirgilPrivateKey;
+
 /**
  * Class SigningOptions
  *

@@ -30,9 +30,9 @@
 
 namespace Virgil\Crypto\Services;
 
-use Virgil\Crypto\Core\OutputStream;
-use Virgil\Crypto\Core\StreamInterface;
-use Virgil\Crypto\Core\VirgilCryptoError;
+use Virgil\Crypto\Core\Enum\VirgilCryptoError;
+use Virgil\Crypto\Core\IO\OutputStream;
+use Virgil\Crypto\Core\IO\StreamInterface;
 use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
 
 /**
@@ -44,7 +44,7 @@ class StreamService
 {
     /**
      * @param string $data
-     * @param OutputStream $outputStream
+     * @param \Virgil\Crypto\Services\OutputStream $outputStream
      *
      * @throws VirgilCryptoServiceException
      */
