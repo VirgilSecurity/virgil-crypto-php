@@ -35,7 +35,7 @@ use MyCLabs\Enum\Enum;
 /**
  * Class VerifyingMode
  *
- * @package Virgil\Crypto\Services
+ * @package Virgil\Crypto\Enum
  */
 class VerifyingMode extends Enum
 {

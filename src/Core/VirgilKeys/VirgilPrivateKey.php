@@ -42,7 +42,8 @@ use Virgil\CryptoWrapper\Foundation\PrivateKey;
 
 /**
  * Class VirgilPrivateKey
- * @package Virgil\Crypto
+ *
+ * @package Virgil\Crypto\Core\VirgilKeys
  */
 class VirgilPrivateKey
 {

@@ -37,7 +37,7 @@ use MyCLabs\Enum\Enum;
  *
  * Class VirgilCryptoError
  *
- * @package Virgil\Crypto
+ * @package Virgil\Crypto\Core\Enum
  */
 class VirgilCryptoError extends Enum
 {

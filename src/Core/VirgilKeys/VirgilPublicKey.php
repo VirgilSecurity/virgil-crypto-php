@@ -41,8 +41,9 @@ use Virgil\Crypto\Core\Enum\KeyPairType;
 use Virgil\CryptoWrapper\Foundation\PublicKey;
 
 /**
- * Class VirgilPrivateKey
- * @package Virgil\Crypto
+ * Class VirgilPublicKey
+ *
+ * @package Virgil\Crypto\Core\VirgilKeys
  */
 class VirgilPublicKey
 {

@@ -39,7 +39,8 @@ namespace Virgil\Crypto\Core\VirgilKeys;
 
 /**
  * Class VirgilKeyPair
- * @package Virgil\Crypto
+ *
+ * @package Virgil\Crypto\Core\VirgilKeys
  */
 class VirgilKeyPair
 {

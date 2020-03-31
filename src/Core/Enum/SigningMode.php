@@ -35,7 +35,7 @@ use MyCLabs\Enum\Enum;
 /**
  * Class SingingMode
  *
- * @package Virgil\Crypto\Services
+ * @package Virgil\Crypto\Enum
  */
 class SigningMode extends Enum
 {

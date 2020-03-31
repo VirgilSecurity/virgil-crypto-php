@@ -41,6 +41,10 @@ use MyCLabs\Enum\Enum;
 
 /**
  * Class keeps list of hash algorithms constants.
+ *
+ * Class HashAlgorithms
+ *
+ * @package Virgil\Crypto\Core\Enum
  */
 class HashAlgorithms extends Enum
 {

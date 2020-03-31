@@ -33,16 +33,16 @@ namespace Virgil\Crypto\Core\VirgilKeys;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
 
 /**
- * Class PublicKeyList
+ * Class VirgilPublicKeyCollection
  *
- * @package Virgil\Crypto\Services
+ * @package Virgil\Crypto\Core\VirgilKeys
  */
 class VirgilPublicKeyCollection
 {
     /**
      * @var array
      */
-    private $list = [];
+    private $collection = [];
 
     /**
      * PublicKeyList constructor.
@@ -52,7 +52,7 @@ class VirgilPublicKeyCollection
     public function __construct(VirgilPublicKey ...$publicKey)
     {
         if ($publicKey)
-            array_push($this->list, ...$publicKey);
+            array_push($this->collection, ...$publicKey);
     }
 
     /**
@@ -60,7 +60,7 @@ class VirgilPublicKeyCollection
      */
     public function addPublicKey(VirgilPublicKey ...$publicKey): void
     {
-        array_push($this->list, ...$publicKey);
+        array_push($this->collection, ...$publicKey);
     }
 
     /**
@@ -70,7 +70,7 @@ class VirgilPublicKeyCollection
     public function getAsArray(): array
     {
         if($this->check())
-            return $this->list;
+            return $this->collection;
     }
 
     /**
@@ -80,7 +80,7 @@ class VirgilPublicKeyCollection
     public function getFirst(): VirgilPublicKey
     {
         if($this->check())
-            return $this->list[0];
+            return $this->collection[0];
     }
 
     /**
@@ -88,7 +88,7 @@ class VirgilPublicKeyCollection
      */
     public function getAmountOfKeys(): int
     {
-        return count($this->list);
+        return count($this->collection);
     }
 
     /**
@@ -97,9 +97,21 @@ class VirgilPublicKeyCollection
      */
     private function check(): bool
     {
-        if(empty($this->list))
-            throw new VirgilCryptoException("Empty VirgilPublicKey list");
+        if(empty($this->collection))
+            throw new VirgilCryptoException("Empty VirgilPublicKey collection");
 
         return true;
+    }
+
+    /**
+     * @param VirgilPublicKeyCollection $virgilPublicKeyCollection
+     *
+     * @throws VirgilCryptoException
+     */
+    public function addCollection(VirgilPublicKeyCollection $virgilPublicKeyCollection)
+    {
+        foreach ($virgilPublicKeyCollection->getAsArray() as $virgilPublicKey) {
+            $this->collection[] = $virgilPublicKey;
+        }
     }
 }

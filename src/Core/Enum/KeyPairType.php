@@ -43,6 +43,10 @@ use Virgil\CryptoWrapper\Foundation\AlgId;
 
 /**
  * Class keeps list of key pair types constants.
+ *
+ * Class KeyPairType
+ *
+ * @package Virgil\Crypto\Core\Enum
  */
 class KeyPairType extends Enum
 {
