@@ -396,7 +396,7 @@ class VirgilCrypto
      * @param bool $allowNotEncryptedSignature
      *
      * @return null|string
-     * @throws Exceptions\VirgilCryptoServiceException
+     * @throws Exceptions\VirgilCryptoException
      * @throws VirgilCryptoException
      */
     public function authDecrypt($inputOutput, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients,
@@ -435,7 +435,7 @@ class VirgilCrypto
      */
     private function checkDataOrStream($inputOutput): void
     {
-        if (!is_string($inputOutput) || !($inputOutput instanceof StreamInterface))
+        if (!is_string($inputOutput) && !($inputOutput instanceof StreamInterface))
             throw new VirgilCryptoException("Invalid type of input/IO data");
     }
 }

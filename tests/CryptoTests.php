@@ -149,7 +149,7 @@ class CryptoTests extends TestCase
         $encryptedData = $crypto->encrypt($data, $pkl);
         $decryptedData = $crypto->decrypt($encryptedData, $keyPair1->getPrivateKey());
 
-        self::assertEquals($rawData, $decryptedData);
+        self::assertEquals($data, $decryptedData);
 
         try {
             $tempRes = $crypto->decrypt($encryptedData, $keyPair2->getPrivateKey());
@@ -285,14 +285,12 @@ class CryptoTests extends TestCase
             $testFileUrl = __DIR__ . "/data/testData.txt";
             $encTestFileUrl = __DIR__."/data/testData_enc.txt";
 
-            $inputStream = new InputStream($testFileUrl);
-            $outputStream = new OutputStream($encTestFileUrl);
-            $stream = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
+            $stream = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());
 
             $signature = $crypto->generateStreamSignature($stream, $keyPair1->getPrivateKey());
 
-            $verifyStream1 = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
-            $verifyStream2 = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
+            $verifyStream1 = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());
+            $verifyStream2 = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());
 
             $res1 = $crypto->verifyStreamSignature($signature, $verifyStream1, $keyPair1->getPublicKey());
             self::assertTrue($res1);
@@ -300,14 +298,14 @@ class CryptoTests extends TestCase
             try {
                 $res2 = $crypto->verifyStreamSignature($signature, $verifyStream2, $keyPair2->getPublicKey());
                 self::assertTrue(empty($res2));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
             $this->unlinkFiles([$encTestFileUrl]);
         }
-        catch (Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        catch (\Exception $e) {
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -343,18 +341,16 @@ class CryptoTests extends TestCase
             $encTestFileUrl = __DIR__."/data/testData_encrypted.txt";
             $decTestFileUrl = __DIR__."/data/testData_decrypted.txt";
 
-            $inputStream = new InputStream($testFileUrl);
-            $outputStream = new OutputStream($encTestFileUrl);
-            $stream = new Stream($inputStream, $outputStream, $crypto->getChunkSize());
+            $stream = new Stream($encTestFileUrl, $decTestFileUrl, $crypto->getChunkSize());
 
             $rawData = file_get_contents($testFileUrl);
 
-            $pkl = new PublicKeyList($keyPair1->getPublicKey());
+            $pkl = new VirgilPublicKeyCollection($keyPair1->getPublicKey());
 
             $encrypt = $crypto->encrypt($stream, $pkl);
 
-            $stream1 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
-            $stream2 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
+            $stream1 = new Stream($encTestFileUrl, $decTestFileUrl, $crypto->getChunkSize());
+            $stream2 = new Stream($encTestFileUrl, $decTestFileUrl, $crypto->getChunkSize());
 
             $decrypt = $crypto->decrypt($stream1, $keyPair1->getPrivateKey());
 
@@ -365,14 +361,14 @@ class CryptoTests extends TestCase
             try {
                 $res = $crypto->decrypt($stream2, $keyPair2->getPrivateKey());
                 self::assertTrue(empty($res));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
             $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
-        } catch (Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -416,7 +412,7 @@ class CryptoTests extends TestCase
             }
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -459,7 +455,7 @@ class CryptoTests extends TestCase
             self::assertTrue(is_string($res));
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -518,7 +514,7 @@ class CryptoTests extends TestCase
             }
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -558,13 +554,13 @@ class CryptoTests extends TestCase
             $decTestFileUrl = __DIR__."/data/testData_decrypted.txt";
 
             $rawData = file_get_contents($testFileUrl);
-            $stream = new Stream(new InputStream($testFileUrl), new OutputStream($encTestFileUrl), filesize($testFileUrl));
+            $stream = new Stream($testFileUrl, $encTestFileUrl, filesize($testFileUrl));
 
             $encrypt = $crypto->authEncrypt($stream, $keyPair1->getPrivateKey(), $pkl);
 
-            $stream1 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
-            $stream2 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
-            $stream3 = new Stream(new InputStream($encTestFileUrl), new OutputStream($decTestFileUrl), $crypto->getChunkSize());
+            $stream1 = new Stream($encTestFileUrl, $decTestFileUrl, $crypto->getChunkSize());
+            $stream2 = new Stream($encTestFileUrl, $decTestFileUrl, $crypto->getChunkSize());
+            $stream3 = new Stream($encTestFileUrl, $decTestFileUrl, $crypto->getChunkSize());
 
             $decrypt = $crypto->authDecrypt($stream1, $keyPair1->getPrivateKey(), $pkl);
             $decryptedData = file_get_contents($decTestFileUrl);
@@ -574,21 +570,21 @@ class CryptoTests extends TestCase
             try {
                 $res1 = $crypto->authDecrypt($stream2, $keyPair3->getPrivateKey(), $pkl);
                 self::assertTrue(empty($res1));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
             try {
                 $res2 = $crypto->authDecrypt($stream3, $keyPair2->getPrivateKey(), $pkl3);
                 self::assertTrue(empty($res2));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
             $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -634,7 +630,7 @@ class CryptoTests extends TestCase
             self::assertEquals($data, $decrypted2);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 

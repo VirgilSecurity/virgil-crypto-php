@@ -30,6 +30,8 @@
 
 namespace Virgil\Crypto\Exceptions;
 
+use Virgil\Crypto\Core\Enum\VirgilCryptoError;
+
 /**
  * Class VirgilCryptoException
  *
@@ -37,5 +39,13 @@ namespace Virgil\Crypto\Exceptions;
  */
 class VirgilCryptoException extends VirgilException
 {
-
+    /**
+     * VirgilCryptoException constructor.
+     *
+     * @param string|VirgilCryptoError|\Exception $error
+     */
+    public function __construct($error)
+    {
+        parent::__construct(is_string($error) ?: $error->getMessage(), is_string($error) ? -1 : $error->getCode());
+    }
 }

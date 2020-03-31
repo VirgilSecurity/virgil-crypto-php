@@ -30,7 +30,6 @@
 
 namespace Virgil\Crypto\Services;
 
-use \Exception;
 use Virgil\Crypto\Core\Enum\HashAlgorithms;
 use Virgil\Crypto\Core\Enum\KeyPairType;
 use Virgil\Crypto\Core\Enum\SigningMode;
@@ -44,7 +43,6 @@ use Virgil\Crypto\Core\VirgilKeys\VirgilPrivateKey;
 use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKey;
 use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
-use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
 use Virgil\CryptoWrapper\Foundation\KeyMaterialRng;
 use Virgil\CryptoWrapper\Foundation\Random;
 use Virgil\CryptoWrapper\Foundation\Aes256Gcm;
@@ -136,7 +134,7 @@ class VirgilCryptoService
             return $res;
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -157,7 +155,7 @@ class VirgilCryptoService
 
             return $this->generateKeyPair($this->defaultKeyType, $seedRng);
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -199,7 +197,7 @@ class VirgilCryptoService
             return new VirgilKeyPair($virgilPrivateKey, $virgilPublicKey);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -228,7 +226,7 @@ class VirgilCryptoService
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -294,13 +292,11 @@ class VirgilCryptoService
                 }
 
             } else {
-
                 $cipher->startEncryption();
-
             }
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -331,15 +327,15 @@ class VirgilCryptoService
 
                 case $inputOutput instanceof StreamInterface:
 
-                    StreamService::write($cipher->packMessageInfo(), $inputOutput->getOutputStream());
+                    $inputOutput->write($cipher->packMessageInfo());
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processEncryption($chunk); };
-                    StreamService::forEachChunk($inputOutput, $this->chunkSize, $chunkClosure, true);
+                    StreamService::forEachChunk($inputOutput, $chunkClosure, true);
 
-                    StreamService::write($cipher->finishEncryption(), $inputOutput->getOutputStream());
+                    $inputOutput->write($cipher->finishEncryption());
 
                     if ($signingOptions && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
-                        StreamService::write($cipher->packMessageInfoFooter(), $inputOutput->getOutputStream());
+                        $inputOutput->write($cipher->packMessageInfoFooter());
 
                     break;
             }
@@ -347,7 +343,7 @@ class VirgilCryptoService
             return $result;
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -378,13 +374,13 @@ class VirgilCryptoService
             return $this->processEncryption($cipher, $inputOutput, $signingOptions);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
     /**
      * @param RecipientCipher $cipher
-     * @param mixed $inputOutput
+     * @param $inputOutput
      *
      * @return null|string
      * @throws VirgilCryptoException
@@ -400,8 +396,8 @@ class VirgilCryptoService
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processDecryption($chunk); };
 
-                    StreamService::forEachChunk($inputOutput, $inputOutput->getStreamSize(), $chunkClosure, true);
-                    StreamService::write($cipher->finishDecryption(), $inputOutput->getOutputStream());
+                    StreamService::forEachChunk($inputOutput, $chunkClosure, true);
+                    $inputOutput->write($cipher->finishDecryption());
 
                     break;
 
@@ -415,8 +411,8 @@ class VirgilCryptoService
 
             return $result;
 
-        } catch (Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -471,7 +467,7 @@ class VirgilCryptoService
             return $result;
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -516,7 +512,7 @@ class VirgilCryptoService
             return $result;
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -556,10 +552,9 @@ class VirgilCryptoService
             }
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
-
 
     /**
      * @param $inputOutput
@@ -589,7 +584,7 @@ class VirgilCryptoService
             return $result;
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -640,12 +635,12 @@ class VirgilCryptoService
             $signer->reset();
 
             $chunkClosure = function ($chunk) use ($signer) { $signer->appendData($chunk); };
-            StreamService::forEachChunk($stream, null, $chunkClosure, false);
+            StreamService::forEachChunk($stream, $chunkClosure, false);
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -668,12 +663,12 @@ class VirgilCryptoService
             $verifier->reset($signature);
 
             $chunkClosure = function ($chunk) use ($verifier) { $verifier->appendData($chunk); };
-            StreamService::forEachChunk($inputStream, $this->chunkSize, $chunkClosure, false);
+            StreamService::forEachChunk($inputStream, $chunkClosure, false);
 
             return $verifier->verify($virgilPublicKey->getPublicKey());
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -688,7 +683,7 @@ class VirgilCryptoService
         try {
             return $this->getRandom()->random($size);
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -739,7 +734,7 @@ class VirgilCryptoService
             return $keyProvider->importPrivateKey($data);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -760,7 +755,7 @@ class VirgilCryptoService
             return $keyProvider->importPublicKey($data);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -793,7 +788,7 @@ class VirgilCryptoService
             return new VirgilKeyPair($virgilPrivateKey, $virgilPublicKey);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -814,7 +809,7 @@ class VirgilCryptoService
             return $keyProvider->exportPrivateKey($privateKey);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -833,7 +828,7 @@ class VirgilCryptoService
 
             return new VirgilPublicKey($virgilPrivateKey->getIdentifier(), $publicKey, $virgilPrivateKey->getKeyType());
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -853,7 +848,7 @@ class VirgilCryptoService
 
             return $keyProvider->exportPublicKey($publicKey);
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -887,7 +882,7 @@ class VirgilCryptoService
             return new VirgilPublicKey($keyId, $publicKey, $keyType);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -903,13 +898,14 @@ class VirgilCryptoService
     {
         try {
             return $this->exportInternalPublicKey($publicKey->getPublicKey());
-        } catch (Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e);
         }
     }
 
     /**
      * Export private key
+     *
      *
      * @param VirgilPrivateKey $privateKey
      *
@@ -920,8 +916,8 @@ class VirgilCryptoService
     {
         try {
             return $this->exportInternalPrivateKey($privateKey->getPrivateKey());
-        } catch (Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -950,7 +946,7 @@ class VirgilCryptoService
             return $this->encrypt($inputOutput, $recipients, $signingOptions);
 
         } catch (\Exception $e) {
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 
@@ -976,7 +972,6 @@ class VirgilCryptoService
      *
      * @return null|string
      * @throws VirgilCryptoException
-     * @throws VirgilCryptoServiceException
      */
     public function authDecrypt($inputOutput, VirgilPrivateKey $privateKey, VirgilPublicKeyCollection $recipients,
                                 bool $allowNotEncryptedSignature = false)
@@ -988,10 +983,10 @@ class VirgilCryptoService
             return $this->decrypt($inputOutput, $privateKey, $verifyingOptions);
 
         } catch (\Exception $e) {
-            if ($e instanceof VirgilCryptoServiceException)
+            if ($e instanceof VirgilCryptoException)
                 throw $e;
 
-            throw new VirgilCryptoException($e->getMessage(), $e->getCode());
+            throw new VirgilCryptoException($e);
         }
     }
 }

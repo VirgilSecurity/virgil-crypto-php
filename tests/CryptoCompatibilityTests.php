@@ -30,7 +30,6 @@
 
 namespace Virgil\CryptoTests;
 
-use PHPUnit\Framework\TestCase;
 use Virgil\Crypto\Core\Enum\HashAlgorithms;
 use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
@@ -42,7 +41,7 @@ use Virgil\CryptoTests\_\CompatibilityDataProvider;
  *
  * @package Virgil\Tests
  */
-class CryptoCompatibilityTests extends TestCase
+class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
 {
     /**
      *
@@ -286,7 +285,7 @@ class CryptoCompatibilityTests extends TestCase
 
     /**
      * @throws VirgilCryptoException
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoServiceException
+     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      * @group f
      */
     public function test009SignThenEncryptShouldMatch()

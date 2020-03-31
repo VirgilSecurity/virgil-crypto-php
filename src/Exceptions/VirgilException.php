@@ -37,14 +37,12 @@
 
 namespace Virgil\Crypto\Exceptions;
 
-use Exception;
-
 /**
  * Class VirgilException
  *
  * @package Virgil\Crypto\Exceptions
  */
-class VirgilException extends Exception
+class VirgilException extends \Exception
 {
 
 }

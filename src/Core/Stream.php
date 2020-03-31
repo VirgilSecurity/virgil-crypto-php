@@ -30,6 +30,10 @@
 
 namespace Virgil\Crypto\Core;
 
+use Virgil\Crypto\Core\Enum\VirgilCryptoError;
+use Virgil\Crypto\Core\IO\StreamInterface;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+
 /**
  * Class StreamInputOutput
  *
@@ -38,48 +42,65 @@ namespace Virgil\Crypto\Core;
 class Stream implements StreamInterface
 {
     /**
-     * @var InputStream
+     * @var string
      */
-    private $inputStream;
-
+    private $input;
     /**
-     * @var OutputStream
+     * @var string
      */
-    private $outputStream;
-
+    private $output;
     /**
-     * @var int|null
+     * @var int
      */
-    private $streamSize;
+    private $size;
 
     /**
      * Stream constructor.
      *
-     * @param InputStream $inputStream
-     * @param OutputStream $outputStream
-     * @param int $streamSize
+     * @param string $input
+     * @param string $output
+     * @param int|null $size
      */
-    public function __construct(InputStream $inputStream, OutputStream $outputStream, int $streamSize)
+    public function __construct(string $input, string $output, int $size = null)
     {
-        $this->inputStream = $inputStream;
-        $this->outputStream = $outputStream;
-        $this->streamSize = $streamSize;
+        $this->input = $input;
+        $this->output = $output;
+        $this->size = $size;
+    }
+
+    public function read(string $chunk): int
+    {
+        var_dump(123);
+        die;
+    }
+
+
+    public function write(string $chunk): int
+    {
+        $handle = fopen($this->output, "a");
+        if (!$handle)
+            throw new VirgilCryptoException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
+
+        $r = fwrite($handle, $chunk);
+        fclose($handle);
+
+        return $r;
     }
 
     /**
-     * @return InputStream
+     * @return string
      */
-    public function getInputStream(): InputStream
+    public function getInput(): string
     {
-        return $this->inputStream;
+        return $this->input;
     }
 
     /**
-     * @return OutputStream
+     * @return string
      */
-    public function getOutputStream(): OutputStream
+    public function getOutput(): string
     {
-        return $this->outputStream;
+        return $this->output;
     }
 
     /**
@@ -87,6 +108,6 @@ class Stream implements StreamInterface
      */
     public function getStreamSize(): int
     {
-        return $this->streamSize;
+        return $this->size ?: filesize($this->input);
     }
 }

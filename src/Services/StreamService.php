@@ -31,9 +31,8 @@
 namespace Virgil\Crypto\Services;
 
 use Virgil\Crypto\Core\Enum\VirgilCryptoError;
-use Virgil\Crypto\Core\IO\OutputStream;
 use Virgil\Crypto\Core\IO\StreamInterface;
-use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
 
 /**
  * Class StreamUtils
@@ -42,47 +41,20 @@ use Virgil\Crypto\Exceptions\VirgilCryptoServiceException;
  */
 class StreamService
 {
-    /**
-     * @param string $data
-     * @param \Virgil\Crypto\Services\OutputStream $outputStream
-     *
-     * @throws VirgilCryptoServiceException
-     */
-    public static function write(string $data, OutputStream $outputStream)
-    {
-        $handle = fopen($outputStream->getOutput(), "a");
-        if (!$handle)
-            throw new VirgilCryptoServiceException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
-
-        fwrite($handle, $data);
-        fclose($handle);
-    }
-
-    /**
-     * @param StreamInterface $stream
-     * @param int|null $streamSize
-     * @param callable $chunkClosure
-     * @param bool $withReturn
-     *
-     * @throws VirgilCryptoServiceException
-     */
-    public static function forEachChunk(StreamInterface $stream, int $streamSize = null, callable $chunkClosure, bool
+    public static function forEachChunk(StreamInterface $stream, callable $chunkClosure, bool
     $withReturn = true)
     {
-        $handle = fopen($stream->getInputStream()->getInput(), "rb");
+        $handle = fopen($stream->getInput(), "rb");
         if (!$handle) {
-            throw new VirgilCryptoServiceException(VirgilCryptoError::INPUT_STREAM_ERROR());
+            throw new VirgilCryptoException(VirgilCryptoError::INPUT_STREAM_ERROR());
         }
 
         while (!feof($handle)) {
-            if (!$streamSize)
-                $streamSize = filesize($stream->getInputStream()->getInput());
-
-            $content = fread($handle, $streamSize);
+            $content = fread($handle, $stream->getStreamSize());
 
             if($withReturn) {
                 $data = $chunkClosure($content);
-                self::write($data, $stream->getOutputStream());
+                $stream->write($data);
             } else {
                 $chunkClosure($content);
             }
