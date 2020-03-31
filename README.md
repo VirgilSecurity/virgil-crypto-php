@@ -24,106 +24,66 @@ Virgil Security, Inc., guides software developers into the forthcoming security 
 
 Generate a key pair with the default algorithm (EC_X25519):
 ```php
-use Virgil\Crypto\VirgilCrypto;
-
-try {
-    $crypto = new VirgilCrypto();
-    
-    $keyPair = $crypto->generateKeyPair();
-    
-} catch (Exception $e) {
-    throw new Exception($e->getMessage(), $e->getCode());
-}
+$crypto = new VirgilCrypto();
+$keyPair = $crypto->generateKeyPair();
 ```
 
 #### Generate and verify a signature
 
 Generate signature and sign data with a private key:
 ```php
-use Virgil\Crypto\VirgilCrypto;
+$crypto = new VirgilCrypto();
+$senderKeyPair = $crypto->generateKeyPair();
 
-try {
-    $crypto = new VirgilCrypto();
-    $senderKeyPair = $crypto->generateKeyPair();
+// prepare a message
+$messageToSign = "Hello, Bob!";
 
-    // prepare a message
-    $messageToSign = "Hello, Bob!";
-
-    // generate a signature
-    $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
-
-} catch (Exception $e) {
-    throw new Exception($e->getMessage(), $e->getCode());
-}
+// generate a signature
+$signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
 ```
 
 Verify a signature with a public key:
 ```php
-use Virgil\Crypto\VirgilCrypto;
-
-try {
-    $crypto = new VirgilCrypto();
+$crypto = new VirgilCrypto();
     
-    $senderKeyPair = $crypto->generateKeyPair();    
+$senderKeyPair = $crypto->generateKeyPair();    
     
-    // prepare a message
-    $messageToSign = "Hello, Bob!";
+// prepare a message
+$messageToSign = "Hello, Bob!";
 
-    // generate a signature
-    $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
+// generate a signature
+$signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
     
-    // verify a signature
-    $verified = $crypto->verifySignature($signature, $messageToSign, $senderKeyPair->getPublicKey());
-
-} catch (Exception $e) {
-    throw new Exception($e->getMessage(), $e->getCode());
-}
+// verify a signature
+$verified = $crypto->verifySignature($signature, $messageToSign, $senderKeyPair->getPublicKey());
 ```
 #### Encrypt and decrypt data
 
 Encrypt Data on a Public Key:
 
 ```php
-use Virgil\Crypto\Core\Data;
-use Virgil\Crypto\Core\PublicKeyList;
-use Virgil\Crypto\VirgilCrypto;
+$crypto = new VirgilCrypto();
+$receiverKeyPair = $crypto->generateKeyPair();
 
-try {
-    $crypto = new VirgilCrypto();
-    $receiverKeyPair = $crypto->generateKeyPair();
+// prepare a message
+$messageToEncrypt = "Hello, Bob!";
 
-    // prepare a message
-    $messageToEncrypt = "Hello, Bob!";
-
-    // encrypt the message
-    $encryptedData = $crypto->encrypt(new Data($messageToEncrypt), new PublicKeyList($receiverKeyPair->getPublicKey()));
-
-} catch (Exception $e) {
-    throw new Exception($e->getMessage(), $e->getCode());
-}
+// encrypt the message
+$encryptedData = $crypto->encrypt($messageToEncrypt, new VirgilPublicKeyCollection($receiverKeyPair->getPublicKey()));
 ```
 Decrypt the encrypted data with a Private Key:
 ```php
-use Virgil\Crypto\Core\Data;
-use Virgil\Crypto\Core\PublicKeyList;
-use Virgil\Crypto\VirgilCrypto;
+$crypto = new VirgilCrypto();
+$receiverKeyPair = $crypto->generateKeyPair();
 
-try {
-    $crypto = new VirgilCrypto();
-    $receiverKeyPair = $crypto->generateKeyPair();
+// prepare a message
+$messageToEncrypt = "Hello, Bob!";
 
-    // prepare a message
-    $messageToEncrypt = "Hello, Bob!";
+// encrypt the message
+$encryptedData = $crypto->encrypt($messageToEncrypt, new VirgilPublicKeyCollection($receiverKeyPair->getPublicKey()));
 
-    // encrypt the message
-    $encryptedData = $crypto->encrypt(new Data($messageToEncrypt), new PublicKeyList($receiverKeyPair->getPublicKey()));
-
-    // prepare data to be decrypted and decrypt the encrypted data using a private key
-    $decryptedData = $crypto->decrypt(new Data($encryptedData), $receiverKeyPair->getPrivateKey());
-
-} catch (Exception $e) {
-    throw new Exception($e->getMessage(), $e->getCode());
-}
+// prepare data to be decrypted and decrypt the encrypted data using a private key
+$decryptedData = $crypto->decrypt($encryptedData, $receiverKeyPair->getPrivateKey());
 ```
 Need more examples? Visit our [developer documentation](https://developer.virgilsecurity.com/docs/how-to#cryptography).
 
