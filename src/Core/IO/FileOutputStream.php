@@ -56,6 +56,14 @@ class FileOutputStream implements OutputStream
     }
 
     /**
+     * @return resource
+     */
+    public function open()
+    {
+        // TODO: Implement open() method.
+    }
+
+    /**
      * @param string $chunk
      *
      * @return int
@@ -71,5 +79,13 @@ class FileOutputStream implements OutputStream
         fclose($handle);
 
         return $r;
+    }
+
+    /**
+     * @return mixed|void
+     */
+    public function close()
+    {
+        // TODO: Implement close() method.
     }
 }

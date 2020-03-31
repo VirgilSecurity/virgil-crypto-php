@@ -40,7 +40,7 @@ interface InputStream
     /**
      * @return resource
      */
-    public function input();
+    public function open();
 
     /**
      * @param resource $chunk
@@ -49,4 +49,9 @@ interface InputStream
      * @return string
      */
     public function read($chunk, int $size): string;
+
+    /**
+     * @return mixed
+     */
+    public function close();
 }

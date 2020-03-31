@@ -38,9 +38,19 @@ namespace Virgil\Crypto\Core\IO;
 interface OutputStream
 {
     /**
+     * @return resource
+     */
+    public function open();
+
+    /**
      * @param string $chunk
      *
      * @return int
      */
     public function write(string $chunk): int;
+
+    /**
+     * @return mixed
+     */
+    public function close();
 }

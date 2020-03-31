@@ -47,7 +47,7 @@ class StreamService
     public static function forEachChunk(StreamInterface $stream, callable $chunkClosure, bool
     $withReturn = true)
     {
-        $handle = $stream->getInputStream()->input();
+        $handle = $stream->getInputStream()->open();
 
         while (!feof($handle)) {
             $content = $stream->getInputStream()->read($handle, $stream->getStreamSize());

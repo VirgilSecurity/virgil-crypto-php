@@ -59,7 +59,7 @@ class FileInputStream implements InputStream
      * @return resource
      * @throws VirgilCryptoException
      */
-    public function input()
+    public function open()
     {
         $handle = fopen($this->input, "rb");
         if (!$handle) {
@@ -79,5 +79,13 @@ class FileInputStream implements InputStream
     {
         $content = fread($handle, $size);
         return $content;
+    }
+
+    /**
+     * @return mixed|void
+     */
+    public function close()
+    {
+        // TODO: Implement close() method.
     }
 }
