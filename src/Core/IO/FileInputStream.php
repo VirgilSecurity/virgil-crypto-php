@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2020 Virgil Security Inc.
+ * Copyright (C) 2015-2019 Virgil Security Inc.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -30,23 +30,54 @@
 
 namespace Virgil\Crypto\Core\IO;
 
+use Virgil\Crypto\Core\Enum\VirgilCryptoError;
+use Virgil\Crypto\Exceptions\VirgilCryptoException;
+
 /**
- * Interface InputStream
+ * Class FileInputStream
  *
  * @package Virgil\Crypto\Core\IO
  */
-interface InputStream
+class FileInputStream implements InputStream
 {
     /**
-     * @return resource
+     * @var string
      */
-    public function input();
+    private $input;
 
     /**
-     * @param resource $chunk
+     * FileInputStream constructor.
+     *
+     * @param string $input
+     */
+    public function __construct(string $input)
+    {
+        $this->input = $input;
+    }
+
+    /**
+     * @return resource
+     * @throws VirgilCryptoException
+     */
+    public function input()
+    {
+        $handle = fopen($this->input, "rb");
+        if (!$handle) {
+            throw new VirgilCryptoException(VirgilCryptoError::INPUT_STREAM_ERROR());
+        }
+
+        return $handle;
+    }
+
+    /**
+     * @param resource $handle
      * @param int $size
      *
      * @return string
      */
-    public function read($chunk, int $size): string;
+    public function read($handle, int $size): string
+    {
+        $content = fread($handle, $size);
+        return $content;
+    }
 }

@@ -35,17 +35,17 @@ namespace Virgil\Crypto\Core\IO;
  *
  * @package Virgil\Crypto\Core\IO
  */
-interface StreamInterface extends InputStream, OutputStream
+interface StreamInterface
 {
     /**
-     * @return string
+     * @return InputStream
      */
-    public function getInput(): string;
+    public function getInputStream(): InputStream;
 
     /**
-     * @return string
+     * @return OutputStream
      */
-    public function getOutput(): string;
+    public function getOutputStream(): OutputStream;
 
     /**
      * @return int

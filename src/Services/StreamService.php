@@ -30,9 +30,7 @@
 
 namespace Virgil\Crypto\Services;
 
-use Virgil\Crypto\Core\Enum\VirgilCryptoError;
 use Virgil\Crypto\Core\IO\StreamInterface;
-use Virgil\Crypto\Exceptions\VirgilCryptoException;
 
 /**
  * Class StreamUtils
@@ -41,20 +39,22 @@ use Virgil\Crypto\Exceptions\VirgilCryptoException;
  */
 class StreamService
 {
+    /**
+     * @param StreamInterface $stream
+     * @param callable $chunkClosure
+     * @param bool $withReturn
+     */
     public static function forEachChunk(StreamInterface $stream, callable $chunkClosure, bool
     $withReturn = true)
     {
-        $handle = fopen($stream->getInput(), "rb");
-        if (!$handle) {
-            throw new VirgilCryptoException(VirgilCryptoError::INPUT_STREAM_ERROR());
-        }
+        $handle = $stream->getInputStream()->input();
 
         while (!feof($handle)) {
-            $content = fread($handle, $stream->getStreamSize());
+            $content = $stream->getInputStream()->read($handle, $stream->getStreamSize());
 
             if($withReturn) {
                 $data = $chunkClosure($content);
-                $stream->write($data);
+                $stream->getOutputStream()->write($data);
             } else {
                 $chunkClosure($content);
             }

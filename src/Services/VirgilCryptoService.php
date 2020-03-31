@@ -327,15 +327,15 @@ class VirgilCryptoService
 
                 case $inputOutput instanceof StreamInterface:
 
-                    $inputOutput->write($cipher->packMessageInfo());
+                    $inputOutput->getOutputStream()->write($cipher->packMessageInfo());
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processEncryption($chunk); };
                     StreamService::forEachChunk($inputOutput, $chunkClosure, true);
 
-                    $inputOutput->write($cipher->finishEncryption());
+                    $inputOutput->getOutputStream()->write($cipher->finishEncryption());
 
                     if ($signingOptions && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
-                        $inputOutput->write($cipher->packMessageInfoFooter());
+                        $inputOutput->getOutputStream()->write($cipher->packMessageInfoFooter());
 
                     break;
             }
@@ -397,7 +397,7 @@ class VirgilCryptoService
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processDecryption($chunk); };
 
                     StreamService::forEachChunk($inputOutput, $chunkClosure, true);
-                    $inputOutput->write($cipher->finishDecryption());
+                    $inputOutput->getOutputStream()->write($cipher->finishDecryption());
 
                     break;
 
@@ -863,12 +863,7 @@ class VirgilCryptoService
     public function importPublicKey(string $data): VirgilPublicKey
     {
         try {
-            $keyProvider = new KeyProvider();
-
-            $keyProvider->useRandom($this->getRandom());
-            $keyProvider->setupDefaults();
-
-            $publicKey = $keyProvider->importPublicKey($data);
+            $publicKey = $this->importInternalPublicKey($data);
 
             if ($publicKey->algId() == AlgId::RSA()) {
                 $keyType = KeyPairType::getRsaKeyType($publicKey->bitLen());

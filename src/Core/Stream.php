@@ -31,6 +31,10 @@
 namespace Virgil\Crypto\Core;
 
 use Virgil\Crypto\Core\Enum\VirgilCryptoError;
+use Virgil\Crypto\Core\IO\FileInputStream;
+use Virgil\Crypto\Core\IO\FileOutputStream;
+use Virgil\Crypto\Core\IO\InputStream;
+use Virgil\Crypto\Core\IO\OutputStream;
 use Virgil\Crypto\Core\IO\StreamInterface;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
 
@@ -65,26 +69,6 @@ class Stream implements StreamInterface
     {
         $this->input = $input;
         $this->output = $output;
-        $this->size = $size;
-    }
-
-    public function read(string $chunk): int
-    {
-        var_dump(123);
-        die;
-    }
-
-
-    public function write(string $chunk): int
-    {
-        $handle = fopen($this->output, "a");
-        if (!$handle)
-            throw new VirgilCryptoException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
-
-        $r = fwrite($handle, $chunk);
-        fclose($handle);
-
-        return $r;
     }
 
     /**
@@ -96,11 +80,19 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @return string
+     * @return InputStream
      */
-    public function getOutput(): string
+    public function getInputStream(): InputStream
     {
-        return $this->output;
+        return new FileInputStream($this->getInput());
+    }
+
+    /**
+     * @return OutputStream
+     */
+    public function getOutputStream(): OutputStream
+    {
+        return new FileOutputStream($this->output);
     }
 
     /**
