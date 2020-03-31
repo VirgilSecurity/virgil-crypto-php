@@ -30,8 +30,6 @@
 
 namespace Virgil\Crypto\Core\VirgilKeys;
 
-use Virgil\Crypto\Exceptions\VirgilCryptoException;
-
 /**
  * Class VirgilPublicKeyCollection
  *
@@ -65,22 +63,18 @@ class VirgilPublicKeyCollection
 
     /**
      * @return array
-     * @throws VirgilCryptoException
      */
     public function getAsArray(): array
     {
-        if($this->check())
-            return $this->collection;
+        return $this->collection;
     }
 
     /**
      * @return VirgilPublicKey
-     * @throws VirgilCryptoException
      */
     public function getFirst(): VirgilPublicKey
     {
-        if($this->check())
-            return $this->collection[0];
+        return $this->collection[0];
     }
 
     /**
@@ -92,21 +86,8 @@ class VirgilPublicKeyCollection
     }
 
     /**
-     * @return bool
-     * @throws VirgilCryptoException
-     */
-    private function check(): bool
-    {
-        if(empty($this->collection))
-            throw new VirgilCryptoException("Empty VirgilPublicKey collection");
-
-        return true;
-    }
-
-    /**
      * @param VirgilPublicKeyCollection $virgilPublicKeyCollection
      *
-     * @throws VirgilCryptoException
      */
     public function addCollection(VirgilPublicKeyCollection $virgilPublicKeyCollection)
     {
