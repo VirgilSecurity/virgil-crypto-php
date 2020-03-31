@@ -5,14 +5,14 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
 [![Total Downloads](https://img.shields.io/packagist/dt/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
 
-### [Introduction](#introduction) | [Library purposes](#library-purposes) | [Usage examples](#usage-examples) | [Installation](#installation) | [Docs](#docs) | [License](#license) | [Contacts](#support)
+[Introduction](#introduction) | [Library purposes](#library-purposes) | [Usage examples](#usage-examples) | [Installation](#installation) | [Docs](#docs) | [License](#license) | [Support](#support)
 
 ## Introduction
+
 VirgilCrypto is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and an open-source high-level [cryptographic library](https://github.com/VirgilSecurity/virgil-crypto) that allows you to perform all necessary operations for securely storing and transferring data in your digital solutions. Crypto Library is written in C++ and is suitable for mobile and server platforms.
 
-Virgil Security, Inc., guides software developers into the forthcoming security world in which everything will be encrypted (and passwords will be eliminated). In this world, the days of developers having to raise millions of dollars to build a secure chat, secure email, secure file-sharing, or a secure anything have come to an end. Now developers can instead focus on building features that give them a competitive market advantage while end-users can enjoy the privacy and security they increasingly demand.
-
 ## Library purposes
+
 * Asymmetric Key Generation
 * Encryption/Decryption of data and streams
 * Generation/Verification of digital signatures
@@ -59,7 +59,7 @@ $verified = $crypto->verifySignature($signature, $messageToSign, $senderKeyPair-
 ```
 #### Encrypt and decrypt data
 
-Encrypt Data on a Public Key:
+Encrypt data with a public key:
 
 ```php
 $crypto = new VirgilCrypto();
@@ -85,7 +85,6 @@ $encryptedData = $crypto->encrypt($messageToEncrypt, new VirgilPublicKeyCollecti
 // prepare data to be decrypted and decrypt the encrypted data using a private key
 $decryptedData = $crypto->decrypt($encryptedData, $receiverKeyPair->getPrivateKey());
 ```
-Need more examples? Visit our [developer documentation](https://developer.virgilsecurity.com/docs/how-to#cryptography).
 
 ## Installation
 
@@ -101,10 +100,12 @@ composer require virgil/crypto
 
 ## Additional information
 
-- [Manual adding the crypto extension into your server](https://github.com/VirgilSecurity/virgil-cryptowrapper-php#additional-information)
+- [Manual adding the crypto extension to your server](https://github.com/VirgilSecurity/virgil-cryptowrapper-php#additional-information)
 
 ## Docs
+
 - [Crypto Core Library](https://github.com/VirgilSecurity/virgil-crypto)
+- [Developer Documentation](https://developer.virgilsecurity.com/)
 
 ## License
 
