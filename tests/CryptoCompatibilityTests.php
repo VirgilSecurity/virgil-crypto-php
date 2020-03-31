@@ -35,6 +35,7 @@ use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
 use Virgil\Crypto\VirgilCrypto;
 use Virgil\CryptoTests\_\CompatibilityDataProvider;
+use Virgil\CryptoTests\_\ExceptionLogger;
 
 /**
  * Class CryptoCompatibilityTests
@@ -43,6 +44,8 @@ use Virgil\CryptoTests\_\CompatibilityDataProvider;
  */
 class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
 {
+    use ExceptionLogger;
+
     /**
      *
      */
@@ -74,257 +77,283 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
+     * @group
      */
     public function test002DecryptFromSingleRecipientShouldDecrypt()
     {
-        $dict = $this->getDataProvider()->getTestData("encrypt_single_recipient");
+        try {
+            $dict = $this->getDataProvider()->getTestData("encrypt_single_recipient");
 
-        $privateKeyStr = $dict["private_key"];
-        $privateKeyData = base64_decode($privateKeyStr);
-
-        $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
-
-        $originalDataStr = $dict["original_data"];
-
-        $cipherDataStr = $dict["cipher_data"];
-        $cipherData = base64_decode($cipherDataStr);
-
-        $decryptedData = $this->getCrypto()->decrypt($cipherData, $privateKey);
-        $decryptedDataStr = base64_encode($decryptedData);
-
-        self::assertEquals($decryptedDataStr, $originalDataStr);
-    }
-
-    /**
-     * @group
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
-     */
-    public function test003DecryptFromMultipleRecipientsShouldDecypt()
-    {
-        $dict = $this->getDataProvider()->getTestData("encrypt_multiple_recipients");
-
-        $privateKeys = [];
-
-        foreach ($dict["private_keys"] as $privateKeyStr)
-        {
+            $privateKeyStr = $dict["private_key"];
             $privateKeyData = base64_decode($privateKeyStr);
+
             $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
-            $privateKeys[] = $privateKey;
-        }
+            $originalDataStr = $dict["original_data"];
 
-        self::assertTrue(count($privateKeys) > 0);
+            $cipherDataStr = $dict["cipher_data"];
+            $cipherData = base64_decode($cipherDataStr);
 
-        $originalDataStr = $dict["original_data"];
-
-        $cipherDataStr = $dict["cipher_data"];
-        $cipherData = base64_decode($cipherDataStr);
-
-        foreach ($privateKeys as $privateKey)
-        {
             $decryptedData = $this->getCrypto()->decrypt($cipherData, $privateKey);
             $decryptedDataStr = base64_encode($decryptedData);
 
             self::assertEquals($decryptedDataStr, $originalDataStr);
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
         }
     }
 
     /**
      * @group
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
+     */
+    public function test003DecryptFromMultipleRecipientsShouldDecypt()
+    {
+        try {
+            $dict = $this->getDataProvider()->getTestData("encrypt_multiple_recipients");
+
+            $privateKeys = [];
+
+            foreach ($dict["private_keys"] as $privateKeyStr)
+            {
+                $privateKeyData = base64_decode($privateKeyStr);
+                $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
+
+                $privateKeys[] = $privateKey;
+            }
+
+            self::assertTrue(count($privateKeys) > 0);
+
+            $originalDataStr = $dict["original_data"];
+
+            $cipherDataStr = $dict["cipher_data"];
+            $cipherData = base64_decode($cipherDataStr);
+
+            foreach ($privateKeys as $privateKey)
+            {
+                $decryptedData = $this->getCrypto()->decrypt($cipherData, $privateKey);
+                $decryptedDataStr = base64_encode($decryptedData);
+
+                self::assertEquals($decryptedDataStr, $originalDataStr);
+            }
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
+        }
+    }
+
+    /**
+     * @group
      */
     public function test004DecryptAndVerifySingleRecipientShouldDecryptAndVerify()
     {
-        $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_single_recipient");
+        try {
+            $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_single_recipient");
 
-        $privateKeyStr = $dict["private_key"];
-        $privateKeyData = base64_decode($privateKeyStr);
+            $privateKeyStr = $dict["private_key"];
+            $privateKeyData = base64_decode($privateKeyStr);
 
-        $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
+            $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
-        $publicKey = $this->getCrypto()->extractPublicKey($privateKey);
-        $pkl = new VirgilPublicKeyCollection($publicKey);
+            $publicKey = $this->getCrypto()->extractPublicKey($privateKey);
+            $pkl = new VirgilPublicKeyCollection($publicKey);
 
-        $originalDataStr = $dict["original_data"];
-        $originalData = base64_decode($originalDataStr);
+            $originalDataStr = $dict["original_data"];
+            $originalData = base64_decode($originalDataStr);
 
-        $cipherDataStr = $dict["cipher_data"];
-        $cipherData = base64_decode($cipherDataStr);
+            $cipherDataStr = $dict["cipher_data"];
+            $cipherData = base64_decode($cipherDataStr);
 
-        $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
+            $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
 
-        self::assertEquals($originalData, $decryptedData);
+            self::assertEquals($originalData, $decryptedData);
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
+        }
     }
 
     /**
      * @group
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test005DecryptAndVerifyMultipleRecipientsShouldDecryptAndVerify()
     {
-        $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_multiple_recipients");
+        try {
+            $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_multiple_recipients");
 
-        $privateKeys = [];
+            $privateKeys = [];
 
-        foreach ($dict["private_keys"] as $privateKeyStr)
-        {
+            foreach ($dict["private_keys"] as $privateKeyStr)
+            {
+                $privateKeyData = base64_decode($privateKeyStr);
+                $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
+
+                $privateKeys[] = $privateKey;
+            }
+
+            self::assertTrue(count($privateKeys) > 0);
+
+            $originalDataStr = $dict["original_data"];
+
+            $cipherDataStr = $dict["cipher_data"];
+            $cipherData = base64_decode($cipherDataStr);
+
+            $signerPublicKey = $this->getCrypto()->extractPublicKey($privateKeys[0]);
+            $pkl = new VirgilPublicKeyCollection($signerPublicKey);
+
+            foreach ($privateKeys as $privateKey)
+            {
+                $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
+                $decryptedDataStr = base64_encode($decryptedData);
+
+                self::assertEquals($decryptedDataStr, $originalDataStr);
+            }
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
+        }
+    }
+
+    /**
+     * @group
+     */
+    public function test006GenerateSignatureShouldBeEqual()
+    {
+        try {
+            $dict = $this->getDataProvider()->getTestData("generate_signature");
+
+            $privateKeyStr = $dict["private_key"];
             $privateKeyData = base64_decode($privateKeyStr);
+
             $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
-            $privateKeys[] = $privateKey;
+            $publicKey = $this->getCrypto()->extractPublicKey($privateKey);
+
+            $originalDataStr = $dict["original_data"];
+            $originalData = base64_decode($originalDataStr);
+
+            $signature = $this->getCrypto()->generateSignature($originalData, $privateKey);
+            $signatureStr = base64_encode($signature);
+
+            $originalSignatureStr = $dict["signature"];
+            $originalSignature = base64_decode($originalSignatureStr);
+
+            $res = $this->getCrypto()->verifySignature($originalSignature, $originalData, $publicKey);
+
+            self::assertTrue($res);
+            self::assertEquals($originalSignatureStr, $signatureStr);
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
         }
+    }
 
-        self::assertTrue(count($privateKeys) > 0);
+    /**
+     * @group
+     */
+    public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
+    {
+        try {
+            $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_multiple_signers");
 
-        $originalDataStr = $dict["original_data"];
+            $privateKeyStr = $dict["private_key"];
+            $privateKeyData = base64_decode($privateKeyStr);
 
-        $cipherDataStr = $dict["cipher_data"];
-        $cipherData = base64_decode($cipherDataStr);
+            $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
 
-        $signerPublicKey = $this->getCrypto()->extractPublicKey($privateKeys[0]);
-        $pkl = new VirgilPublicKeyCollection($signerPublicKey);
+            $pkl = new VirgilPublicKeyCollection();
 
-        foreach ($privateKeys as $privateKey)
-        {
+            foreach ($dict["public_keys"] as $publicKeyStr)
+            {
+                $publicKeyData = base64_decode($publicKeyStr);
+                $publicKey = $this->getCrypto()->importPublicKey($publicKeyData);
+
+                $pkl->addPublicKey($publicKey);
+            }
+
+            $originalDataStr = $dict["original_data"];
+
+            $cipherDataStr = $dict["cipher_data"];
+            $cipherData = base64_decode($cipherDataStr);
+
             $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
             $decryptedDataStr = base64_encode($decryptedData);
 
             self::assertEquals($decryptedDataStr, $originalDataStr);
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
         }
     }
 
     /**
      * @group
-     * @throws VirgilCryptoException
-     */
-    public function test006GenerateSignatureShouldBeEqual()
-    {
-        $dict = $this->getDataProvider()->getTestData("generate_signature");
-
-        $privateKeyStr = $dict["private_key"];
-        $privateKeyData = base64_decode($privateKeyStr);
-
-        $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
-
-        $publicKey = $this->getCrypto()->extractPublicKey($privateKey);
-
-        $originalDataStr = $dict["original_data"];
-        $originalData = base64_decode($originalDataStr);
-
-        $signature = $this->getCrypto()->generateSignature($originalData, $privateKey);
-        $signatureStr = base64_encode($signature);
-
-        $originalSignatureStr = $dict["signature"];
-        $originalSignature = base64_decode($originalSignatureStr);
-
-        $res = $this->getCrypto()->verifySignature($originalSignature, $originalData, $publicKey);
-
-        self::assertTrue($res);
-        self::assertEquals($originalSignatureStr, $signatureStr);
-    }
-
-    /**
-     * @group
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
-     */
-    public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
-    {
-        $dict = $this->getDataProvider()->getTestData("sign_and_encrypt_multiple_signers");
-
-        $privateKeyStr = $dict["private_key"];
-        $privateKeyData = base64_decode($privateKeyStr);
-
-        $privateKey = $this->getCrypto()->importPrivateKey($privateKeyData)->getPrivateKey();
-
-        $pkl = new VirgilPublicKeyCollection();
-
-        foreach ($dict["public_keys"] as $publicKeyStr)
-        {
-            $publicKeyData = base64_decode($publicKeyStr);
-            $publicKey = $this->getCrypto()->importPublicKey($publicKeyData);
-
-            $pkl->addPublicKey($publicKey);
-        }
-
-        $originalDataStr = $dict["original_data"];
-
-        $cipherDataStr = $dict["cipher_data"];
-        $cipherData = base64_decode($cipherDataStr);
-
-        $decryptedData = $this->getCrypto()->decryptAndVerify($cipherData, $privateKey, $pkl);
-        $decryptedDataStr = base64_encode($decryptedData);
-
-        self::assertEquals($decryptedDataStr, $originalDataStr);
-    }
-
-    /**
-     * @group
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      */
     public function test008GenerateEd25519UsingSeedShouldMatch()
     {
-        $dict = $this->getDataProvider()->getTestData("generate_ed25519_using_seed");
+        try {
+            $dict = $this->getDataProvider()->getTestData("generate_ed25519_using_seed");
 
-        $seedStr = $dict["seed"];
-        $seed = base64_decode($seedStr);
+            $seedStr = $dict["seed"];
+            $seed = base64_decode($seedStr);
 
-        $keyPair = $this->getCrypto()->generateKeyPairUsingSeed($seed);
+            $keyPair = $this->getCrypto()->generateKeyPairUsingSeed($seed);
 
-        $privateKeyStr = $dict["private_key"];
-        $publicKeyStr = $dict["public_key"];
-        $privateKeyData = base64_decode($privateKeyStr);
-        $publicKeyData = base64_decode($publicKeyStr);
+            $privateKeyStr = $dict["private_key"];
+            $publicKeyStr = $dict["public_key"];
+            $privateKeyData = base64_decode($privateKeyStr);
+            $publicKeyData = base64_decode($publicKeyStr);
 
-        $a1 = $this->getCrypto()->exportPrivateKey($keyPair->getPrivateKey());
-        self::assertEquals($a1, $privateKeyData);
+            $a1 = $this->getCrypto()->exportPrivateKey($keyPair->getPrivateKey());
+            self::assertEquals($a1, $privateKeyData);
 
-        $b1 = $this->getCrypto()->exportPublicKey($keyPair->getPublicKey());
-        self::assertEquals($b1, $publicKeyData);
+            $b1 = $this->getCrypto()->exportPublicKey($keyPair->getPublicKey());
+            self::assertEquals($b1, $publicKeyData);
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
+        }
+
     }
 
     /**
-     * @throws VirgilCryptoException
-     * @throws \Virgil\Crypto\Exceptions\VirgilCryptoException
      * @group f
      */
     public function test009SignThenEncryptShouldMatch()
     {
-        $dict = $this->getDataProvider()->getTestData("auth_encrypt");
-
-        $privateKey1Str = $dict["private_key1"];
-        $privateKey2Str = $dict["private_key2"];
-        $publicKeyStr = $dict["public_key"];
-        $dataSha512Str = $dict["data_sha512"];
-        $cipherDataStr = $dict["cipher_data"];
-
-        $privateKey1 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey1Str))->getPrivateKey();
-        $keyPair2 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey2Str));
-        $publicKey = $this->getCrypto()->importPublicKey(base64_decode($publicKeyStr));
-        $pkl = new VirgilPublicKeyCollection($publicKey);
-        $pkl2 = new VirgilPublicKeyCollection($keyPair2->getPublicKey());
-
-        $dataSha512 = base64_decode($dataSha512Str);
-        $cipherData = base64_decode($cipherDataStr);
-
-        $data = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl);
-
-        $a1 = $this->getCrypto()->computeHash($data, HashAlgorithms::SHA512());
-
-        self::assertEquals($a1, $dataSha512);
-
         try {
-            $res1 = $this->getCrypto()->authDecrypt($cipherData, $keyPair2->getPrivateKey(), $pkl);
-            self::assertTrue(empty($res1));
-        } catch (\Exception $e) {
-            self::assertTrue($e instanceof VirgilCryptoException);
-        }
+            $dict = $this->getDataProvider()->getTestData("auth_encrypt");
 
-        try {
-            $res2 = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl2);
-            self::assertTrue(empty($res2));
-        } catch (\Exception $e) {
-            self::assertTrue($e instanceof VirgilCryptoException);
+            $privateKey1Str = $dict["private_key1"];
+            $privateKey2Str = $dict["private_key2"];
+            $publicKeyStr = $dict["public_key"];
+            $dataSha512Str = $dict["data_sha512"];
+            $cipherDataStr = $dict["cipher_data"];
+
+            $privateKey1 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey1Str))->getPrivateKey();
+            $keyPair2 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey2Str));
+            $publicKey = $this->getCrypto()->importPublicKey(base64_decode($publicKeyStr));
+            $pkl = new VirgilPublicKeyCollection($publicKey);
+            $pkl2 = new VirgilPublicKeyCollection($keyPair2->getPublicKey());
+
+            $dataSha512 = base64_decode($dataSha512Str);
+            $cipherData = base64_decode($cipherDataStr);
+
+            $data = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl);
+
+            $a1 = $this->getCrypto()->computeHash($data, HashAlgorithms::SHA512());
+
+            self::assertEquals($a1, $dataSha512);
+
+            try {
+                $res1 = $this->getCrypto()->authDecrypt($cipherData, $keyPair2->getPrivateKey(), $pkl);
+                self::assertTrue(empty($res1));
+            } catch (\Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+            try {
+                $res2 = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl2);
+                self::assertTrue(empty($res2));
+            } catch (\Exception $e) {
+                self::assertTrue($e instanceof VirgilCryptoException);
+            }
+
+        } catch (\Exception $exception) {
+            self::fail($this->logException($exception));
         }
     }
 }

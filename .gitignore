@@ -3,3 +3,4 @@
 vendor/
 _dev/
 .phpunit.result.cache
+tests/data/testData_*
