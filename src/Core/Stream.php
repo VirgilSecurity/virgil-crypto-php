@@ -30,7 +30,6 @@
 
 namespace Virgil\Crypto\Core;
 
-use Virgil\Crypto\Core\Enum\VirgilCryptoError;
 use Virgil\Crypto\Core\IO\FileInputStream;
 use Virgil\Crypto\Core\IO\FileOutputStream;
 use Virgil\Crypto\Core\IO\InputStream;
@@ -72,23 +71,17 @@ class Stream implements StreamInterface
     }
 
     /**
-     * @return string
-     */
-    public function getInput(): string
-    {
-        return $this->input;
-    }
-
-    /**
      * @return InputStream
+     * @throws VirgilCryptoException
      */
     public function getInputStream(): InputStream
     {
-        return new FileInputStream($this->getInput());
+        return new FileInputStream($this->input);
     }
 
     /**
      * @return OutputStream
+     * @throws VirgilCryptoException
      */
     public function getOutputStream(): OutputStream
     {
@@ -100,6 +93,6 @@ class Stream implements StreamInterface
      */
     public function getStreamSize(): int
     {
-        return $this->size ?: filesize($this->input);
+        return $this->size ?: filesize($this->input) ?: 1;
     }
 }

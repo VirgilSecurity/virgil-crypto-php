@@ -305,7 +305,6 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl]);
 
         $stream = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());
-
         $signature = $crypto->generateStreamSignature($stream, $keyPair1->getPrivateKey());
 
         $verifyStream1 = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());

@@ -38,22 +38,9 @@ namespace Virgil\Crypto\Core\IO;
 interface InputStream
 {
     /**
-     * @return resource
-     */
-    public function open();
-
-    /**
-     * @param $resource
      * @param int $size
      *
-     * @return string
+     * @return null|string
      */
-    public function read($resource, int $size): string;
-
-    /**
-     * @param $resource
-     *
-     * @return mixed
-     */
-    public function close($resource);
+    public function read(int $size): ?string;
 }

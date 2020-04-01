@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2019 Virgil Security Inc.
+ * Copyright (C) 2015-2020 Virgil Security Inc.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -46,47 +46,51 @@ class FileInputStream implements InputStream
     private $input;
 
     /**
+     * @var resource
+     */
+    private $resource;
+
+    /**
      * FileInputStream constructor.
      *
      * @param string $input
+     *
+     * @throws VirgilCryptoException
      */
     public function __construct(string $input)
     {
-        $this->input = $input;
-    }
-
-    /**
-     * @return resource
-     * @throws VirgilCryptoException
-     */
-    public function open()
-    {
-        $resource = fopen($this->input, "rb");
+        $resource = fopen($input, "rb");
         if (!$resource) {
             throw new VirgilCryptoException(VirgilCryptoError::INPUT_STREAM_ERROR());
         }
 
-        return $resource;
+        $this->input = $input;
+        $this->resource = $resource;
     }
 
     /**
-     * @param resource $resource
      * @param int $size
      *
      * @return string
      */
-    public function read($resource, int $size): string
+    public function read(int $size): string
     {
-        return fread($resource, $size);
+        $r = "";
+
+//        while (!feof($this->resource)) {
+//            $r .= fread($this->resource, $size);
+//        }
+
+        $r = fread($this->resource, $size);
+        return $r;
     }
 
+
     /**
-     * @param $resource
      *
-     * @return mixed|void
      */
-    public function close($resource)
+    public function __destruct()
     {
-        fclose($resource);
+        fclose($this->resource);
     }
 }

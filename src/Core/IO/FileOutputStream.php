@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2015-2019 Virgil Security Inc.
+ * Copyright (C) 2015-2020 Virgil Security Inc.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -46,46 +46,39 @@ class FileOutputStream implements OutputStream
     private $output;
 
     /**
+     * @var resource
+     */
+    private $resource;
+
+    /**
      * FileOutputStream constructor.
      *
      * @param string $output
+     *
+     * @throws VirgilCryptoException
      */
     public function __construct(string $output)
     {
-        $this->output = $output;
-    }
-
-    /**
-     * @return bool|resource
-     * @throws VirgilCryptoException
-     */
-    public function open()
-    {
-        $resource = fopen($this->output, "a");
+        $resource = fopen($output, "a");
         if (!$resource)
             throw new VirgilCryptoException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
 
-        return $resource;
+        $this->output = $output;
+        $this->resource = $resource;
     }
 
     /**
-     * @param resource $resource
      * @param string $chunk
      *
      * @return int
      */
-    public function write($resource, string $chunk): int
+    public function write(string $chunk): int
     {
-        return fwrite($resource, $chunk);
+        return fwrite($this->resource, $chunk);
     }
 
-    /**
-     * @param $resource
-     *
-     * @return mixed|void
-     */
-    public function close($resource)
+    public function __destruct()
     {
-        fclose($resource);
+        fclose($this->resource);
     }
 }

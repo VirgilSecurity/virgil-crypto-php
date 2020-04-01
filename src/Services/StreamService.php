@@ -40,22 +40,23 @@ use Virgil\Crypto\Core\IO\StreamInterface;
 class StreamService
 {
     /**
-     * @param resource $resourceInput
-     * @param resource $resourceOutput
      * @param StreamInterface $stream
      * @param callable $chunkClosure
      * @param bool $withReturn
      */
-    public static function forEachChunk($resourceInput, $resourceOutput, StreamInterface $stream, callable
-    $chunkClosure, bool
-    $withReturn = true)
+    public static function forEachChunk(StreamInterface $stream,
+                                        callable $chunkClosure,
+                                        bool $withReturn = true)
     {
-        while (!feof($resourceInput)) {
-            $content = $stream->getInputStream()->read($resourceInput, $stream->getStreamSize());
+        if ("" == $stream->getInputStream()->read($stream->getStreamSize()))
+            return;
+
+        while (!$stream->getInputStream()->read($stream->getStreamSize())) {
+            $content = $stream->getInputStream()->read($stream->getStreamSize());
 
             if($withReturn) {
                 $data = $chunkClosure($content);
-                $stream->getOutputStream()->write($resourceOutput, $data);
+                $stream->getOutputStream()->write($data);
             } else {
                 $chunkClosure($content);
             }
