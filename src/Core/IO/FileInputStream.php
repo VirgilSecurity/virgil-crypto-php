@@ -61,31 +61,32 @@ class FileInputStream implements InputStream
      */
     public function open()
     {
-        $handle = fopen($this->input, "rb");
-        if (!$handle) {
+        $resource = fopen($this->input, "rb");
+        if (!$resource) {
             throw new VirgilCryptoException(VirgilCryptoError::INPUT_STREAM_ERROR());
         }
 
-        return $handle;
+        return $resource;
     }
 
     /**
-     * @param resource $handle
+     * @param resource $resource
      * @param int $size
      *
      * @return string
      */
-    public function read($handle, int $size): string
+    public function read($resource, int $size): string
     {
-        $content = fread($handle, $size);
-        return $content;
+        return fread($resource, $size);
     }
 
     /**
+     * @param $resource
+     *
      * @return mixed|void
      */
-    public function close()
+    public function close($resource)
     {
-        // TODO: Implement close() method.
+        fclose($resource);
     }
 }

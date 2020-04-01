@@ -43,14 +43,17 @@ interface OutputStream
     public function open();
 
     /**
+     * @param resource $resource
      * @param string $chunk
      *
      * @return int
      */
-    public function write(string $chunk): int;
+    public function write($resource, string $chunk): int;
 
     /**
+     * @param $resource
+     *
      * @return mixed
      */
-    public function close();
+    public function close($resource);
 }

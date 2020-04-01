@@ -327,15 +327,21 @@ class VirgilCryptoService
 
                 case $inputOutput instanceof StreamInterface:
 
-                    $inputOutput->getOutputStream()->write($cipher->packMessageInfo());
+                    $rIn = $inputOutput->getInputStream()->open();
+                    $rOut = $inputOutput->getOutputStream()->open();
+
+                    $inputOutput->getOutputStream()->write($rOut, $cipher->packMessageInfo());
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processEncryption($chunk); };
-                    StreamService::forEachChunk($inputOutput, $chunkClosure, true);
+                    StreamService::forEachChunk($rIn, $rOut, $inputOutput, $chunkClosure, true);
 
-                    $inputOutput->getOutputStream()->write($cipher->finishEncryption());
+                    $inputOutput->getOutputStream()->write($rOut, $cipher->finishEncryption());
 
                     if ($signingOptions && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
-                        $inputOutput->getOutputStream()->write($cipher->packMessageInfoFooter());
+                        $inputOutput->getOutputStream()->write($rOut, $cipher->packMessageInfoFooter());
+
+                    $inputOutput->getInputStream()->close($rIn);
+                    $inputOutput->getOutputStream()->close($rOut);
 
                     break;
             }
@@ -393,11 +399,16 @@ class VirgilCryptoService
 
             switch ($inputOutput) {
                 case $inputOutput instanceof StreamInterface:
+                    $rIn = $inputOutput->getInputStream()->open();
+                    $rOut = $inputOutput->getOutputStream()->open();
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processDecryption($chunk); };
 
-                    StreamService::forEachChunk($inputOutput, $chunkClosure, true);
-                    $inputOutput->getOutputStream()->write($cipher->finishDecryption());
+                    StreamService::forEachChunk($rIn, $rOut, $inputOutput, $chunkClosure, true);
+                    $inputOutput->getOutputStream()->write($rOut, $cipher->finishDecryption());
+
+                    $inputOutput->getInputStream()->close($rIn);
+                    $inputOutput->getOutputStream()->close($rOut);
 
                     break;
 
@@ -634,8 +645,11 @@ class VirgilCryptoService
 
             $signer->reset();
 
+            $rIn = $stream->getInputStream()->open();
+            $rOut = $stream->getOutputStream()->open();
+
             $chunkClosure = function ($chunk) use ($signer) { $signer->appendData($chunk); };
-            StreamService::forEachChunk($stream, $chunkClosure, false);
+            StreamService::forEachChunk($rIn, $rOut, $stream, $chunkClosure, false);
 
             return $signer->sign($virgilPrivateKey->getPrivateKey());
 
@@ -662,8 +676,14 @@ class VirgilCryptoService
 
             $verifier->reset($signature);
 
+            $rIn = $inputStream->getInputStream()->open();
+            $rOut = $inputStream->getOutputStream()->open();
+
             $chunkClosure = function ($chunk) use ($verifier) { $verifier->appendData($chunk); };
-            StreamService::forEachChunk($inputStream, $chunkClosure, false);
+            StreamService::forEachChunk($rIn, $rOut, $inputStream, $chunkClosure, false);
+
+            $inputStream->getInputStream()->close($rIn);
+            $inputStream->getInputStream()->close($rOut);
 
             return $verifier->verify($virgilPublicKey->getPublicKey());
 

@@ -43,15 +43,17 @@ interface InputStream
     public function open();
 
     /**
-     * @param resource $chunk
+     * @param $resource
      * @param int $size
      *
      * @return string
      */
-    public function read($chunk, int $size): string;
+    public function read($resource, int $size): string;
 
     /**
+     * @param $resource
+     *
      * @return mixed
      */
-    public function close();
+    public function close($resource);
 }

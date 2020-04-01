@@ -56,36 +56,36 @@ class FileOutputStream implements OutputStream
     }
 
     /**
-     * @return resource
+     * @return bool|resource
+     * @throws VirgilCryptoException
      */
     public function open()
     {
-        // TODO: Implement open() method.
+        $resource = fopen($this->output, "a");
+        if (!$resource)
+            throw new VirgilCryptoException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
+
+        return $resource;
     }
 
     /**
+     * @param resource $resource
      * @param string $chunk
      *
      * @return int
-     * @throws VirgilCryptoException
      */
-    public function write(string $chunk): int
+    public function write($resource, string $chunk): int
     {
-        $handle = fopen($this->output, "a");
-        if (!$handle)
-            throw new VirgilCryptoException(VirgilCryptoError::OUTPUT_STREAM_ERROR());
-
-        $r = fwrite($handle, $chunk);
-        fclose($handle);
-
-        return $r;
+        return fwrite($resource, $chunk);
     }
 
     /**
+     * @param $resource
+     *
      * @return mixed|void
      */
-    public function close()
+    public function close($resource)
     {
-        // TODO: Implement close() method.
+        fclose($resource);
     }
 }

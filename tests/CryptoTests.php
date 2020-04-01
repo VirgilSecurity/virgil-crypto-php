@@ -302,6 +302,8 @@ class CryptoTests extends TestCase
         $testFileUrl = __DIR__ . "/data/testData.txt";
         $encTestFileUrl = __DIR__ . "/data/testData_enc.txt";
 
+        $this->unlinkFiles([$encTestFileUrl]);
+
         $stream = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());
 
         $signature = $crypto->generateStreamSignature($stream, $keyPair1->getPrivateKey());
@@ -355,6 +357,8 @@ class CryptoTests extends TestCase
 
         $encTestFileUrl = __DIR__ . "/data/testData_encrypted.txt";
         $decTestFileUrl = __DIR__ . "/data/testData_decrypted.txt";
+
+        $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
         $stream = new Stream($testFileUrl, $encTestFileUrl, $crypto->getChunkSize());
 
@@ -558,6 +562,8 @@ class CryptoTests extends TestCase
         $testFileUrl = __DIR__ . "/data/testData.txt";
         $encTestFileUrl = __DIR__ . "/data/testData_encrypted.txt";
         $decTestFileUrl = __DIR__ . "/data/testData_decrypted.txt";
+
+        $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
 
         $rawData = file_get_contents($testFileUrl);
         $stream = new Stream($testFileUrl, $encTestFileUrl, filesize($testFileUrl));
