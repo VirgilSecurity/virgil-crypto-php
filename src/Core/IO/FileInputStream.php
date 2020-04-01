@@ -79,10 +79,10 @@ class FileInputStream implements InputStream
     {
         $buffer = file_get_contents($this->input, false, null, $offset, $size);
 
-        $r = strlen($buffer);
-        $offset += (int) $r;
+        $len = strlen($buffer);
+        $offset += $len;
 
-        return $r;
+        return $len;
     }
 
     public function __destruct()

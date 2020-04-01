@@ -386,7 +386,7 @@ class CryptoTests extends TestCase
     }
 
     /**
-     * @group a
+     * @group
      */
     public function test07EncryptStreamFileShouldDecrypt()
     {

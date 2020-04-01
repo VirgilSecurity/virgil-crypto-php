@@ -637,8 +637,6 @@ class VirgilCryptoService
             $chunkClosure = function ($chunk) use ($signer) { $signer->appendData($chunk); };
             StreamService::forEachChunk($stream, $chunkClosure, false);
 
-//            $stream->getInputStream()->close();
-
             return $signer->sign($virgilPrivateKey->getPrivateKey());
 
         } catch (\Exception $e) {
