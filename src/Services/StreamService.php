@@ -48,17 +48,15 @@ class StreamService
                                         callable $chunkClosure,
                                         bool $withReturn = true)
     {
-        if ("" == $stream->getInputStream()->read($stream->getStreamSize()))
-            return;
+        list($offset, $buffer) = [0, ""];
 
-        while (!$stream->getInputStream()->read($stream->getStreamSize())) {
-            $content = $stream->getInputStream()->read($stream->getStreamSize());
+        while (0 != $stream->getInputStream()->read($buffer, $offset, $stream->getStreamSize())) {
 
-            if($withReturn) {
-                $data = $chunkClosure($content);
+            if ($withReturn) {
+                $data = $chunkClosure($buffer);
                 $stream->getOutputStream()->write($data);
             } else {
-                $chunkClosure($content);
+                $chunkClosure($buffer);
             }
         }
     }

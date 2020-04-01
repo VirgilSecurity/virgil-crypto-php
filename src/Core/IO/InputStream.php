@@ -38,9 +38,11 @@ namespace Virgil\Crypto\Core\IO;
 interface InputStream
 {
     /**
+     * @param string $buffer
+     * @param int $offset
      * @param int $size
      *
-     * @return null|string
+     * @return int
      */
-    public function read(int $size): ?string;
+    public function read(string &$buffer, int &$offset, int $size): int;
 }

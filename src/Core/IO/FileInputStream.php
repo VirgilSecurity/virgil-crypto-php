@@ -69,26 +69,22 @@ class FileInputStream implements InputStream
     }
 
     /**
+     * @param string $buffer
+     * @param int $offset
      * @param int $size
      *
-     * @return string
+     * @return int
      */
-    public function read(int $size): string
+    public function read(string &$buffer, int &$offset, int $size): int
     {
-        $r = "";
+        $buffer = file_get_contents($this->input, false, null, $offset, $size);
 
-//        while (!feof($this->resource)) {
-//            $r .= fread($this->resource, $size);
-//        }
+        $r = strlen($buffer);
+        $offset += (int) $r;
 
-        $r = fread($this->resource, $size);
         return $r;
     }
 
-
-    /**
-     *
-     */
     public function __destruct()
     {
         fclose($this->resource);
