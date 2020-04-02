@@ -1,7 +1,6 @@
 .DS_Store
 .idea/
 vendor/
-samples/
-tests/src/data/
-!/tests/src/data/test-key.pdf
-!/tests/src/data/test-password.pdf
+_dev/
+.phpunit.result.cache
+tests/data/testData_*
