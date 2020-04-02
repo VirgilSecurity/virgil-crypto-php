@@ -51,6 +51,11 @@ class FileInputStream implements InputStream
     private $resource;
 
     /**
+     * @var int
+     */
+    private $offset;
+
+    /**
      * FileInputStream constructor.
      *
      * @param string $input
@@ -66,21 +71,21 @@ class FileInputStream implements InputStream
 
         $this->input = $input;
         $this->resource = $resource;
+        $this->offset = 0;
     }
 
     /**
      * @param string $buffer
-     * @param int $offset
      * @param int $size
      *
      * @return int
      */
-    public function read(string &$buffer, int &$offset, int $size): int
+    public function read(string &$buffer, int $size): int
     {
-        $buffer = file_get_contents($this->input, false, null, $offset, $size);
+        $buffer = file_get_contents($this->input, false, null, $this->offset, $size);
 
         $len = strlen($buffer);
-        $offset += $len;
+        $this->offset += $len;
 
         return $len;
     }

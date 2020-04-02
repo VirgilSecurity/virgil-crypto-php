@@ -39,10 +39,9 @@ interface InputStream
 {
     /**
      * @param string $buffer
-     * @param int $offset
      * @param int $size
      *
      * @return int
      */
-    public function read(string &$buffer, int &$offset, int $size): int;
+    public function read(string &$buffer, int $size): int;
 }
