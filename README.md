@@ -1,34 +1,47 @@
-# Virgil Security PHP Crypto Library
+# Virgil Crypto Library PHP 
 
 [![Build Status](https://api.travis-ci.com/VirgilSecurity/virgil-crypto-php.svg?branch=master)](https://travis-ci.com/VirgilSecurity/virgil-crypto-php/)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
 [![Total Downloads](https://img.shields.io/packagist/dt/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
 
-[Introduction](#introduction) | [Library purposes](#library-purposes) | [Usage examples](#usage-examples) | [Installation](#installation) | [Docs](#docs) | [License](#license) | [Support](#support)
+[Introduction](#introduction) | [Library purposes](#library-purposes) | [Installation](#installation) | [Usage examples](#usage-examples) | [Docs](#docs) | [License](#license) | [Support](#support)
 
 ## Introduction
 
-VirgilCrypto is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and an open-source high-level [cryptographic library](https://github.com/VirgilSecurity/virgil-crypto) that allows you to perform all necessary operations for securely storing and transferring data in your digital solutions. Crypto Library is written in C++ and is suitable for mobile and server platforms.
+Virgil Crypto Library PHP is a stack of security libraries (ECIES with Crypto Agility wrapped in Virgil Cryptogram) and an open-source high-level [cryptographic library](https://github.com/VirgilSecurity/virgil-crypto) that allows you to perform all necessary operations for securely storing and transferring data in your digital solutions. Crypto Library is written in C++ and is suitable for mobile and server platforms.
 
 ## Library purposes
 
 * Asymmetric Key Generation
 * Encryption/Decryption of data and streams
 * Generation/Verification of digital signatures
-* PFS (Perfect Forward Secrecy)
+* Double Ratchet algorithm support
+* **Post quantum algorithms support**: [Round5](https://round5.org/) (ecnryption) and [Falcon](https://falcon-sign.info/) (signature) 
+* Crypto for using [Virgil Core SDK](https://github.com/VirgilSecurity/virgil-sdk-php)
+
+## Installation
+
+**Requirements**:
+- PHP 7.2 / 7.3 / 7.4
+
+#### Installation via composer
+
+```bash
+composer require virgil/crypto
+```
 
 ## Usage examples
 
-#### Generate a key pair
+### Generate a key pair
 
-Generate a key pair with the default algorithm (EC_X25519):
+Generate a key pair using the default algorithm (EC_X25519):
 ```php
 $crypto = new VirgilCrypto();
 $keyPair = $crypto->generateKeyPair();
 ```
 
-#### Generate and verify a signature
+### Generate and verify a signature
 
 Generate signature and sign data with a private key:
 ```php
@@ -57,7 +70,7 @@ $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPriva
 // verify a signature
 $verified = $crypto->verifySignature($signature, $messageToSign, $senderKeyPair->getPublicKey());
 ```
-#### Encrypt and decrypt data
+### Encrypt and decrypt data
 
 Encrypt data with a public key:
 
@@ -71,7 +84,8 @@ $messageToEncrypt = "Hello, Bob!";
 // encrypt the message
 $encryptedData = $crypto->encrypt($messageToEncrypt, new VirgilPublicKeyCollection($receiverKeyPair->getPublicKey()));
 ```
-Decrypt the encrypted data with a Private Key:
+Decrypt the encrypted data with a private key:
+
 ```php
 $crypto = new VirgilCrypto();
 $receiverKeyPair = $crypto->generateKeyPair();
@@ -86,21 +100,51 @@ $encryptedData = $crypto->encrypt($messageToEncrypt, new VirgilPublicKeyCollecti
 $decryptedData = $crypto->decrypt($encryptedData, $receiverKeyPair->getPrivateKey());
 ```
 
-## Installation
+### Import and export keys
 
-### Requirements
+Export keys:
 
-**PHP 7.2 / 7.3 / 7.4**
+```
+use Virgil\CryptoImpl\VirgilCrypto;
 
-#### Installation via composer
+$crypto = new VirgilCrypto();
+$keyPair = $crypto->generateKeys();
 
-```bash
-composer require virgil/crypto
+// export private key
+$privateKeyData = $crypto->exportPrivateKey($keyPair->getPrivateKey(), "YOUR_PASSWORD");
+$privateKeyStr = base64_encode($privateKeyData);
+
+// export public key
+$publicKeyData = $crypto->exportPublicKey($keyPair->getPrivateKey());
+$publicKeyStr = base64_encode($publicKeyData);
+```
+
+Import keys:
+
+```
+use Virgil\CryptoImpl\VirgilCrypto;
+
+$crypto = new VirgilCrypto();
+$privateKeyStr = "MIGhMF0GCSqGSIb3DQEFDTBQMC8GCSqGSIb3DQEFDDAiBBBtfBoM7VfmWPlvyHuGWvMSAgIZ6zAKBggqhkiG9w0CCjAdBglghkgBZQMEASoEECwaKJKWFNn3OMVoUXEcmqcEQMZ+WWkmPqzwzJXGFrgS/+bEbr2DvreVgEUiLKrggmXL9ZKugPKG0VhNY0omnCNXDzkXi5dCFp25RLqbbSYsCyw=";
+
+$privateKeyData = base64_decode($privateKeyStr);
+
+// import a Private key
+$privateKey = $crypto->importPrivateKey($privateKeyData, "YOUR_PASSWORD");
+
+//-----------------------------------------------------
+
+$publicKeyStr = "MCowBQYDK2VwAyEA9IVUzsQENtRVzhzraTiEZZy7YLq5LDQOXGQG/q0t0kE=";
+
+$publicKeyData = base64_decode($publicKeyStr);
+
+// import a Public key
+$publicKey = $crypto->importPublicKey($publicKeyData);
 ```
 
 ## Additional information
 
-- [Manual adding the crypto extension to your server](https://github.com/VirgilSecurity/virgil-cryptowrapper-php#additional-information)
+- [Manually adding the crypto extension to your server](https://github.com/VirgilSecurity/virgil-cryptowrapper-php#additional-information)
 
 ## Docs
 
