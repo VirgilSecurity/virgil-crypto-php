@@ -46,6 +46,13 @@ use Virgil\CryptoWrapper\Foundation\AlgId;
  *
  * Class KeyPairType
  *
+ * @method static KeyPairType ED25519
+ * @method static KeyPairType CURVE25519
+ * @method static KeyPairType SECP256R1
+ * @method static KeyPairType RSA2048
+ * @method static KeyPairType RSA4096
+ * @method static KeyPairType RSA8192
+ *
  * @package Virgil\Crypto\Core\Enum
  */
 class KeyPairType extends Enum
@@ -152,11 +159,7 @@ class KeyPairType extends Enum
                 $res = AlgId::SECP256R1();
                 break;
             case $keyPairType::RSA2048():
-                $res = AlgId::RSA();
-                break;
             case $keyPairType::RSA4096():
-                $res = AlgId::RSA();
-                break;
             case $keyPairType::RSA8192():
                 $res = AlgId::RSA();
                 break;

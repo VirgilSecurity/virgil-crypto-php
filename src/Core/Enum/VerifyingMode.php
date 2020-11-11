@@ -35,6 +35,10 @@ use MyCLabs\Enum\Enum;
 /**
  * Class VerifyingMode
  *
+ * @method static VerifyingMode DECRYPT_AND_VERIFY
+ * @method static VerifyingMode DECRYPT_THEN_VERIFY
+ * @method static VerifyingMode ANY
+ *
  * @package Virgil\Crypto\Enum
  */
 class VerifyingMode extends Enum

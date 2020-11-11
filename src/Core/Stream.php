@@ -68,6 +68,7 @@ class Stream implements StreamInterface
     {
         $this->input = $input;
         $this->output = $output;
+        $this->size = $size;
     }
 
     /**

@@ -72,26 +72,26 @@ class VirgilCrypto
     private $chunkSize = 1024;
 
     /**
-     * @var null|Random
+     * @var Random
      */
     private $rng;
 
     /**
      * VirgilCrypto constructor.
      *
-     * @param KeyPairType|null $defaultKeyType
+     * @param KeyPairType|null $keyPairType
      * @param bool $useSHA256Fingerprints
      * @param Random|null $rng
      *
      * @throws \Exception
      */
-    public function __construct(KeyPairType $defaultKeyType = null, bool $useSHA256Fingerprints = false, Random $rng
+    public function __construct(KeyPairType $keyPairType = null, bool $useSHA256Fingerprints = false, Random $rng
     = null)
     {
-        $this->defaultKeyType = is_null($defaultKeyType) ? KeyPairType::ED25519() : $defaultKeyType;
+        $this->defaultKeyType = is_null($keyPairType) ? KeyPairType::ED25519() : $keyPairType;
         $this->useSHA256Fingerprints = $useSHA256Fingerprints;
 
-        if (is_null($rng)) {
+        if (null === $rng) {
             $rng = new CtrDrbg();
             $rng->setupDefaults();
         }

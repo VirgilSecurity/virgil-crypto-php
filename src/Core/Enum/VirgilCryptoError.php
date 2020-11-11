@@ -37,6 +37,19 @@ use MyCLabs\Enum\Enum;
  *
  * Class VirgilCryptoError
  *
+ * @method static VirgilCryptoError SIGNER_NOT_FOUND
+ * @method static VirgilCryptoError SIGNATURE_NOT_FOUND
+ * @method static VirgilCryptoError SIGNATURE_NOT_VERIFIED
+ * @method static VirgilCryptoError UNKNOWN_ALG_ID
+ * @method static VirgilCryptoError RSA_SHOULD_BE_CONSTRUCTED_DIRECTLY
+ * @method static VirgilCryptoError UNSUPPORTED_RSA_LENGTH
+ * @method static VirgilCryptoError PASSED_KEY_IS_NOT_VIRGIL
+ * @method static VirgilCryptoError OUTPUT_STREAM_ERROR
+ * @method static VirgilCryptoError INPUT_STREAM_ERROR
+ * @method static VirgilCryptoError INVALID_SEED_SIZE
+ * @method static VirgilCryptoError DATA_IS_NOT_SIGNED
+ * @method static VirgilCryptoError INVALID_STREAM_SIZE
+ *
  * @package Virgil\Crypto\Core\Enum
  */
 class VirgilCryptoError extends Enum
