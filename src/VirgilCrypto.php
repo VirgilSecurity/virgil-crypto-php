@@ -230,9 +230,9 @@ class VirgilCrypto
      * @param string $data
      * @param HashAlgorithms $algorithm
      *
-     * @return null|string
+     * @return string
      */
-    public function computeHash(string $data, HashAlgorithms $algorithm): ?string
+    public function computeHash(string $data, HashAlgorithms $algorithm): string
     {
         return $this->getCryptoService()->computeHash($data, $algorithm);
     }

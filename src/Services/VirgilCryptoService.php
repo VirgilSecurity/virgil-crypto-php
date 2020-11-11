@@ -690,9 +690,9 @@ class VirgilCryptoService
      * @param string $data
      * @param HashAlgorithms $algorithm
      *
-     * @return null|string
+     * @return string
      */
-    public function computeHash(string $data, HashAlgorithms $algorithm): ?string
+    public function computeHash(string $data, HashAlgorithms $algorithm): string
     {
         switch ($algorithm) {
             case $algorithm::SHA224():
@@ -708,7 +708,7 @@ class VirgilCryptoService
                 $hash = new Sha512();
                 break;
             default:
-                $hash = null;
+                $hash = new Sha512();
         }
 
         return $hash::hash($data);
