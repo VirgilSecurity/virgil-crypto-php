@@ -44,6 +44,11 @@ use MyCLabs\Enum\Enum;
  *
  * Class HashAlgorithms
  *
+ * @method static HashAlgorithms SHA224
+ * @method static HashAlgorithms SHA256
+ * @method static HashAlgorithms SHA384
+ * @method static HashAlgorithms SHA512
+ *
  * @package Virgil\Crypto\Core\Enum
  */
 class HashAlgorithms extends Enum

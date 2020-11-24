@@ -326,9 +326,6 @@ class VirgilCryptoService
                     break;
 
                 case $inputOutput instanceof StreamInterface:
-
-                    $p = $cipher->packMessageInfo();
-
                     $inputOutput->getOutputStream()->write($cipher->packMessageInfo());
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processEncryption($chunk); };
@@ -465,7 +462,7 @@ class VirgilCryptoService
             if (!$result)
                 throw new VirgilCryptoException(VirgilCryptoError::SIGNATURE_NOT_VERIFIED());
 
-            return $result;
+            return true;
 
         } catch (\Exception $e) {
             throw new VirgilCryptoException($e);
@@ -510,7 +507,7 @@ class VirgilCryptoService
             if (!$result)
                 throw new VirgilCryptoException(VirgilCryptoError::SIGNATURE_NOT_VERIFIED());
 
-            return $result;
+            return true;
 
         } catch (\Exception $e) {
             throw new VirgilCryptoException($e);
@@ -693,9 +690,9 @@ class VirgilCryptoService
      * @param string $data
      * @param HashAlgorithms $algorithm
      *
-     * @return null|string
+     * @return string
      */
-    public function computeHash(string $data, HashAlgorithms $algorithm): ?string
+    public function computeHash(string $data, HashAlgorithms $algorithm): string
     {
         switch ($algorithm) {
             case $algorithm::SHA224():
@@ -711,7 +708,7 @@ class VirgilCryptoService
                 $hash = new Sha512();
                 break;
             default:
-                $hash = null;
+                $hash = new Sha512();
         }
 
         return $hash::hash($data);
