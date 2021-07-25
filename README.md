@@ -23,7 +23,7 @@ Virgil Crypto Library PHP is a stack of security libraries (ECIES with Crypto Ag
 ## Installation
 
 **Requirements**:
-- PHP 7.2 / 7.3 / 7.4
+- PHP 7.3 / 7.4 / 8.0
 
 #### Installation via composer
 
