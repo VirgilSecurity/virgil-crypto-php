@@ -19,4 +19,5 @@ install:
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 before_script:
   - composer install
+  - sh $TRAVIS_BUILD_DIR/vendor/virgil/crypto-wrapper/_extensions/setup.sh -all -vendor
 script: vendor/bin/phpunit --configuration phpunit.xml
