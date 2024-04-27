@@ -32,13 +32,13 @@
     }
   ],
   "require": {
-    "php": "^7.3|^8",
-    "myclabs/php-enum": "^1.7",
-    "virgil/crypto-wrapper": "^0.16",
+    "php": "^8.2",
+    "myclabs/php-enum": "^1.8",
+    "virgil/crypto-wrapper": "^0.17",
     "ext-json": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^8"
+    "phpunit/phpunit": "^11"
   },
   "autoload": {
     "psr-4": {
@@ -49,5 +49,11 @@
     "psr-4": {
       "Virgil\\CryptoTests\\": "tests/"
     }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "chmod +x ./vendor/virgil/crypto-wrapper/_extensions/setup.sh",
+      "./vendor/virgil/crypto-wrapper/_extensions/setup.sh -all -vendor"
+    ]
   }
 }
