@@ -1,0 +1,37 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - "**"
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-13, windows-latest]
+        php-version: ["8.2", "8.3"]
+        include:
+          - os: ubuntu-latest
+            phpts: "nts"
+          - os: macos-13
+            phpts: "nts"
+          - os: windows-latest
+            phpts: "ts"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PHP ${{ matrix.php-version }}
+        id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+        env:
+          update: true
+          phpts: ${{ matrix.phpts }}
+      - name: Check PHP Version
+        run: php -v
+      - name: Build and Install
+        run: composer install
+      - name: Run Tests
+        if: runner.os != 'Windows'
+        run: vendor/bin/phpunit --configuration phpunit.xml
