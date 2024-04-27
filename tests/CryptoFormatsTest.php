@@ -44,9 +44,7 @@ class CryptoFormatsTest extends TestCase
 {
     use ExceptionLogger;
 
-    /**
-     * @group
-     */
+    #[group]
     public function test001SignatureHash()
     {
         try {
@@ -60,9 +58,7 @@ class CryptoFormatsTest extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test004KeyIdentifierIsCorrect()
     {
         try {

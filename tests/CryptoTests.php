@@ -120,9 +120,7 @@ class CryptoTests extends TestCase
         self::assertEquals($b1, $b2);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test02KeyImportAllKeysShouldMatch()
     {
         try {
@@ -167,9 +165,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test03EncryptionSomeDataShouldMatch()
     {
         try {
@@ -212,9 +208,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test04SignatureSomeDataShouldVerify()
     {
         try {
@@ -270,9 +264,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test05SignAndEncryptSomeDataShouldDecryptAndVerify()
     {
         try {
@@ -323,9 +315,7 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl]);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test06SignStreamFileShouldVerify()
     {
         try {
@@ -385,9 +375,7 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test07EncryptStreamFileShouldDecrypt()
     {
         try {
@@ -426,9 +414,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test08GenerateKeyUsingSeedFixedSeedShouldMatch()
     {
         try {
@@ -524,9 +510,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test11AuthEncryptRandomDataShouldMatch()
     {
         try {
@@ -595,9 +579,7 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test12AuthEncryptStreamShouldMatch()
     {
         try {
@@ -639,9 +621,7 @@ class CryptoTests extends TestCase
         self::assertEquals($data, $decrypted2);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test13AuthEncryptDeprecatedShouldWork()
     {
         try {

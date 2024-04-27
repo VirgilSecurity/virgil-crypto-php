@@ -68,17 +68,13 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         return new CompatibilityDataProvider(__DIR__.self::JSON_DATA);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test001CheckNumberOfTestsInJSON()
     {
         self::assertEquals($this->getDataProvider()->getNumberOfTests(), 8);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test002DecryptFromSingleRecipientShouldDecrypt()
     {
         try {
@@ -103,9 +99,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test003DecryptFromMultipleRecipientsShouldDecypt()
     {
         try {
@@ -140,9 +134,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test004DecryptAndVerifySingleRecipientShouldDecryptAndVerify()
     {
         try {
@@ -170,9 +162,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test005DecryptAndVerifyMultipleRecipientsShouldDecryptAndVerify()
     {
         try {
@@ -210,9 +200,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test006GenerateSignatureShouldBeEqual()
     {
         try {
@@ -243,9 +231,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
     {
         try {
@@ -280,9 +266,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test008GenerateEd25519UsingSeedShouldMatch()
     {
         try {
