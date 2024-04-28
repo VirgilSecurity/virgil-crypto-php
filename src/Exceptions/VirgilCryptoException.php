@@ -46,6 +46,6 @@ class VirgilCryptoException extends VirgilException
      */
     public function __construct($error)
     {
-        parent::__construct(is_string($error) ?: $error->getMessage(), is_string($error) ? -1 : $error->getCode());
+        parent::__construct(is_string($error) ? : $error->getMessage(), is_string($error) ? -1 : $error->getCode());
     }
 }

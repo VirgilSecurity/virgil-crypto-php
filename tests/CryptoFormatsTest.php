@@ -33,12 +33,12 @@ namespace Virgil\CryptoTests;
 use PHPUnit\Framework\TestCase;
 use Virgil\Crypto\Core\Enum\HashAlgorithms;
 use Virgil\Crypto\VirgilCrypto;
-use Virgil\CryptoTests\_\ExceptionLogger;
+use Virgil\CryptoTests\Utils\ExceptionLogger;
 
 /**
  * Class СryptoFormatsTests
  *
- * @package Virgil\Tests
+ * @package Virgil\CryptoTests
  */
 class CryptoFormatsTest extends TestCase
 {
