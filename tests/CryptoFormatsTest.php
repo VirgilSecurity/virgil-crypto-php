@@ -33,20 +33,18 @@ namespace Virgil\CryptoTests;
 use PHPUnit\Framework\TestCase;
 use Virgil\Crypto\Core\Enum\HashAlgorithms;
 use Virgil\Crypto\VirgilCrypto;
-use Virgil\CryptoTests\_\ExceptionLogger;
+use Virgil\CryptoTests\Utils\ExceptionLogger;
 
 /**
  * Class СryptoFormatsTests
  *
- * @package Virgil\Tests
+ * @package Virgil\CryptoTests
  */
 class CryptoFormatsTest extends TestCase
 {
     use ExceptionLogger;
 
-    /**
-     * @group
-     */
+    #[group]
     public function test001SignatureHash()
     {
         try {
@@ -60,9 +58,7 @@ class CryptoFormatsTest extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test004KeyIdentifierIsCorrect()
     {
         try {

@@ -240,25 +240,19 @@ class VirgilCryptoService
     private function startEncryption(RecipientCipher $cipher, $inputOutput, SigningOptions $signingOptions = null)
     {
         try {
-
             if ($signingOptions) {
                 $signingMode = $signingOptions->getSigningMode();
 
                 switch ($signingMode) {
                     case $signingMode::SIGN_AND_ENCRYPT():
 
-                        switch ($inputOutput) {
-
-                            case is_string($inputOutput):
-
+                        if (is_string($inputOutput)) {
                                 $signature = $this->generateSignature($inputOutput, $signingOptions->getVirgilPrivateKey());
                                 $cipher->customParams()->addData(self::CUSTOM_PARAM_KEY_SIGNATURE, $signature);
                                 $cipher->customParams()->addData(self::CUSTOM_PARAM_KEY_SIGNER_ID,
                                     $signingOptions->getVirgilPrivateKey()->getIdentifier());
-                                break;
-
-                            case $inputOutput instanceof StreamInterface:
-                                throw new VirgilCryptoException("signAndEncrypt is not supported for streams");
+                        } else {
+                            throw new VirgilCryptoException("signAndEncrypt is supported only for strings");
                         }
 
                         $cipher->startEncryption();
@@ -271,20 +265,20 @@ class VirgilCryptoService
 
                         $size = null;
 
-                        switch ($inputOutput) {
 
-                            case is_string($inputOutput):
+                         if (is_string($inputOutput)) {
 
                                 $size = strlen($inputOutput);
-                                break;
 
-                            case $inputOutput instanceof StreamInterface:
+                         } else if ($inputOutput instanceof StreamInterface) {
 
-                                if (!$inputOutput->getStreamSize())
+                                if (!$inputOutput->getStreamSize()) {
                                     throw new VirgilCryptoException("signThenEncrypt for streams with unknown size is not supported");
+                                }
 
                                 $size = $inputOutput->getStreamSize();
-                                break;
+                        } else {
+                            throw new VirgilCryptoException("Unsupported inputOutput type");
                         }
 
                         $cipher->startSignedEncryption($size);
@@ -296,6 +290,7 @@ class VirgilCryptoService
             }
 
         } catch (\Exception $e) {
+            print($e);
             throw new VirgilCryptoException($e);
         }
     }
@@ -313,19 +308,17 @@ class VirgilCryptoService
         try {
             $result = null;
 
-            switch ($inputOutput) {
-                case is_string($inputOutput):
-
+            if (is_string($inputOutput)) {
                     $result = $cipher->packMessageInfo();
                     $result .= $cipher->processEncryption($inputOutput);
                     $result .= $cipher->finishEncryption();
 
-                    if (($signingOptions) && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
+                    if (($signingOptions) && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT())) {
                         $result .= $cipher->packMessageInfoFooter();
+                    }
 
-                    break;
 
-                case $inputOutput instanceof StreamInterface:
+            } else if ($inputOutput instanceof StreamInterface) {
                     $inputOutput->getOutputStream()->write($cipher->packMessageInfo());
 
                     $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processEncryption($chunk); };
@@ -333,10 +326,11 @@ class VirgilCryptoService
 
                     $inputOutput->getOutputStream()->write($cipher->finishEncryption());
 
-                    if ($signingOptions && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT()))
+                    if ($signingOptions && ($signingOptions->getSigningMode() == SigningMode::SIGN_THEN_ENCRYPT())) {
                         $inputOutput->getOutputStream()->write($cipher->packMessageInfoFooter());
-
-                    break;
+                    }
+            } else {
+                throw new VirgilCryptoException("Unsupported inputOutput type");
             }
 
             return $result;
@@ -390,21 +384,19 @@ class VirgilCryptoService
 
             $result = null;
 
-            switch ($inputOutput) {
-                case $inputOutput instanceof StreamInterface:
-                    $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processDecryption($chunk); };
+            if (is_string($inputOutput)) {
+                $result = $cipher->processDecryption($inputOutput);
+                $result .= $cipher->finishDecryption();
 
-                    StreamService::forEachChunk($inputOutput, $chunkClosure, true);
-                    $inputOutput->getOutputStream()->write($cipher->finishDecryption());
 
-                    break;
+            } else if ($inputOutput instanceof StreamInterface) {
+                $chunkClosure = function ($chunk) use ($cipher) { return $cipher->processDecryption($chunk); };
 
-                case is_string($inputOutput):
+                StreamService::forEachChunk($inputOutput, $chunkClosure, true);
+                $inputOutput->getOutputStream()->write($cipher->finishDecryption());
 
-                    $result = $cipher->processDecryption($inputOutput);
-                    $result .= $cipher->finishDecryption();
-
-                    break;
+            } else {
+                throw new VirgilCryptoException("Unsupported inputOutput type");
             }
 
             return $result;

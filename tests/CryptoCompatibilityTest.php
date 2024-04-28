@@ -30,19 +30,20 @@
 
 namespace Virgil\CryptoTests;
 
+use PHPUnit\Framework\TestCase;
 use Virgil\Crypto\Core\Enum\HashAlgorithms;
 use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
 use Virgil\Crypto\VirgilCrypto;
-use Virgil\CryptoTests\_\CompatibilityDataProvider;
-use Virgil\CryptoTests\_\ExceptionLogger;
+use Virgil\CryptoTests\Utils\CompatibilityDataProvider;
+use Virgil\CryptoTests\Utils\ExceptionLogger;
 
 /**
  * Class CryptoCompatibilityTests
  *
  * @package Virgil\Tests
  */
-class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
+class CryptoCompatibilityTest extends TestCase
 {
     use ExceptionLogger;
 
@@ -68,17 +69,13 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         return new CompatibilityDataProvider(__DIR__.self::JSON_DATA);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test001CheckNumberOfTestsInJSON()
     {
         self::assertEquals($this->getDataProvider()->getNumberOfTests(), 8);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test002DecryptFromSingleRecipientShouldDecrypt()
     {
         try {
@@ -103,9 +100,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test003DecryptFromMultipleRecipientsShouldDecypt()
     {
         try {
@@ -140,9 +135,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test004DecryptAndVerifySingleRecipientShouldDecryptAndVerify()
     {
         try {
@@ -170,9 +163,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test005DecryptAndVerifyMultipleRecipientsShouldDecryptAndVerify()
     {
         try {
@@ -210,9 +201,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test006GenerateSignatureShouldBeEqual()
     {
         try {
@@ -243,9 +232,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test007DecryptAndVerifyMultipleSignersShouldDecryptAndVerify()
     {
         try {
@@ -280,9 +267,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test008GenerateEd25519UsingSeedShouldMatch()
     {
         try {
@@ -309,9 +294,7 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
 
     }
 
-    /**
-     * @group f
-     */
+    #[group]
     public function test009SignThenEncryptShouldMatch()
     {
         try {
@@ -319,34 +302,36 @@ class CryptoCompatibilityTests extends \PHPUnit\Framework\TestCase
 
             $privateKey1Str = $dict["private_key1"];
             $privateKey2Str = $dict["private_key2"];
-            $publicKeyStr = $dict["public_key"];
+            $publicKey1Str = $dict["public_key1"];
             $dataSha512Str = $dict["data_sha512"];
             $cipherDataStr = $dict["cipher_data"];
 
-            $privateKey1 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey1Str))->getPrivateKey();
-            $keyPair2 = $this->getCrypto()->importPrivateKey(base64_decode($privateKey2Str));
-            $publicKey = $this->getCrypto()->importPublicKey(base64_decode($publicKeyStr));
-            $pkl = new VirgilPublicKeyCollection($publicKey);
-            $pkl2 = new VirgilPublicKeyCollection($keyPair2->getPublicKey());
+            $senderPublicKey = $this->getCrypto()->importPublicKey(base64_decode($publicKey1Str));
+            $senderPrivateKey = $this->getCrypto()->importPrivateKey(base64_decode($privateKey1Str))->getPrivateKey();
 
-            $dataSha512 = base64_decode($dataSha512Str);
+            $receiverKeyPair = $this->getCrypto()->importPrivateKey(base64_decode($privateKey2Str));
+            $senderPkl = new VirgilPublicKeyCollection($senderPublicKey);
+            $receiverPkl = new VirgilPublicKeyCollection($receiverKeyPair->getPublicKey());
+
+            $expectedDataHash = base64_decode($dataSha512Str);
             $cipherData = base64_decode($cipherDataStr);
 
-            $data = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl);
+            $data = $this->getCrypto()->authDecrypt($cipherData, $receiverKeyPair->getPrivateKey(), $senderPkl);
+            $actualDataHash = $this->getCrypto()->computeHash($data, HashAlgorithms::SHA512());
 
-            $a1 = $this->getCrypto()->computeHash($data, HashAlgorithms::SHA512());
-
-            self::assertEquals($a1, $dataSha512);
+            self::assertEquals($actualDataHash, $expectedDataHash);
 
             try {
-                $res1 = $this->getCrypto()->authDecrypt($cipherData, $keyPair2->getPrivateKey(), $pkl);
+                // Wrong validation key
+                $res1 = $this->getCrypto()->authDecrypt($cipherData, $receiverKeyPair->getPrivateKey(), $receiverPkl);
                 self::assertTrue(empty($res1));
             } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);
             }
 
             try {
-                $res2 = $this->getCrypto()->authDecrypt($cipherData, $privateKey1, $pkl2);
+                // Wrong decryption key
+                $res2 = $this->getCrypto()->authDecrypt($cipherData, $senderPrivateKey, $senderPkl);
                 self::assertTrue(empty($res2));
             } catch (\Exception $e) {
                 self::assertTrue($e instanceof VirgilCryptoException);

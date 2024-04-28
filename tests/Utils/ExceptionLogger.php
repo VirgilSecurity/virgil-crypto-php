@@ -28,12 +28,12 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoTests\_;
+namespace Virgil\CryptoTests\Utils;
 
 /**
- * Trait FailExceptionLogger
+ * Trait ExceptionLogger
  *
- * @package Virgil\CryptoTests\_
+ * @package Virgil\CryptoTests\Utils
  */
 trait ExceptionLogger
 {
@@ -44,7 +44,7 @@ trait ExceptionLogger
      */
     public function logException(\Exception $exception): string
     {
-        return printf("\nException: %s\nMessage: %s\nCode: %s\nFile: %s\nLine: %s", get_class($exception),
+        return printf("\nException: %s\nMessage: %s\nCode: %s\nFile: %s:%s", get_class($exception),
             $exception->getMessage
         (), $exception->getCode(), $exception->getFile(), $exception->getLine()) ;
     }

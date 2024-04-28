@@ -1,6 +1,6 @@
-# Virgil Crypto Library PHP 
+# Virgil Crypto Library PHP
 
-[![Build Status](https://api.travis-ci.com/VirgilSecurity/virgil-crypto-php.svg?branch=master)](https://travis-ci.com/VirgilSecurity/virgil-crypto-php/)
+[![Build Status](https://github.com/VirgilSecurity/virgil-crypto-php/actions/workflows/build.yml/badge.svg?branch=master)](https://travis-ci.com/VirgilSecurity/virgil-crypto-php)
 [![GitHub license](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/VirgilSecurity/virgil/blob/master/LICENSE)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
 [![Total Downloads](https://img.shields.io/packagist/dt/virgil/crypto.svg?style=flat-square)](https://packagist.org/packages/virgil/crypto)
@@ -13,17 +13,18 @@ Virgil Crypto Library PHP is a stack of security libraries (ECIES with Crypto Ag
 
 ## Library purposes
 
-* Asymmetric Key Generation
-* Encryption/Decryption of data and streams
-* Generation/Verification of digital signatures
-* Double Ratchet algorithm support
-* **Post-quantum algorithms support**: [Round5](https://round5.org/) (encryption) and [Falcon](https://falcon-sign.info/) (signature) 
-* Crypto for using [Virgil Core SDK](https://github.com/VirgilSecurity/virgil-sdk-php)
+- Asymmetric Key Generation
+- Encryption/Decryption of data and streams
+- Generation/Verification of digital signatures
+- Double Ratchet algorithm support
+- **Post-quantum algorithms support**: [Round5](https://round5.org/) (encryption) and [Falcon](https://falcon-sign.info/) (signature)
+- Crypto for using [Virgil Core SDK](https://github.com/VirgilSecurity/virgil-sdk-php)
 
 ## Installation
 
 **Requirements**:
-- PHP 7.3 / 7.4 / 8.0
+
+- PHP 8.2, 8.3
 
 #### Installation via composer
 
@@ -36,6 +37,7 @@ composer require virgil/crypto
 ### Generate a key pair
 
 Generate a key pair using the default algorithm (EC_X25519):
+
 ```php
 $crypto = new VirgilCrypto();
 $keyPair = $crypto->generateKeyPair();
@@ -44,6 +46,7 @@ $keyPair = $crypto->generateKeyPair();
 ### Generate and verify a signature
 
 Generate signature and sign data with a private key:
+
 ```php
 $crypto = new VirgilCrypto();
 $senderKeyPair = $crypto->generateKeyPair();
@@ -56,20 +59,22 @@ $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPriva
 ```
 
 Verify a signature with a public key:
+
 ```php
 $crypto = new VirgilCrypto();
-    
-$senderKeyPair = $crypto->generateKeyPair();    
-    
+
+$senderKeyPair = $crypto->generateKeyPair();
+
 // prepare a message
 $messageToSign = "Hello, Bob!";
 
 // generate a signature
 $signature = $crypto->generateSignature($messageToSign, $senderKeyPair->getPrivateKey());
-    
+
 // verify a signature
 $verified = $crypto->verifySignature($signature, $messageToSign, $senderKeyPair->getPublicKey());
 ```
+
 ### Encrypt and decrypt data
 
 Encrypt data with a public key:
@@ -84,6 +89,7 @@ $messageToEncrypt = "Hello, Bob!";
 // encrypt the message
 $encryptedData = $crypto->encrypt($messageToEncrypt, new VirgilPublicKeyCollection($receiverKeyPair->getPublicKey()));
 ```
+
 Decrypt the encrypted data with a private key:
 
 ```php
@@ -156,6 +162,7 @@ $publicKey = $crypto->importPublicKey($publicKeyData);
 This library is released under the [3-clause BSD License](LICENSE).
 
 ## Support
+
 Our developer support team is here to help you. Find out more information on our [Help Center](https://help.virgilsecurity.com/).
 
 You can find us on [Twitter](https://twitter.com/VirgilSecurity) or send us email support@VirgilSecurity.com.

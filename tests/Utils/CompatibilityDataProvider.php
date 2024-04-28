@@ -35,12 +35,12 @@
  * Lead Maintainer: Virgil Security Inc. <support@virgilsecurity.com>
  */
 
-namespace Virgil\CryptoTests\_;
+namespace Virgil\CryptoTests\Utils;
 
 /**
  * Class CompatibilityDataProvider
  *
- * @package Virgil\Tests\_
+ * @package Virgil\CryptoTests\Utils
  */
 class CompatibilityDataProvider
 {

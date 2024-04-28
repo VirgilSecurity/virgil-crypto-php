@@ -36,14 +36,14 @@ use Virgil\Crypto\Core\Stream;
 use Virgil\Crypto\Core\VirgilKeys\VirgilPublicKeyCollection;
 use Virgil\Crypto\Exceptions\VirgilCryptoException;
 use Virgil\Crypto\VirgilCrypto;
-use Virgil\CryptoTests\_\ExceptionLogger;
+use Virgil\CryptoTests\Utils\ExceptionLogger;
 
 /**
  * Class CryptoTests
  *
  * @package Virgil\Tests
  */
-class CryptoTests extends TestCase
+class CryptoTest extends TestCase
 {
     use ExceptionLogger;
 
@@ -120,9 +120,7 @@ class CryptoTests extends TestCase
         self::assertEquals($b1, $b2);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test02KeyImportAllKeysShouldMatch()
     {
         try {
@@ -167,9 +165,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test03EncryptionSomeDataShouldMatch()
     {
         try {
@@ -212,9 +208,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test04SignatureSomeDataShouldVerify()
     {
         try {
@@ -270,9 +264,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test05SignAndEncryptSomeDataShouldDecryptAndVerify()
     {
         try {
@@ -323,9 +315,7 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl]);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test06SignStreamFileShouldVerify()
     {
         try {
@@ -385,9 +375,7 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test07EncryptStreamFileShouldDecrypt()
     {
         try {
@@ -426,9 +414,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test08GenerateKeyUsingSeedFixedSeedShouldMatch()
     {
         try {
@@ -453,7 +439,6 @@ class CryptoTests extends TestCase
     private function checkKeyExportImport(VirgilCrypto $crypto, KeyPairType $keyPairType)
     {
         $keyPair = $crypto->generateKeyPair($keyPairType);
-
         $publicKeyData = $crypto->exportPublicKey($keyPair->getPublicKey());
         $privateKeyData = $crypto->exportPrivateKey($keyPair->getPrivateKey());
 
@@ -467,9 +452,7 @@ class CryptoTests extends TestCase
         self::assertTrue(is_string($res));
     }
 
-    /**
-     * @group f
-     */
+    #[group]
     public function test10ImportExportKeyRandomKeyShouldMatch()
     {
         try {
@@ -524,9 +507,7 @@ class CryptoTests extends TestCase
         }
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test11AuthEncryptRandomDataShouldMatch()
     {
         try {
@@ -595,9 +576,7 @@ class CryptoTests extends TestCase
         $this->unlinkFiles([$encTestFileUrl, $decTestFileUrl]);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test12AuthEncryptStreamShouldMatch()
     {
         try {
@@ -639,9 +618,7 @@ class CryptoTests extends TestCase
         self::assertEquals($data, $decrypted2);
     }
 
-    /**
-     * @group
-     */
+    #[group]
     public function test13AuthEncryptDeprecatedShouldWork()
     {
         try {
